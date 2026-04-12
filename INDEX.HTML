@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מערכת ליווי</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, "Helvetica Neue", sans-serif;
+      color: #1f2937;
+      background: #f6f7f9;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 216px minmax(0, 1fr);
+      background: #f7f8fa;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #fff;
+      border-left: 1px solid #e5e7eb;
+      min-height: 100vh;
+    }
+
+    .brand {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      border-bottom: 1px solid #eef0f3;
+      font-weight: 700;
+      font-size: 16px;
+      color: #151515;
+    }
+
+    .menu {
+      padding: 22px 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .menu a,
+    .settings {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      border-radius: 8px;
+      color: #4b5563;
+      font-size: 14px;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .menu a.active {
+      color: #2563eb;
+      background: #edf4ff;
+      box-shadow: inset 3px 0 0 #2563eb;
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 20px;
+      color: currentColor;
+    }
+
+    .settings {
+      border-top: 1px solid #eef0f3;
+      border-radius: 0;
+      min-height: 58px;
+      margin: 0;
+      padding: 0 24px;
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border-bottom: 1px solid #d7dbe2;
+      padding: 0 26px;
+    }
+
+    .page-title {
+      margin: 0;
+      color: #111;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .user-status {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: #4b5563;
+      font-size: 13px;
+    }
+
+    .student-bar {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 0 28px;
+    }
+
+    .student-name {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 1px;
+      color: #080808;
+    }
+
+    .back {
+      width: 34px;
+      height: 34px;
+      border: 0;
+      background: transparent;
+      color: #2563eb;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-start;
+      background: #f7f8fa;
+      border-bottom: 1px solid #edf0f3;
+      padding: 32px 18px 0;
+      overflow-x: auto;
+    }
+
+    .tab {
+      min-width: 112px;
+      height: 46px;
+      border: 0;
+      background: #fff;
+      color: #4b5563;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: #2563eb;
+      background: #edf4ff;
+      border-bottom: 2px solid #2563eb;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+
+    .content {
+      padding: 24px 18px 28px;
+    }
+
+    .card {
+      max-width: 602px;
+      min-height: 456px;
+      margin-right: 0;
+      margin-left: auto;
+      background: #fff;
+      border: 1px solid #e0e4ea;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+      padding: 30px 22px;
+    }
+
+    .card h2 {
+      margin: 0 0 28px;
+      color: #111;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px 22px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      color: #4b5563;
+      font-size: 13px;
+    }
+
+    label {
+      font-weight: 600;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 38px;
+      border: 1px solid #e5e7eb;
+      border-radius: 7px;
+      padding: 0 14px;
+      color: #6b7280;
+      background: #fff;
+      font: inherit;
+      font-size: 13px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
+    }
+
+    .status-pill {
+      justify-self: start;
+      min-width: 58px;
+      height: 32px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 10px;
+      color: #15803d;
+      background: #d9fbe6;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .actions {
+      max-width: 602px;
+      margin: 28px 0 0 auto;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-start;
+    }
+
+    .btn {
+      min-width: 80px;
+      height: 40px;
+      border: 1px solid #e5e7eb;
+      border-radius: 7px;
+      background: #fff;
+      color: #4b5563;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+    }
+
+    .btn.primary {
+      color: #fff;
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      left: 22px;
+      display: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      color: #fff;
+      background: #111827;
+      box-shadow: 0 8px 24px rgba(17, 24, 39, 0.22);
+      font-size: 14px;
+    }
+
+    .toast.visible {
+      display: block;
+    }
+
+    @media (max-width: 760px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        min-height: auto;
+        border-left: 0;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .brand,
+      .settings {
+        display: none;
+      }
+
+      .menu {
+        grid-auto-flow: column;
+        grid-auto-columns: max-content;
+        overflow-x: auto;
+        padding: 10px;
+      }
+
+      .topbar,
+      .student-bar {
+        padding: 0 16px;
+      }
+
+      .page-title {
+        font-size: 18px;
+      }
+
+      .user-status span {
+        display: none;
+      }
+
+      .tabs {
+        padding-top: 16px;
+      }
+
+      .content {
+        padding: 16px;
+      }
+
+      .card,
+      .actions {
+        max-width: none;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-label="ניווט ראשי">
+      <div>
+        <div class="brand">מערכת ליווי</div>
+        <nav class="menu">
+          <a href="#">
+            <span class="icon">▦</span>
+            <span>דשבורד</span>
+          </a>
+          <a href="#" class="active">
+            <span class="icon">♙</span>
+            <span>תיקי סטודנטים</span>
+          </a>
+          <a href="#">
+            <span class="icon">□</span>
+            <span>פניות ושיח יזום</span>
+          </a>
+          <a href="#">
+            <span class="icon">⌁</span>
+            <span>תגבורים ותאמות</span>
+          </a>
+          <a href="#">
+            <span class="icon">▥</span>
+            <span>התקדמות במשחק</span>
+          </a>
+          <a href="#">
+            <span class="icon">▤</span>
+            <span>דוחות ומאגרי מידע</span>
+          </a>
+        </nav>
+      </div>
+      <a class="settings" href="#">
+        <span class="icon">⚙</span>
+        <span>הגדרות</span>
+      </a>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <h1 class="page-title">תיק ליווי מלא</h1>
+        <div class="user-status">
+          <span>פולינה (רכזת)</span>
+          <span class="icon" aria-label="התראות">♡</span>
+        </div>
+      </header>
+
+      <section class="student-bar" aria-label="פרטי סטודנט">
+        <h2 class="student-name">יוסי כהן | 32589656</h2>
+        <button class="back" type="button" aria-label="חזרה">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </section>
+
+      <div class="tabs" role="tablist" aria-label="לשוניות תיק">
+        <button class="tab active" type="button">פרטים</button>
+        <button class="tab" type="button">מסמכי התאמות</button>
+        <button class="tab" type="button">תוכנית ליווי</button>
+        <button class="tab" type="button">סיכומי שיחה</button>
+      </div>
+
+      <section class="content">
+        <form id="studentForm">
+          <div class="card">
+            <h2>פרטים אישיים - סטודנט</h2>
+            <div class="form-grid">
+              <div class="field">
+                <label for="name">שם מלא</label>
+                <input id="name" name="name" value="יוסי כהן">
+              </div>
+
+              <div class="field">
+                <label for="track">חוג/מסלול</label>
+                <select id="track" name="track">
+                  <option>מערכות מידע</option>
+                  <option>מדעי המחשב</option>
+                  <option>עיצוב</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="idNumber">ת"ז</label>
+                <input id="idNumber" name="idNumber" value="123456789">
+              </div>
+
+              <div class="field">
+                <label for="year">שנה לימודים</label>
+                <select id="year" name="year">
+                  <option>שנה ב</option>
+                  <option>שנה א</option>
+                  <option>שנה ג</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="phone">טלפון</label>
+                <input id="phone" name="phone" value="050-1234567">
+              </div>
+
+              <div class="field">
+                <label for="semester">סמסטר</label>
+                <select id="semester" name="semester">
+                  <option>א׳ תשפ״ה</option>
+                  <option>ב׳ תשפ״ה</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="email">אימייל</label>
+                <input id="email" name="email" value="yossi.cohen@student.ac.il">
+              </div>
+
+              <div class="field">
+                <label>סטטוס סטודנט</label>
+                <span class="status-pill">פתוח</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" type="submit">שמירה</button>
+            <button class="btn" type="reset">עריכה</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">הפרטים נשמרו</div>
+
+  <script>
+    const tabs = document.querySelectorAll(".tab");
+    const form = document.querySelector("#studentForm");
+    const toast = document.querySelector("#toast");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((item) => item.classList.remove("active"));
+        tab.classList.add("active");
+      });
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      toast.classList.add("visible");
+      window.setTimeout(() => toast.classList.remove("visible"), 2200);
+    });
+  </script>
+</body>
+</html>
