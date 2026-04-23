@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מסמכי התאמות - מערכת ליווי</title>
+  <link rel="stylesheet" href="../CSS/site.css" />
+  <link rel="stylesheet" href="../CSS/case-documents.css" />
+</head>
+<body class="page">
+
+  <div class="layout">
+
+    <aside class="right-sidebar">
+      <div class="brand">מערכת ליווי</div>
+
+      <nav class="main-nav">
+        <a href="dashboard.html" class="nav-item">
+          <span>דשבורד</span>
+        </a>
+
+        <a href="student-cases.html" class="nav-item active">
+          <span>תיקי סטודנטים</span>
+        </a>
+
+        <a href="tickets.html" class="nav-item">
+          <span>פניות ושיח יזום</span>
+        </a>
+
+        <a href="alerts.html" class="nav-item">
+          <span>תגבורים והתאמות</span>
+        </a>
+
+        <a href="progress.html" class="nav-item">
+          <span>התקדמות ומשחוק</span>
+        </a>
+
+        <a href="reports.html" class="nav-item">
+          <span>דוחות ואחזור מידע</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" class="settings-link">הגדרות</a>
+      </div>
+    </aside>
+
+    <div class="main-area">
+
+      <header class="topbar">
+        <div class="topbar-right">
+          <h1 class="page-title">תיק ליווי</h1>
+        </div>
+
+        <div class="topbar-center">
+          <div class="search-box">
+            <input type="text" placeholder="חיפוש סטודנט / פנייה..." />
+          </div>
+        </div>
+
+        <div class="topbar-left">
+          <button class="icon-btn" type="button">🔔</button>
+          <div class="user-name">פולינה (רכזת)</div>
+        </div>
+      </header>
+
+      <section class="student-bar" aria-label="פרטי סטודנט">
+        <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
+        <button
+          class="back"
+          type="button"
+          aria-label="חזרה"
+          onclick="window.location.href='student-cases.html'">
+          ←
+        </button>
+      </section>
+
+      <div class="tabs" role="tablist" aria-label="לשוניות תיק">
+        <a class="tab" id="detailsTab" href="#">פרטים</a>
+        <a class="tab active" id="documentsTab" href="#">מסמכי התאמות</a>
+        <a class="tab" id="planTab" href="#">תוכנית ליווי</a>
+        <a class="tab" id="summaryTab" href="#">סיכומי שיחה</a>
+      </div>
+
+      <main class="content">
+        <section class="table-card documents-shell">
+          <div class="documents-header">
+            <h3>מסמכי התאמות - סטודנט</h3>
+          </div>
+
+          <table class="documents-table">
+            <thead>
+              <tr>
+                <th>קובץ</th>
+                <th>סוג התאמה</th>
+                <th>תאריך העלאה</th>
+                <th>סטטוס</th>
+                <th>פעולה</th>
+              </tr>
+            </thead>
+            <tbody id="documentsTableBody"></tbody>
+          </table>
+
+          <div class="table-footer documents-footer">
+            <div class="documents-form">
+              <input type="text" id="docName" placeholder="שם מסמך" />
+              <select id="docType">
+                <option value="">בחרי סוג התאמה</option>
+                <option>אישור רפואי</option>
+                <option>אישור מילואים</option>
+                <option>אבחון דידקטי</option>
+                <option>טופס התאמות</option>
+              </select>
+              <button class="primary-btn" type="button" id="addDocumentBtn">העלאת מסמך +</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">המסמך נוסף</div>
+
+  <script src="../JS/case-documents.js"></script>
+</body>
+</html>
