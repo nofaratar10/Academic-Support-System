@@ -1,4 +1,3 @@
-
 const searchInput = document.getElementById("searchInput");
 const tableBody = document.getElementById("studentsTableBody");
 

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>תוכנית ליווי - מערכת ליווי</title>
+  <link rel="stylesheet" href="../CSS/site.css" />
+  <link rel="stylesheet" href="../CSS/case-plan.css" />
+</head>
+<body class="page">
+
+  <div class="layout">
+
+    <aside class="right-sidebar">
+      <div class="brand">מערכת ליווי</div>
+
+      <nav class="main-nav">
+        <a href="dashboard.html" class="nav-item">
+          <span>דשבורד</span>
+        </a>
+
+        <a href="student-cases.html" class="nav-item active">
+          <span>תיקי סטודנטים</span>
+        </a>
+
+        <a href="tickets.html" class="nav-item">
+          <span>פניות ושיח יזום</span>
+        </a>
+
+        <a href="alerts.html" class="nav-item">
+          <span>תגבורים והתאמות</span>
+        </a>
+
+        <a href="progress.html" class="nav-item">
+          <span>התקדמות ומשחוק</span>
+        </a>
+
+        <a href="reports.html" class="nav-item">
+          <span>דוחות ואחזור מידע</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" class="settings-link">הגדרות</a>
+      </div>
+    </aside>
+
+    <div class="main-area">
+
+      <header class="topbar">
+        <div class="topbar-right">
+          <h1 class="page-title">תיק ליווי</h1>
+        </div>
+
+        <div class="topbar-center">
+          <div class="search-box">
+            <input type="text" placeholder="חיפוש סטודנט / פנייה..." />
+          </div>
+        </div>
+
+        <div class="topbar-left">
+          <button class="icon-btn" type="button">🔔</button>
+          <div class="user-name">פולינה (רכזת)</div>
+        </div>
+      </header>
+
+      <section class="student-bar" aria-label="פרטי סטודנט">
+        <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
+        <button
+          class="back"
+          type="button"
+          aria-label="חזרה"
+          onclick="window.location.href='student-cases.html'">
+          ←
+        </button>
+      </section>
+
+      <div class="tabs" role="tablist" aria-label="לשוניות תיק">
+        <a class="tab" id="detailsTab" href="student-details.html">פרטים</a>
+        <a class="tab" id="documentsTab" href="case-documents.html">מסמכי התאמות</a>
+        <a class="tab active" id="planTab" href="case-plan.html">תוכנית ליווי</a>
+        <a class="tab" id="summaryTab" href="student-summary.html">סיכומי שיחה</a>
+      </div>
+
+      <main class="content">
+        <section class="table-card plan-shell">
+          <div class="plan-header">
+            <h3>תוכנית ליווי - סטודנט</h3>
+          </div>
+
+          <div class="plan-top-fields">
+            <div class="field">
+              <label for="planGoal">מטרת הליווי</label>
+              <input id="planGoal" type="text" value="חזרה לשגרה אקדמית לאחר מילואים" />
+            </div>
+
+            <div class="field">
+              <label for="planStartDate">תאריך התחלת ליווי</label>
+              <input id="planStartDate" type="text" value="01/09/2025" />
+            </div>
+
+            <div class="field field-wide">
+              <label for="planStatus">סטטוס תוכנית</label>
+              <input id="planStatus" type="text" value="פעילה" />
+            </div>
+          </div>
+
+          <table class="plan-table">
+            <thead>
+              <tr>
+                <th>משימה</th>
+                <th>תיאור</th>
+                <th>תאריך יעד</th>
+                <th>סטטוס</th>
+                <th>פעולה</th>
+              </tr>
+            </thead>
+            <tbody id="planTableBody"></tbody>
+          </table>
+
+          <div class="table-footer plan-footer">
+            <button class="primary-btn big-btn" type="button" id="addTaskBtn">הוספת משימה+</button>
+          </div>
+        </section>
+      </main>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">המשימה נוספה</div>
+
+  <script src="../JS/case-plan.js"></script>
+</body>
+</html>
