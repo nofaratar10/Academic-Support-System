@@ -1,0 +1,60 @@
+/* ===== SUMMARY PAGE FIXED STYLES ===== */
+
+.summary-shell * {
+  box-sizing: border-box;
+}
+
+.summary-shell {
+  padding: 20px;
+}
+
+.details-body {
+  padding: 0 12px;
+}
+
+/* textarea */
+.summary-shell textarea {
+  width: 100%;
+  min-height: 140px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  padding: 14px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.actions {
+  margin-top: 16px;
+}
+
+.summary-result {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.result-box {
+  background: #f9fafb;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 16px;
+  line-height: 1.5;
+}
+
+.result-box h4 {
+  margin-bottom: 8px;
+}
+
+.result-box ul {
+  padding-right: 18px;
+  margin: 0;
+}
+
+.result-box li {
+  margin-bottom: 4px;
+}
