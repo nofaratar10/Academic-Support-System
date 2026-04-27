@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>פתיחת תיק חדש - מערכת ליווי</title>
+
+  <link rel="stylesheet" href="../CSS/site.css" />
+  <link rel="stylesheet" href="../CSS/new-case.css" />
+</head>
+
+<body class="page">
+  <div class="layout">
+
+    <aside class="right-sidebar">
+      <div class="brand">מערכת ליווי</div>
+
+      <nav class="main-nav">
+        <a href="dashboard.html" class="nav-item"><span>דשבורד</span></a>
+        <a href="student-cases.html" class="nav-item active"><span>תיקי סטודנטים</span></a>
+        <a href="tickets.html" class="nav-item"><span>פניות ושיח יזום</span></a>
+        <a href="alerts.html" class="nav-item"><span>תגבורים והתאמות</span></a>
+        <a href="progress.html" class="nav-item"><span>התקדמות ומשחוק</span></a>
+        <a href="reports.html" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" class="settings-link">הגדרות</a>
+      </div>
+    </aside>
+
+    <div class="main-area">
+
+      <header class="topbar">
+        <div class="topbar-right">
+          <h1 class="page-title">פתיחת תיק חדש</h1>
+        </div>
+
+        <div class="topbar-center">
+          <div class="search-box">
+            <input type="text" placeholder="חיפוש סטודנט / פנייה..." />
+          </div>
+        </div>
+
+        <div class="topbar-left">
+          <button class="icon-btn" type="button">🔔</button>
+          <div class="user-name">פולינה (רכזת)</div>
+        </div>
+      </header>
+
+      <main class="content">
+        <form id="newCaseForm" class="new-case-card">
+          <h3>פרטי סטודנט</h3>
+
+          <div class="new-case-grid">
+            <div class="field">
+              <label for="first_name">שם פרטי</label>
+              <input id="first_name" required />
+            </div>
+
+            <div class="field">
+              <label for="last_name">שם משפחה</label>
+              <input id="last_name" required />
+            </div>
+
+            <div class="field">
+              <label for="academic_year">שנה</label>
+              <input id="academic_year" placeholder="שנה א / ב / ג" />
+            </div>
+
+            <div class="field">
+              <label for="email">אימייל</label>
+              <input id="email" />
+            </div>
+
+            <div class="field">
+              <label for="phone">טלפון</label>
+              <input id="phone" />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="window.location.href='student-cases.html'">ביטול</button>
+            <button type="submit" class="primary-btn">שמירה ופתיחת תיק</button>
+          </div>
+        </form>
+      </main>
+
+    </div>
+  </div>
+
+  <script src="../JS/new-case.js"></script>
+</body>
+</html>
