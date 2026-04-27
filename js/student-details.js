@@ -49,7 +49,7 @@ function setTabs(studentIdValue) {
   document.getElementById("detailsTab").href = `student-details.html?id=${studentIdValue}`;
   document.getElementById("documentsTab").href = `case-documents.html?id=${studentIdValue}`;
   document.getElementById("planTab").href = `case-plan.html?id=${studentIdValue}`;
-  document.getElementById("summaryTab").href = `case-summary.html?id=${studentIdValue}`;
+  document.getElementById("summaryTab").href = `student-summary.html?id=${studentIdValue}`;
 }
 
 async function loadStudent() {

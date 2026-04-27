@@ -1,0 +1,49 @@
+.new-case-card {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 28px;
+  border-radius: 22px;
+  background: #fff;
+  border: 1px solid #dde3ee;
+}
+
+.new-case-card h3 {
+  margin-bottom: 24px;
+}
+
+.new-case-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 22px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-weight: 700;
+  color: #1f2a44;
+}
+
+.field input,
+.field select,
+.field textarea {
+  height: 46px;
+  border: 1px solid #cfd8e6;
+  border-radius: 14px;
+  padding: 0 14px;
+  font-size: 15px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-start;
+}
