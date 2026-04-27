@@ -66,26 +66,6 @@ class SupportFile(db.Model):
             "urgency_level": self.urgency_level,
             "summary": self.summary,
         }
-    
-class Task(db.Model):
-    __tablename__ = "tasks"
-
-    task_id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey("students.student_id"), nullable=False)
-    task = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    due_date = db.Column(db.String(20), nullable=True)
-    status = db.Column(db.String(50), nullable=False, default="פתוח")
-
-    def to_dict(self):
-        return {
-            "task_id": self.task_id,
-            "student_id": self.student_id,
-            "task": self.task,
-            "description": self.description,
-            "dueDate": self.due_date,
-            "status": self.status
-        }
 
 
 @app.route("/")
@@ -127,42 +107,6 @@ def create_student():
     db.session.commit()
 
     return jsonify(student.to_dict()), 201
-
-@app.route("/students/<int:student_id>/tasks", methods=["GET"])
-def get_student_tasks(student_id):
-    tasks = Task.query.filter_by(student_id=student_id).all()
-    return jsonify([task.to_dict() for task in tasks])
-
-
-@app.route("/students/<int:student_id>/tasks", methods=["POST"])
-def create_student_task(student_id):
-    data = request.get_json()
-
-    if not data or not data.get("task"):
-        return jsonify({"error": "task is required"}), 400
-
-    task = Task(
-        student_id=student_id,
-        task=data.get("task"),
-        description=data.get("description"),
-        due_date=data.get("dueDate"),
-        status=data.get("status", "פתוח")
-    )
-
-    db.session.add(task)
-    db.session.commit()
-
-    return jsonify(task.to_dict()), 201
-
-
-@app.route("/tasks/<int:task_id>", methods=["DELETE"])
-def delete_task(task_id):
-    task = Task.query.get_or_404(task_id)
-
-    db.session.delete(task)
-    db.session.commit()
-
-    return jsonify({"message": "task deleted successfully"})
 
 
 @app.route("/seed-students", methods=["GET"])
@@ -206,4 +150,4 @@ def seed_students():
 if __name__ == "__main__":
     with app.app_context():
       db.create_all()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)
