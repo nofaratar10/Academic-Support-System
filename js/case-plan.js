@@ -13,6 +13,14 @@ const planTab = document.getElementById("planTab");
 const summaryTab = document.getElementById("summaryTab");
 
 const addTaskBtn = document.getElementById("addTaskBtn");
+const taskModal = document.getElementById("taskModal");
+const cancelTaskBtn = document.getElementById("cancelTaskBtn");
+const saveTaskBtn = document.getElementById("saveTaskBtn");
+
+const taskNameInput = document.getElementById("taskName");
+const taskDescriptionInput = document.getElementById("taskDescription");
+const taskDueDateInput = document.getElementById("taskDueDate");
+const taskStatusInput = document.getElementById("taskStatus");
 
 function showToast(message) {
   toast.textContent = message;
@@ -57,23 +65,15 @@ async function loadTasks() {
     renderTasks(tasks);
   } catch (error) {
     console.error(error);
-    planTableBody.innerHTML = `
-      <tr>
-        <td colspan="5">שגיאה בטעינת המשימות</td>
-      </tr>
-    `;
+    planTableBody.innerHTML = `<tr><td colspan="5">שגיאה בטעינת המשימות</td></tr>`;
   }
 }
 
 function renderTasks(tasks) {
   planTableBody.innerHTML = "";
 
-  if (tasks.length === 0) {
-    planTableBody.innerHTML = `
-      <tr>
-        <td colspan="5">אין משימות לסטודנט זה</td>
-      </tr>
-    `;
+  if (!tasks.length) {
+    planTableBody.innerHTML = `<tr><td colspan="5">אין משימות לסטודנט זה</td></tr>`;
     return;
   }
 
@@ -95,15 +95,12 @@ function renderTasks(tasks) {
 }
 
 async function addTask() {
-  const task = document.getElementById("taskName").value.trim();
-  const description = document.getElementById("taskDescription").value.trim();
-  const dueDate = document.getElementById("taskDueDate").value;
-  const status = document.getElementById("taskStatus").value;
+  const task = prompt("כתבי קטגוריית משימה / שם משימה:");
+  if (!task) return;
 
-  if (!task) {
-    alert("צריך למלא קטגוריית משימה");
-    return;
-  }
+  const description = prompt("כתבי תיאור משימה:") || "";
+  const dueDate = prompt("כתבי תאריך יעד:") || new Date().toLocaleDateString("he-IL");
+  const status = prompt("כתבי סטטוס: פתוח / בביצוע / הושלם") || "פתוח";
 
   try {
     const response = await fetch(`${API_BASE_URL}/students/${studentId}/tasks`, {
@@ -120,11 +117,6 @@ async function addTask() {
     });
 
     if (!response.ok) throw new Error("Failed to create task");
-
-    document.getElementById("taskName").value = "";
-    document.getElementById("taskDescription").value = "";
-    document.getElementById("taskDueDate").value = "";
-    document.getElementById("taskStatus").value = "פתוח";
 
     await loadTasks();
     showToast("המשימה נוספה");
@@ -153,7 +145,49 @@ window.deleteTask = async function deleteTask(taskId) {
   }
 };
 
-addTaskBtn.addEventListener("click", addTask);
+addTaskBtn.addEventListener("click", () => {
+  taskModal.classList.add("visible");
+});
+
+cancelTaskBtn.addEventListener("click", () => {
+  taskModal.classList.remove("visible");
+});
+saveTaskBtn.addEventListener("click", async () => {
+  const task = taskNameInput.value.trim();
+  const description = taskDescriptionInput.value.trim();
+  const dueDate = taskDueDateInput.value;
+  const status = taskStatusInput.value;
+
+  if (!task) {
+    alert("צריך למלא שם משימה");
+    return;
+  }
+
+  try {
+    const response = await fetch(`http://vmedu473.mtacloud.co.il:5000/students/${studentId}/tasks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        task,
+        description,
+        dueDate,
+        status
+      })
+    });
+
+    if (!response.ok) throw new Error();
+
+    taskModal.classList.remove("visible");
+    await loadTasks();
+    showToast("המשימה נוספה");
+
+  } catch (err) {
+    console.error(err);
+    alert("שגיאה");
+  }
+});
 
 loadStudent();
 loadTasks();
