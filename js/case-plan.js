@@ -1,3 +1,5 @@
+const API_BASE_URL = "http://vmedu473.mtacloud.co.il:5000";
+
 const params = new URLSearchParams(window.location.search);
 const studentId = params.get("id");
 
@@ -25,93 +27,6 @@ function setTabs(studentIdValue) {
   summaryTab.href = `student-summary.html?id=${studentIdValue}`;
 }
 
-function getStorageKey() {
-  return `student_plan_${studentId}`;
-}
-
-function getTasks() {
-  const raw = localStorage.getItem(getStorageKey());
-
-  if (raw) {
-    return JSON.parse(raw);
-  }
-
-  return [
-    {
-      task: "פגישה עם מלווה",
-      description: "תיאום פגישה אישית",
-      dueDate: "15.9.26",
-      status: "בביצוע"
-    },
-    {
-      task: "תיאום תגבור",
-      description: "פנייה לדיקנט",
-      dueDate: "20.9.26",
-      status: "הושלם"
-    },
-    {
-      task: "הגשת ערעור",
-      description: "קורס מתמטיקה",
-      dueDate: "25.9.26",
-      status: "פתוח"
-    },
-    {
-      task: "תיאום תגבור",
-      description: "קורס מתמטיקה",
-      dueDate: "26.8.26",
-      status: "פתוח"
-    }
-  ];
-}
-
-function saveTasks(tasks) {
-  localStorage.setItem(getStorageKey(), JSON.stringify(tasks));
-}
-
-function renderTasks() {
-  const tasks = getTasks();
-  planTableBody.innerHTML = "";
-
-  tasks.forEach((item, index) => {
-    const row = document.createElement("tr");
-
-    const statusClass = item.status === "מחיקה" ? "plan-task-warning" : "";
-    row.innerHTML = `
-      <td>${item.task}</td>
-      <td>${item.description}</td>
-      <td>${item.dueDate}</td>
-      <td class="${statusClass}">${item.status}</td>
-      <td>
-        <button class="btn" type="button" onclick="deleteTask(${index})">עריכה</button>
-      </td>
-    `;
-
-    planTableBody.appendChild(row);
-  });
-}
-
-window.deleteTask = function deleteTask(index) {
-  const tasks = getTasks();
-  tasks.splice(index, 1);
-  saveTasks(tasks);
-  renderTasks();
-  showToast("המשימה הוסרה");
-};
-
-function addTask() {
-  const tasks = getTasks();
-  tasks.push({
-    task: "משימה חדשה",
-    description: "משימה שנוספה ידנית",
-    dueDate: new Date().toLocaleDateString("he-IL"),
-    status: "פתוח"
-  });
-
-  saveTasks(tasks);
-  renderTasks();
-  showToast("המשימה נוספה");
-};
-
 async function loadStudent() {
   if (!studentId) {
     studentHeader.textContent = "לא נבחר סטודנט";
@@ -119,10 +34,8 @@ async function loadStudent() {
   }
 
   try {
-    const response = await fetch(`http://127.0.0.1:5000/students/${studentId}`);
-    if (!response.ok) {
-      throw new Error("Student not found");
-    }
+    const response = await fetch(`${API_BASE_URL}/students/${studentId}`);
+    if (!response.ok) throw new Error("Student not found");
 
     const student = await response.json();
     const fullName = `${student.first_name || ""} ${student.last_name || ""}`.trim();
@@ -135,7 +48,112 @@ async function loadStudent() {
   }
 }
 
+async function loadTasks() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/students/${studentId}/tasks`);
+    if (!response.ok) throw new Error("Failed to load tasks");
+
+    const tasks = await response.json();
+    renderTasks(tasks);
+  } catch (error) {
+    console.error(error);
+    planTableBody.innerHTML = `
+      <tr>
+        <td colspan="5">שגיאה בטעינת המשימות</td>
+      </tr>
+    `;
+  }
+}
+
+function renderTasks(tasks) {
+  planTableBody.innerHTML = "";
+
+  if (tasks.length === 0) {
+    planTableBody.innerHTML = `
+      <tr>
+        <td colspan="5">אין משימות לסטודנט זה</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tasks.forEach((item) => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${item.task || ""}</td>
+      <td>${item.description || ""}</td>
+      <td>${item.dueDate || ""}</td>
+      <td>${item.status || "פתוח"}</td>
+      <td>
+        <button class="btn" type="button" onclick="deleteTask(${item.task_id})">מחיקה</button>
+      </td>
+    `;
+
+    planTableBody.appendChild(row);
+  });
+}
+
+async function addTask() {
+  const task = document.getElementById("taskName").value.trim();
+  const description = document.getElementById("taskDescription").value.trim();
+  const dueDate = document.getElementById("taskDueDate").value;
+  const status = document.getElementById("taskStatus").value;
+
+  if (!task) {
+    alert("צריך למלא קטגוריית משימה");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/students/${studentId}/tasks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        task,
+        description,
+        dueDate,
+        status
+      })
+    });
+
+    if (!response.ok) throw new Error("Failed to create task");
+
+    document.getElementById("taskName").value = "";
+    document.getElementById("taskDescription").value = "";
+    document.getElementById("taskDueDate").value = "";
+    document.getElementById("taskStatus").value = "פתוח";
+
+    await loadTasks();
+    showToast("המשימה נוספה");
+  } catch (error) {
+    console.error(error);
+    alert("שגיאה בהוספת משימה");
+  }
+}
+
+window.deleteTask = async function deleteTask(taskId) {
+  const confirmDelete = confirm("למחוק את המשימה?");
+  if (!confirmDelete) return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+      method: "DELETE"
+    });
+
+    if (!response.ok) throw new Error("Failed to delete task");
+
+    await loadTasks();
+    showToast("המשימה נמחקה");
+  } catch (error) {
+    console.error(error);
+    alert("שגיאה במחיקת משימה");
+  }
+};
+
 addTaskBtn.addEventListener("click", addTask);
 
 loadStudent();
-renderTasks();
+loadTasks();

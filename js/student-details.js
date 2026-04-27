@@ -59,7 +59,7 @@ async function loadStudent() {
   }
 
   try {
-    const response = await fetch(`http://127.0.0.1:5000/students/${studentId}`);
+    const response = await fetch(`http://vmedu473.mtacloud.co.il:5000/students/${studentId}`);
     if (!response.ok) {
       throw new Error("Student not found");
     }
