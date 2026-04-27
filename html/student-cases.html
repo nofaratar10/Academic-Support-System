@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="../CSS/site.css" />
   <link rel="stylesheet" href="../CSS/student-cases.css" />
 </head>
+
 <body class="page">
 
   <div class="layout">
@@ -107,7 +109,7 @@
 
           <div class="table-footer">
             <button class="secondary-link">«</button>
-            <a href="new-case.html" class="primary-btn big-btn"> פתיחת תיק חדש</a>                                                  
+            <a href="new-case.html" class="primary-btn big-btn"> פתיחת תיק חדש</a>
           </div>
         </section>
       </main>
@@ -194,7 +196,7 @@
 
     async function loadStudents() {
       try {
-        const response = await fetch("http://127.0.0.1:5000/students");
+        const response = await fetch("http://vmedu473.mtacloud.co.il:5000/students");
         if (!response.ok) {
           throw new Error("Failed to load students");
         }
@@ -217,4 +219,5 @@
     loadStudents();
   </script>
 </body>
+
 </html>
