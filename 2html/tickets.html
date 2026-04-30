@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>פניות ושיח יזום - מערכת ליווי</title>
+  <!-- חיבור לקבצי ה-CSS הקיימים שלך -->
+  <link rel="stylesheet" href="../CSS/site.css" />
+  <link rel="stylesheet" href="../CSS/student-cases.css" /> 
+  <link rel="stylesheet" href="../2CSS/tickets.css" />
+  <link rel="stylesheet" href="../2CSS/Chatbot.css" />
+</head>
+<body class="page">
+
+  <div class="layout">
+    <!-- Sidebar - זהה לשאר העמודים שלך -->
+    <aside class="right-sidebar">
+      <div class="brand">מערכת ליווי</div>
+      <nav class="main-nav">
+        <a href="dashboard.html" class="nav-item"><span>דשבורד</span></a>
+        <a href="student-cases.html" class="nav-item"><span>תיקי סטודנטים</span></a>
+        <a href="tickets.html" class="nav-item active"><span>פניות ושיח יזום</span></a>
+        <a href="alerts.html" class="nav-item"><span>תגבורים והתאמות</span></a>
+        <a href="progress.html" class="nav-item"><span>התקדמות ומשחוק</span></a>
+        <a href="reports.html" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="#" class="settings-link">הגדרות</a>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-right">
+          <h1 class="page-title">פניות ושיח יזום</h1>
+        </div>
+        <div class="topbar-center">
+          <div class="search-box">
+            <input type="text" id="ticketSearch" placeholder="חיפוש סטודנט / פנייה..." />
+          </div>
+        </div>
+        <div class="topbar-left">
+          <button class="icon-btn">🔔</button>
+          <div class="user-name">פולינה (רכזת)</div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="filters-card">
+          <div class="filters-row">
+            <div class="filter-group">
+              <label>שנה סטודנטיאלית:</label>
+              <input type="text" value='תשפ"ו (2025–2026)' />
+            </div>
+            <div class="filter-group">
+              <label>שנה:</label>
+              <input type="text" placeholder="שנה א" />
+            </div>
+            <div class="filter-group">
+              <label>סמסטר:</label>
+              <input type="text" placeholder="סמסטר א" />
+            </div>
+          </div>
+          <div class="filters-row second-row">
+            <div class="filter-group wide">
+              <label>סינון:</label>
+              <input type="text" id="filterInput" placeholder="שם/מס' סטודנט/סטטוס ליווי/סטטוס משימות" />
+            </div>
+          </div>
+        </section>
+
+        <section class="table-card">
+          <div class="details-header">
+            <h3>פניות נכנסות</h3>
+          </div>
+          
+          <table class="students-table">
+            <thead>
+              <tr>
+                <th>מס'</th>
+                <th>סטודנט</th>
+                <th>נושא</th>
+                <th>סטטוס</th>
+                <th>פעולה</th>
+              </tr>
+            </thead>
+            <tbody id="ticketsTableBody">
+              <!-- דוגמה לשורה, בהמשך זה יתמלא מה-JS -->
+              <tr>
+                <td>2451</td>
+                <td>יוסי כהן</td>
+                <td>תגבור במתמטיקה</td>
+                <td><span class="status-pill new">חדש</span></td>
+                <td><button class="action-btn" onclick="openTicket(2451)">פתיחה</button></td>
+              </tr>
+              <tr>
+                <td>2445</td>
+                <td>דוד מזרחי</td>
+                <td>שיחת ליווי</td>
+                <td><span class="status-pill waiting">ממתין</span></td>
+                <td><button class="action-btn">פתיחה</button></td>
+              </tr>
+              <tr>
+                <td>2442</td>
+                <td>רחל אברהם</td>
+                <td>בקשת ארכה</td>
+                <td><span class="status-pill urgent">דחוף</span></td>
+                <td><button class="action-btn">פתיחה</button></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="footer-actions">
+            <button class="secondary-link">« חזור</button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a href="#" style="color: #339af0; text-decoration: none; font-weight: bold;">פניות יוצאות »</a>
+                <button class="primary-btn" onclick="location.href='new-ticket.html'">פנייה חדשה +</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // פונקציה למעבר למסך "פתיחת פנייה" או "פרטי פנייה"
+    function openTicket(id) {
+        console.log("Opening ticket:", id);
+        // window.location.href = `ticket-details.html?id=${id}`;
+    }
+
+    // כאן תכניסי את ה-Fetch שלך ל-API כדי למשוך את הפניות האמיתיות מהשרת
+  </script>
+  <div class="chatbot-bubble" id="globalChatbot" title="">
+    <span>🤖</span>
+  </div>
+</body>
+</html>

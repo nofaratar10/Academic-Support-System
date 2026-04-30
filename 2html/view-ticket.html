@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>פנייה פתוחה - מערכת ליווי</title>
+  <link rel="stylesheet" href="../CSS/site.css" />
+  <link rel="stylesheet" href="../2CSS/view-ticket.css" />
+  <link rel="stylesheet" href="../2CSS/Chatbot.css" />
+</head>
+<body class="page">
+
+    <div class="layout">
+        <aside class="right-sidebar">
+        <div class="brand">מערכת ליווי</div>
+        <nav class="main-nav">
+            <a href="dashboard.html" class="nav-item"><span>דשבורד</span></a>
+            <a href="student-cases.html" class="nav-item"><span>תיקי סטודנטים</span></a>
+            <a href="tickets.html" class="nav-item active"><span>פניות ושיח יזום</span></a>
+            <a href="alerts.html" class="nav-item"><span>תגבורים והתאמות</span></a>
+            <a href="progress.html" class="nav-item"><span>התקדמות ומשחוק</span></a>
+            <a href="reports.html" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+        </nav>
+        </aside>
+
+        <div class="main-area">
+        <header class="topbar">
+            <div class="topbar-right">
+            <h1 class="page-title">פנייה פתוחה</h1>
+            </div>
+            <div class="topbar-left">
+            <button class="icon-btn">🔔</button>
+            <div class="user-name">פולינה (רכזת)</div>
+            </div>
+        </header>
+
+        <main class="content">
+            <div class="ticket-container">
+            <!-- כותרת הפנייה וסטטוס -->
+            <div class="ticket-header-card table-card">
+                <button class="back-btn" onclick="history.back()">&#10094;</button>
+                <div class="header-info">
+                <h2>תיאום תגבור</h2>
+                <span class="status-pill status-progress">בטיפול</span>
+                </div>
+            </div>
+            <!-- הודעה ראשונה (סטודנט) -->
+            <div class="message-card incoming">
+                <div class="message-meta">
+                <span class="timestamp">14/08/26 | 10:30</span>
+                <div class="sender-info">
+                    <strong>מאת:</strong> יוסי כהן <br>
+                    <strong>אל:</strong> רכזת מילואים
+                </div>
+                </div>
+                <div class="message-body">
+                שלום, <br><br>
+                לאחר מספר מפגשי תגבור שהתקיימו לאחרונה, אני עדיין מרגיש קושי בהבנת החומר. <br>
+                למרות שהתגבור היה מועיל, אני מרגיש שחלק מהנושאים עדיין לא ברורים לי...
+                </div>
+            </div>
+
+            <!-- הודעה שנייה (תגובת רכזת) -->
+            <div class="message-card outgoing">
+                <div class="message-meta">
+                <span class="timestamp">14/08/26 | 10:45</span>
+                <div class="sender-info">
+                    <strong>מאת:</strong> רכזת מילואים <br>
+                    <strong>אל:</strong> יוסי כהן
+                </div>
+                </div>
+                <div class="message-body">
+                שלום יוסי, <br>
+                תודה שפנית ושיתפת בקושי - זה חשוב מאוד. <br>
+                קושי גם לאחר תגבור הוא דבר שכיח...
+                </div>
+            </div>
+            </div>
+        </main>
+        </div>
+    </div>
+
+    <script>
+    // אינטגרציה בסיסית - לחיצה על כפתור הצ'אט
+    document.getElementById('openChatbot').addEventListener('click', () => {
+      alert('כאן יפתח ממשק הצ\'אטבוט שהחברה השנייה בונה!');
+      // כאן תוכלי להפעיל פונקציה שתציג את ה-Chatbot
+    });
+    </script>
+    <div class="chatbot-bubble" id="globalChatbot" title="">
+        <span>🤖</span>
+    </div>
+</body>
+</html>
