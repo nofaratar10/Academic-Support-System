@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>צ'אטבוט ליווי אקדמי</title>
+
+    <!-- קובץ ה-CSS שלך -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='chatbot.css') }}">
+</head>
+
+<body>
+
+    <header>
+        <h1>מערכת ליווי אקדמי</h1>
+        <nav>
+            <a href="index.html">דף הבית</a>
+            <a href="student.html">אזור סטודנט</a>
+            <a href="chatbot.html">צ'אטבוט</a>
+        </nav>
+    </header>
+
+    <main class="chatbot-page">
+
+        <section class="chatbot-intro">
+            <h2>התייעצות עם הצ'אטבוט</h2>
+            <p>
+                כאן ניתן להתייעץ עם הצ'אטבוט בנושאים הקשורים לליווי אקדמי,
+                קושי בלימודים, הכוונה לגורם מתאים וקבלת מידע ראשוני.
+            </p>
+        </section>
+
+        <section class="chatbot-container">
+
+            <div class="chat-header">
+                <h3>צ'אט ליווי אקדמי</h3>
+                <p>כתוב/י הודעה והמערכת תנסה לסייע או להפנות לגורם מתאים.</p>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    שלום, אני כאן כדי לעזור. במה תרצה/י להתייעץ?
+                </div>
+            </div>
+
+            <form class="chat-input-area" id="chatForm">
+                <input 
+                    type="text" 
+                    id="userMessage" 
+                    placeholder="כתוב/י כאן את ההודעה שלך..."
+                    autocomplete="off"
+                >
+
+                <button type="submit" id="sendMessage">
+                    שליחה
+                </button>
+            </form>
+
+        </section>
+
+    </main>
+
+    <!-- הכפתור הצף שמתאים ל-CSS ול-JS שלך -->
+    <button 
+        id="globalChatbot" 
+        class="chatbot-bubble" 
+        type="button"
+        aria-label="התייעצות עם הצ'אטבוט">
+        💬
+    </button>
+
+    <!-- קובץ ה-JS שלך -->
+    <script src="{{ url_for('static', filename='chatbot.js') }}"></script>
+
+</body>
+</html>
