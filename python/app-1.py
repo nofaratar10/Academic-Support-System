@@ -1,10 +1,18 @@
+import os
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import date
+from dotenv import load_dotenv  
+import google.generativeai as genai  
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+
+GEMINI_KEY = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=GEMINI_KEY)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://livu_user:12345678@localhost/livu_db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -145,6 +153,32 @@ def seed_students():
     db.session.commit()
 
     return jsonify({"message": "demo students seeded successfully"})
+
+@app.route("/summarize", methods=["POST"])
+def summarize_text():
+    data = request.get_json()
+    if not data or "text" not in data:
+        return jsonify({"error": "No text provided"}), 400
+
+    original_text = data["text"]
+
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        prompt = f"""סכם את השיחה בפורמט הבא בדיוק:
+        סיכום: ...
+        נקודות: 
+        * ...
+        משימות:
+        * ...
+
+        השיחה: {original_text}"""
+
+        response = model.generate_content(prompt)
+        return jsonify({"summary_result": response.text})
+
+    except Exception as e:
+        print(f"Error with Gemini: {e}")
+        return jsonify({"error": "Failed to generate summary"}), 500
 
 
 if __name__ == "__main__":

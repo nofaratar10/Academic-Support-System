@@ -1,4 +1,3 @@
-const API_KEY = "AIzaSyD0_bxpUReEKbfXvPA__oDdpirXCeGWRqU";
 const API_BASE_URL = "http://vmedu473.mtacloud.co.il:5000";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -19,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("planTab").href = `case-plan.html?id=${studentId}`;
   document.getElementById("summaryTab").href = `student-summary.html?id=${studentId}`;
 
-  // ===== 👤 טעינת שם סטודנט =====
+  // ===== 👤 טעינת שם סטודנט מהשרת =====
   fetch(`${API_BASE_URL}/students/${studentId}`)
     .then(res => res.json())
     .then(student => {
@@ -34,50 +33,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const pointsOutput = document.getElementById("pointsOutput");
   const tasksOutput = document.getElementById("tasksOutput");
 
-  // ===== ✨ יצירת סיכום AI =====
+  // ===== ✨ יצירת סיכום AI (דרך השרת המאובטח) =====
   btn.addEventListener("click", async () => {
 
     const text = textarea.value.trim();
     if (!text) return alert("תכניסי תוכן שיחה קודם 🙂");
 
-    btn.innerText = "Gemini מנתח...";
+    btn.innerText = "המערכת מנתחת...";
     btn.disabled = true;
 
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
-
-      const response = await fetch(url, {
+      // ✅ פנייה לשרת הפייתון שלך במקום ישירות לגוגל
+      const response = await fetch(`${API_BASE_URL}/summarize`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `סכם את השיחה בפורמט:
-סיכום: ...
-נקודות:
-* ...
-משימות:
-* ...
-
-השיחה: ${text}`
-            }]
-          }]
-        })
+        body: JSON.stringify({ text: text })
       });
 
       const data = await response.json();
 
-      if (data.error) throw new Error(data.error.message);
+      if (data.error) throw new Error(data.error);
 
-      const fullText = data.candidates[0].content.parts[0].text;
+      // השגת הטקסט שחזר מהשרת
+      const fullText = data.summary_result;
 
-      // ניקוי תוצאות
+      // ניקוי תוצאות קודמות מהמסך
       summaryOutput.innerText = "";
       pointsOutput.innerHTML = "";
       tasksOutput.innerHTML = "";
 
       let currentSection = "";
 
+      // פירוק הטקסט שחזר והצגתו במסכים
       fullText.split("\n").forEach(line => {
         const clean = line.trim();
 
@@ -101,14 +88,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (error) {
       console.error(error);
-      alert("שגיאה: " + error.message);
+      alert("שגיאה בתהליך הסיכום: " + error.message);
     } finally {
       btn.innerText = "✨ יצירת סיכום";
       btn.disabled = false;
     }
   });
 
-  // ===== 💾 שמירה ל-DB =====
+  // ===== 💾 שמירת הסיכום לבסיס הנתונים =====
   document.querySelector(".table-footer .btn").addEventListener("click", async () => {
 
     const summaryText = summaryOutput.innerText;
@@ -120,9 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const response = await fetch(`${API_BASE_URL}/support-files`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           student_id: studentId,
           summary: summaryText,
@@ -133,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (response.ok) {
         alert("הסיכום נשמר בהצלחה 🎉");
       } else {
-        alert("שגיאה בשמירה");
+        alert("שגיאה בשמירה לשרת");
       }
 
     } catch (error) {
