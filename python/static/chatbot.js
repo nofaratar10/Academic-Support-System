@@ -3,6 +3,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const userMessageInput = document.getElementById('userMessage');
     const chatMessages = document.getElementById('chatMessages');
 
+
+    const bubble = document.getElementById('globalChatbot');
+    const chatContainer = document.querySelector('.chatbot-container');
+    if (bubble && chatContainer) {
+            bubble.addEventListener('click', () => {
+                // בודק אם החלונית מוצגת. אם כן - מסתיר, אם לא - מציג.
+                if (chatContainer.style.display === 'none' || chatContainer.style.display === '') {
+                    chatContainer.style.display = 'flex';
+                } else {
+                    chatContainer.style.display = 'none';
+                }
+            });
+        }
+
     if (chatForm) {
         chatForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -17,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             userMessageInput.value = '';
 
             try {
-                const response = await fetch('/chatbot/message', {
+                const response = await fetch('http://vmedu473.mtacloud.co.il:5000/chatbot/message', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -46,6 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         'bot-message'
                     );
                     return;
+                }
+
+                if (data.reply) {
+                    addMessage(data.reply, 'bot-message');
+                } else if (data.answer) {
+                    addMessage(data.answer, 'bot-message'); // לגיבוי אם היא תשנה
                 }
 
                 addMessage(data.answer, 'bot-message');

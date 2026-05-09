@@ -1,5 +1,6 @@
+/* מיכל הפנייה הראשי - נשאר דומה לשלך */
 .ticket-container {
-    max-width: 1000px;
+    max-width: 900px; /* קצת יותר קטן וממוקד לעין */
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -23,35 +24,28 @@
     margin-right: 20px;
 }
 
-.header-info h2 { margin: 0; font-size: 1.3rem; }
+.header-info h2 { 
+    margin: 0; 
+    font-size: 1.3rem; 
+}
 
-/* כפתור הצ'אטבוט - מעוצב כדי לבלוט */
-.chatbot-trigger {
-    background-color: #f0f7ff;
-    border: 1px solid #339af0;
-    color: #339af0;
-    padding: 8px 16px;
-    border-radius: 20px;
-    cursor: pointer;
+/* מיכל הודעות הצאט */
+#ticketMessagesContainer {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    transition: all 0.2s;
+    flex-direction: column;
+    gap: 16px; /* ריווח נעים בין ההודעות */
 }
 
-.chatbot-trigger:hover {
-    background-color: #339af0;
-    color: white;
-}
-
-/* עיצוב כרטיסי ההודעות */
+/* עיצוב כרטיסי ההודעות הבסיסי */
 .message-card {
     background: white;
     border-radius: 8px;
     border: 1px solid #e0e0e0;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    max-width: 75%; /* מגביל את הרוחב כדי שלא יימרחו על כל הדף! */
+    width: 100%;
+    transition: all 0.2s ease-in-out;
 }
 
 .message-meta {
@@ -70,8 +64,96 @@
     color: #333;
 }
 
-/* בידול בין נכנס ליוצא (לפי התמונה) */
-.incoming { border-right: 4px solid #339af0; }
-.outgoing { border-right: 4px solid #fab005; margin-right: 20px; }
+/* --- השינוי הגדול: יישור ימין ושמאל --- */
 
-.status-progress { background: #e7f5ff; color: #228be6; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; }
+/* הודעה נכנסת (סטודנט) - מוצמדת לימין */
+.message-card.incoming { 
+    border-right: 4px solid #339af0; 
+    align-self: flex-start; /* מצמיד את האלמנט לימין של התיקייה ברשת RTL */
+    border-top-right-radius: 0px; /* נותן מראה בועה קלאסי */
+}
+
+/* הודעה יוצאת (רכזת) - מוצמדת לשמאל */
+.message-card.outgoing { 
+    border-right: 4px solid #fab005; 
+    align-self: flex-end; /* מצמיד את האלמנט לשמאל ברשת RTL */
+    border-top-left-radius: 0px; /* נותן מראה בועה קלאסי */
+    background-color: #fffdf5; /* רקע צהבהב עדין מאוד שתואם לפס */
+}
+
+.status-progress { 
+    background: #e7f5ff; 
+    color: #228be6; 
+    padding: 4px 12px; 
+    border-radius: 12px; 
+    font-size: 0.8rem; 
+}
+
+/* כפתור חזרה - עיצוב כללי */
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #495057;
+    padding: 5px;
+}
+.back-btn:hover {
+    color: #339af0;
+}
+
+/* כרטיסיית תיבת התגובה */
+.reply-area-card {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.reply-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* תיבת הטקסט של התגובה */
+.reply-form textarea {
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.reply-form textarea:focus {
+    border-color: #339af0;
+    box-shadow: 0 0 0 3px rgba(51, 154, 240, 0.1);
+}
+
+/* שורת הכפתורים בתחתית התיבה */
+.reply-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.send-reply-btn {
+    background-color: #339af0;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.send-reply-btn:hover {
+    background-color: #228be6;
+}
