@@ -65,6 +65,50 @@ class SupportFile(db.Model):
     urgency_level = db.Column(db.String(50), nullable=True)
     summary = db.Column(db.Text, nullable=True)
 
+class Ticket(db.Model):
+    __tablename__ = "tickets"
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("students.student_id"), nullable=False)
+    subject = db.Column(db.String(150), nullable=False)
+    status = db.Column(db.String(50), nullable=False, default="new")
+    
+    messages = db.relationship("Message", backref="ticket", lazy=True, cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "student_id": self.student_id,
+            "student_name": f"{self.student.first_name} {self.student.last_name}" if self.student else "סטודנט כללי",
+            "subject": self.subject,
+            "status": self.status,
+            "messages": [msg.to_dict() for msg in sorted(self.messages, key=lambda m: m.id)]
+        }
+
+
+class Message(db.Model):
+    __tablename__ = "messages"
+
+    id = db.Column(db.Integer, primary_key=True)
+    ticket_id = db.Column(db.Integer, db.ForeignKey("tickets.id"), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    sender_role = db.Column(db.String(50), nullable=False) # 'student' or 'coordinator'
+    sender_name = db.Column(db.String(100), nullable=False)
+    recipient_name = db.Column(db.String(100), nullable=False)
+    timestamp = db.Column(db.String(50), nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "ticket_id": self.ticket_id,
+            "content": self.content,
+            "sender_role": self.sender_role,
+            "sender_name": self.sender_name,
+            "recipient_name": self.recipient_name,
+            "timestamp": self.timestamp
+        }
+
+
     def to_dict(self):
         return {
             "case_id": self.case_id,
@@ -180,8 +224,57 @@ def summarize_text():
         print(f"Error with Gemini: {e}")
         return jsonify({"error": "Failed to generate summary"}), 500
 
+# שליפת כל הפניות (עבור טבלת הפניות tickets.html)
+@app.route("/tickets", methods=["GET"])
+def get_tickets():
+    tickets = Ticket.query.all()
+    return jsonify([ticket.to_dict() for ticket in tickets])
 
+
+# שליפת פנייה ספציפית כולל ההודעות שלה (עבור view-ticket.html)
+@app.route("/tickets/<int:ticket_id>", methods=["GET"])
+def get_ticket(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    return jsonify(ticket.to_dict())
+
+
+# שליחת תגובה חדשה לפנייה קיימת (מיועד לתיבת התגובה שלך)
+@app.route("/tickets/<int:ticket_id>/messages", methods=["POST"])
+def add_message(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    data = request.get_json()
+
+    if not data or not data.get("content"):
+        return jsonify({"error": "Content is required"}), 400
+
+    from datetime import datetime
+    new_msg = Message(
+        ticket_id=ticket_id,
+        content=data["content"],
+        sender_role=data.get("sender_role", "coordinator"),
+        sender_name=data.get("sender_name", "רכזת"),
+        recipient_name=data.get("recipient_name", "סטודנט"),
+        timestamp=data.get("timestamp", datetime.now().strftime("%d/%m/%y | %H:%M"))
+    )
+
+    db.session.add(new_msg)
+    
+    # עדכון סטטוס הפנייה ברגע שהרכזת משיבה
+    if data.get("sender_role") == "coordinator":
+        ticket.status = "pending"
+
+    db.session.commit()
+    return jsonify(new_msg.to_dict()), 201
+
+"""
+# הקוד הישן שרץ רק בלוקאלי ולא בדוקר:
 if __name__ == "__main__":
     with app.app_context():
       db.create_all()
     app.run(debug=True)
+"""
+# הקוד החדש שבאמת ירוץ:
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    app.run(host="0.0.0.0", port=5000, debug=True)
