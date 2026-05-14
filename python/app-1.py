@@ -73,19 +73,19 @@ class SupportFile(db.Model):
 
 @app.route("/")
 def home():
-    return send_from_directory(os.path.join(BASE_DIR, "HTML"), "student-cases.html")
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "student-cases.html")
 
 @app.route('/CSS/<path:filename>')
 def css_files(filename):
-    return send_from_directory(os.path.join(BASE_DIR, "CSS"), filename)
+    return send_from_directory(os.path.join(BASE_DIR, "css"), filename)
 
 @app.route('/JS/<path:filename>')
 def js_files(filename):
-    return send_from_directory(os.path.join(BASE_DIR, "JS"), filename)
+    return send_from_directory(os.path.join(BASE_DIR, "js"), filename)
 
 @app.route('/HTML/<path:filename>')
 def html_files(filename):
-    return send_from_directory(os.path.join(BASE_DIR, "HTML"), filename)
+    return send_from_directory(os.path.join(BASE_DIR, "html"), filename)
 
 @app.route("/students", methods=["GET"])
 def get_students():
