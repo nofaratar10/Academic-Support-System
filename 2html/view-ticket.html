@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>פרטי שיחה - מערכת ליווי</title>
+  <link rel="stylesheet" href="../CSS/site.css" />
+  <link rel="stylesheet" href="../2CSS/view-ticket.css" />
+  <link rel="stylesheet" href="../2CSS/Chatbot.css" />
+</head>
+<body class="page">
+
+    <div class="layout">
+        <aside class="right-sidebar">
+            <div class="brand">מערכת ליווי</div>
+            <nav class="main-nav">
+                <a href="dashboard.html" class="nav-item"><span>דשבורד</span></a>
+                <a href="student-cases.html" class="nav-item"><span>תיקי סטודנטים</span></a>
+                <a href="tickets.html" class="nav-item active"><span>פניות ושיח יזום</span></a>
+                <a href="alerts.html" class="nav-item"><span>תגבורים והתאמות</span></a>
+                <a href="progress.html" class="nav-item"><span>התקדמות ומשחוק</span></a>
+                <a href="reports.html" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+            </nav>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div class="topbar-right" style="display: flex; align-items: center; gap: 15px;">
+                    <button class="back-btn" onclick="history.back()" title="חזרה">&#10094;</button>
+                    <h1 class="page-title">פרטי שיחה <span id="ticketIdHeader" class="ticket-id">#2451</span></h1>
+                </div>
+                <div class="topbar-left">
+                    <button class="icon-btn">🔔</button>
+                    <div class="user-name">פולינה (רכזת)</div>
+                </div>
+            </header>
+
+            <main class="content">
+                <div class="ticket-container">
+                    
+                    <div class="ticket-header-card table-card">
+                        <div class="header-info">
+                            <h2 id="ticketSubject">תיאום תגבור</h2>
+                            <span id="ticketStatus" class="status-pill status-progress">בטיפול</span>
+                        </div>
+                    </div>
+                    
+                    
+                    <div id="ticketMessagesContainer" class="chat-area">
+                        
+                        <div class="message-card incoming">
+                            <div class="message-meta">
+                                <span class="timestamp">14/05/26 | 10:30</span>
+                                <div class="sender-info">
+                                    <strong>מאת:</strong> יוסי כהן <br>
+                                    <strong>אל:</strong> רכזת מילואים
+                                </div>
+                            </div>
+                            <div class="message-body">
+                                שלום, <br><br>
+                                לאחר מספר מפגשי תגבור שהתקיימו לאחרונה, אני עדיין מרגיש קושי בהבנת החומר. <br>
+                                למרות שהתגבור היה מועיל, אני מרגיש שחלק מהנושאים עדיין לא ברורים לי...
+                            </div>
+                        </div>
+
+                        <div class="message-card outgoing">
+                            <div class="message-meta">
+                                <span class="timestamp">14/05/26 | 10:45</span>
+                                <div class="sender-info">
+                                    <strong>מאת:</strong> רכזת מילואים <br>
+                                    <strong>אל:</strong> יוסי כהן
+                                </div>
+                            </div>
+                            <div class="message-body">
+                                שלום יוסי, <br>
+                                תודה שפנית ושיתפת בקושי - זה חשוב מאוד. <br>
+                                קושי גם לאחר תגבור הוא דבר שכיח...
+                            </div>
+                        </div>
+                        <div class="reply-area-card">
+                            <form id="replyForm" class="reply-form">
+                                <textarea 
+                                    id="replyContent" 
+                                    placeholder="הקלידו כאן תגובה להמשך השיח..." 
+                                    required
+                                ></textarea>
+                                <div class="reply-actions">
+                                    <button type="submit" class="primary-btn send-reply-btn">שליחת תגובה</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="chatbot-bubble" id="globalChatbot" title="">
+        <span>🤖</span>
+    </div>
+    
+    <script src="../2js/view-ticket.js"></script>
+    <script src="../2js/chatbot.js"></script>
+</body>
+</html>

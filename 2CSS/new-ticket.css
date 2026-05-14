@@ -1,0 +1,120 @@
+/* עיצוב המכלול של הטופס */
+.form-container {
+    padding: 30px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.form-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #339af0;
+    cursor: pointer;
+    padding: 0;
+}
+
+.form-header h2 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #333;
+}
+
+/* שורות ושדות בטופס */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus {
+    border-color: #339af0;
+}
+
+/* עיצוב ה-Editor (תיבת הטקסט) */
+.editor-container {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.editor-toolbar {
+    background-color: #f8f9fa;
+    padding: 8px 15px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    gap: 15px;
+}
+
+.editor-toolbar button {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: #444;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.editor-toolbar button:hover {
+    color: #339af0;
+}
+
+#ticketContent {
+    width: 100%;
+    min-height: 300px;
+    border: none;
+    resize: vertical;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+/* כפתור שליחה */
+.form-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.submit-btn {
+    min-width: 200px;
+    padding: 12px 40px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+}

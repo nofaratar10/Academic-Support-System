@@ -1,0 +1,159 @@
+/* מיכל הפנייה הראשי - נשאר דומה לשלך */
+.ticket-container {
+    max-width: 900px; /* קצת יותר קטן וממוקד לעין */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ticket-header-card {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.header-info {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-right: 20px;
+}
+
+.header-info h2 { 
+    margin: 0; 
+    font-size: 1.3rem; 
+}
+
+/* מיכל הודעות הצאט */
+#ticketMessagesContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* ריווח נעים בין ההודעות */
+}
+
+/* עיצוב כרטיסי ההודעות הבסיסי */
+.message-card {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    max-width: 75%; /* מגביל את הרוחב כדי שלא יימרחו על כל הדף! */
+    width: 100%;
+    transition: all 0.2s ease-in-out;
+}
+
+.message-meta {
+    background-color: #fcfcfc;
+    padding: 12px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+.message-body {
+    padding: 20px;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* --- השינוי הגדול: יישור ימין ושמאל --- */
+
+/* הודעה נכנסת (סטודנט) - מוצמדת לימין */
+.message-card.incoming { 
+    border-right: 4px solid #339af0; 
+    align-self: flex-start; /* מצמיד את האלמנט לימין של התיקייה ברשת RTL */
+    border-top-right-radius: 0px; /* נותן מראה בועה קלאסי */
+}
+
+/* הודעה יוצאת (רכזת) - מוצמדת לשמאל */
+.message-card.outgoing { 
+    border-right: 4px solid #fab005; 
+    align-self: flex-end; /* מצמיד את האלמנט לשמאל ברשת RTL */
+    border-top-left-radius: 0px; /* נותן מראה בועה קלאסי */
+    background-color: #fffdf5; /* רקע צהבהב עדין מאוד שתואם לפס */
+}
+
+.status-progress { 
+    background: #e7f5ff; 
+    color: #228be6; 
+    padding: 4px 12px; 
+    border-radius: 12px; 
+    font-size: 0.8rem; 
+}
+
+/* כפתור חזרה - עיצוב כללי */
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #495057;
+    padding: 5px;
+}
+.back-btn:hover {
+    color: #339af0;
+}
+
+/* כרטיסיית תיבת התגובה */
+.reply-area-card {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.reply-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* תיבת הטקסט של התגובה */
+.reply-form textarea {
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.reply-form textarea:focus {
+    border-color: #339af0;
+    box-shadow: 0 0 0 3px rgba(51, 154, 240, 0.1);
+}
+
+/* שורת הכפתורים בתחתית התיבה */
+.reply-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.send-reply-btn {
+    background-color: #339af0;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.send-reply-btn:hover {
+    background-color: #228be6;
+}

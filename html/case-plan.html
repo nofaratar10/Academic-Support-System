@@ -104,32 +104,6 @@
               <input id="planStatus" type="text" value="פעילה" />
             </div>
           </div>
-          <div class="plan-top-fields">
-            
-  <div class="field">
-    <label for="taskName">קטגוריית משימה</label>
-    <input id="taskName" type="text" placeholder="לדוגמה: תגבור / פגישה / התאמות" />
-  </div>
-
-  <div class="field">
-    <label for="taskDescription">תיאור משימה</label>
-    <input id="taskDescription" type="text" placeholder="פירוט המשימה" />
-  </div>
-
-  <div class="field">
-    <label for="taskDueDate">תאריך יעד</label>
-    <input id="taskDueDate" type="date" />
-  </div>
-
-  <div class="field">
-    <label for="taskStatus">סטטוס</label>
-    <select id="taskStatus">
-      <option>פתוח</option>
-      <option>בביצוע</option>
-      <option>הושלם</option>
-    </select>
-  </div>
-</div>
 
           <table class="plan-table">
             <thead>
@@ -152,6 +126,40 @@
 
     </div>
   </div>
+  <div class="modal-overlay" id="taskModal">
+  <div class="task-modal">
+    <h3>הוספת משימה חדשה</h3>
+
+    <div class="field">
+      <label for="taskName">משימה / קטגוריה</label>
+      <input id="taskName" type="text" placeholder="לדוגמה: פגישה עם מלווה" />
+    </div>
+
+    <div class="field">
+      <label for="taskDescription">תיאור</label>
+      <input id="taskDescription" type="text" placeholder="פירוט המשימה" />
+    </div>
+
+    <div class="field">
+      <label for="taskDueDate">תאריך יעד</label>
+      <input id="taskDueDate" type="date" />
+    </div>
+
+    <div class="field">
+      <label for="taskStatus">סטטוס</label>
+      <select id="taskStatus">
+        <option value="פתוח">פתוח</option>
+        <option value="בביצוע">בביצוע</option>
+        <option value="הושלם">הושלם</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" type="button" id="cancelTaskBtn">ביטול</button>
+      <button class="primary-btn" type="button" id="saveTaskBtn">שמירה</button>
+    </div>
+  </div>
+</div>
 
   <div class="toast" id="toast" role="status" aria-live="polite">המשימה נוספה</div>
 

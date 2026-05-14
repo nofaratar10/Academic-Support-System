@@ -1,0 +1,21 @@
+/* הוספת סגנונות ספציפיים לכפתורי הסטטוס מהתמונה */
+    .status-pill.new { background-color: #e6fcf5; color: #0ca678; } /* ירוק בהיר */
+    .status-pill.waiting { background-color: #fff9db; color: #f08c00; } /* צהוב */
+    .status-pill.urgent { background-color: #fff5f5; color: #fa5252; } /* אדום */
+    .status-pill.in-progress { background-color: #e7f5ff; color: #228be6; } /* כחול */
+    
+    .action-btn {
+      background-color: #339af0;
+      color: white;
+      border: none;
+      padding: 4px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
