@@ -4,16 +4,16 @@ import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import date
-from dotenv import load_dotenv  
-import google.generativeai as genai  
+# from dotenv import load_dotenv  
+# import google.generativeai as genai  
 
-load_dotenv()
+#load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-GEMINI_KEY = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=GEMINI_KEY)
+#GEMINI_KEY = os.getenv("GEMINI_API_KEY")
+#genai.configure(api_key=GEMINI_KEY)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://livu_user:12345678@localhost/livu_db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
