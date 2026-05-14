@@ -77,7 +77,7 @@ def home():
 
 @app.route('/CSS/<path:filename>')
 def css_files(filename):
-    return send_from_directory(os.path.join(BASE_DIR, "css"), filename)
+    return send_from_directory(os.path.join(BASE_DIR, "CSS"), filename)
 
 @app.route('/JS/<path:filename>')
 def js_files(filename):
