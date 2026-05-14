@@ -1,10 +1,13 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import date
+import os
 
 app = Flask(__name__)
 CORS(app)
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://livu_user:12345678@localhost/livu_db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -70,8 +73,19 @@ class SupportFile(db.Model):
 
 @app.route("/")
 def home():
-    return jsonify({"message": "Student Support System API is running"})
+    return send_from_directory(os.path.join(BASE_DIR, "HTML"), "student-cases.html")
 
+@app.route('/CSS/<path:filename>')
+def css_files(filename):
+    return send_from_directory(os.path.join(BASE_DIR, "CSS"), filename)
+
+@app.route('/JS/<path:filename>')
+def js_files(filename):
+    return send_from_directory(os.path.join(BASE_DIR, "JS"), filename)
+
+@app.route('/HTML/<path:filename>')
+def html_files(filename):
+    return send_from_directory(os.path.join(BASE_DIR, "HTML"), filename)
 
 @app.route("/students", methods=["GET"])
 def get_students():
