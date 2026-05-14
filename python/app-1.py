@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import date
@@ -6,7 +6,7 @@ from datetime import date
 app = Flask(__name__)
 CORS(app)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///student_support.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://livu_user:12345678@localhost/livu_db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -90,7 +90,7 @@ class Task(db.Model):
 
 @app.route("/")
 def home():
-    return jsonify({"message": "Student Support System API is running"})
+    return send_from_directory("../HTML", "student-cases.html")
 
 
 @app.route("/students", methods=["GET"])
