@@ -23,7 +23,7 @@ form.addEventListener("submit", async function (e) {
     const result = await response.json();
 
     // 🔥 מעבר לתיק עם ID
-    window.location.href = `student-details.html?id=${result.student_id}`;
+    window.location.href = `/student-details?id=${result.student_id}`;
 
   } catch (error) {
     console.error("שגיאה:", error);
