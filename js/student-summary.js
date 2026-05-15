@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!studentId) {
     alert("לא נבחר סטודנט");
-    window.location.href = "student-cases.html";
+    window.location.href = "/student-cases";
     return;
   }
 
