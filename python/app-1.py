@@ -114,6 +114,15 @@ def dashboard():
 def tickets():
     return send_from_directory(os.path.join(BASE_DIR, "html"), "tickets.html")
 
+@app.route("/new-ticket")
+def new_ticket():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "new-ticket.html")
+
+
+@app.route("/view-ticket")
+def view_ticket():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "view-ticket.html")
+
 
 @app.route("/alerts")
 def alerts():
