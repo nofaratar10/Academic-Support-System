@@ -70,6 +70,27 @@ class SupportFile(db.Model):
             "summary": self.summary,
         }
 
+class Ticket(db.Model):
+    __tablename__ = "tickets"
+
+    ticket_id = db.Column(db.Integer, primary_key=True)
+    recipient = db.Column(db.String(100), nullable=False)
+    cc = db.Column(db.String(100), nullable=True)
+    subject = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(50), nullable=False, default="חדש")
+    created_at = db.Column(db.Date, nullable=False, default=date.today)
+
+    def to_dict(self):
+        return {
+            "ticket_id": self.ticket_id,
+            "recipient": self.recipient,
+            "cc": self.cc,
+            "subject": self.subject,
+            "content": self.content,
+            "status": self.status,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
 
 @app.route("/")
 def home():
@@ -149,6 +170,43 @@ def js_files(filename):
 @app.route('/HTML/<path:filename>')
 def html_files(filename):
     return send_from_directory(os.path.join(BASE_DIR, "html"), filename)
+
+# API routes
+
+@app.route("/api/tickets", methods=["GET"])
+def get_tickets():
+    tickets = Ticket.query.order_by(Ticket.ticket_id.desc()).all()
+    return jsonify([ticket.to_dict() for ticket in tickets])
+
+
+@app.route("/api/tickets", methods=["POST"])
+def create_ticket():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No JSON body provided"}), 400
+
+    if not data.get("recipient") or not data.get("subject") or not data.get("content"):
+        return jsonify({"error": "recipient, subject and content are required"}), 400
+
+    ticket = Ticket(
+        recipient=data.get("recipient"),
+        cc=data.get("cc"),
+        subject=data.get("subject"),
+        content=data.get("content"),
+        status=data.get("status", "חדש")
+    )
+
+    db.session.add(ticket)
+    db.session.commit()
+
+    return jsonify(ticket.to_dict()), 201
+
+
+@app.route("/api/tickets/<int:ticket_id>", methods=["GET"])
+def get_ticket(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    return jsonify(ticket.to_dict())
 
 @app.route("/students", methods=["GET"])
 def get_students():
