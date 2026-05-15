@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // חיבור ל-API של נופר - שליחת הנתונים לשרת
-                const response = await fetch('http://vmedu473.mtacloud.co.il:5000/tickets', {
+                const response = await fetch('/api/tickets', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok) {
                     alert('הפנייה נשלחה בהצלחה!');
-                    window.location.href = 'tickets.html'; // חזרה לרשימת הפניות
+                    window.location.href = '/tickets'; // חזרה לרשימת הפניות
                 } else {
                     throw new Error('שגיאה בשליחת הפנייה');
                 }
