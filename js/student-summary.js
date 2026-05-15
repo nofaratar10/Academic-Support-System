@@ -14,10 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===== 🔗 עדכון טאבים =====
-  document.getElementById("detailsTab").href = `student-details.html?id=${studentId}`;
-  document.getElementById("documentsTab").href = `case-documents.html?id=${studentId}`;
-  document.getElementById("planTab").href = `case-plan.html?id=${studentId}`;
-  document.getElementById("summaryTab").href = `student-summary.html?id=${studentId}`;
+document.getElementById("detailsTab").href = `/student-details?id=${studentId}`;
+document.getElementById("documentsTab").href = `/case-documents?id=${studentId}`;
+document.getElementById("planTab").href = `/case-plan?id=${studentId}`;
+document.getElementById("summaryTab").href = `/student-summary?id=${studentId}`;
 
   // ===== 👤 טעינת שם סטודנט =====
   fetch(`${API_BASE_URL}/students/${studentId}`)
