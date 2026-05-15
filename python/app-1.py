@@ -75,6 +75,60 @@ class SupportFile(db.Model):
 def home():
     return send_from_directory(os.path.join(BASE_DIR, "html"), "student-cases.html")
 
+@app.route("/student-cases")
+def student_cases():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "student-cases.html")
+
+
+@app.route("/student-details")
+def student_details():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "student-details.html")
+
+
+@app.route("/case-documents")
+def case_documents():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "case-documents.html")
+
+
+@app.route("/case-plan")
+def case_plan():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "case-plan.html")
+
+
+@app.route("/student-summary")
+def student_summary():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "student-summary.html")
+
+
+@app.route("/new-case")
+def new_case():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "new-case.html")
+
+
+@app.route("/dashboard")
+def dashboard():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "dashboard.html")
+
+
+@app.route("/tickets")
+def tickets():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "tickets.html")
+
+
+@app.route("/alerts")
+def alerts():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "alerts.html")
+
+
+@app.route("/progress")
+def progress():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "progress.html")
+
+
+@app.route("/reports")
+def reports():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "reports.html")
+
 @app.route('/CSS/<path:filename>')
 def css_files(filename):
     return send_from_directory(os.path.join(BASE_DIR, "CSS"), filename)
