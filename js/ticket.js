@@ -47,7 +47,7 @@ async function fetchTickets() {
 // פונקציית עזר לפתיחת פנייה ספציפית
 function openTicket(id) {
     // מעבר לדף הפרטים עם ה-ID של הפנייה בכתובת
-    window.location.href = `view-ticket.html?id=${id}`;
+    window.location.href = `/view-ticket?id=${id}`;
 }
 
 // עזר לעיצוב הסטטוסים
