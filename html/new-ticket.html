@@ -1,28 +1,32 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>פנייה חדשה - מערכת ליווי</title>
-  <!-- חיבור לקבצים הקיימים שלך -->
-  <link rel="stylesheet" href="/CSS/site.css" />
-  <!-- חיבור לקובץ ה-CSS החדש שיצרנו למטה -->
-  <link rel="stylesheet" href="/CSS/new-ticket.css" />
-  <link rel="stylesheet" href="/CSS/Chatbot.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>פנייה חדשה - מערכת ליווי</title>
+    <!-- חיבור לקבצים הקיימים שלך -->
+    <link rel="stylesheet" href="/CSS/site.css" />
+    <!-- חיבור לקובץ ה-CSS החדש שיצרנו למטה -->
+    <link rel="stylesheet" href="/CSS/new-ticket.css" />
+    <link rel="stylesheet" href="/CSS/Chatbot.css" />
+    <link rel="stylesheet" href="../python/static/Chatbot.css" />
+
 </head>
+
 <body class="page">
 
-  <div class="layout">
+    <div class="layout">
         <aside class="right-sidebar">
             <div class="brand">מערכת ליווי</div>
-                <nav class="main-nav">
-                    <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
-                    <a href="/student-cases" class="nav-item"><span>תיקי סטודנטים</span></a>
-                    <a href="/tickets" class="nav-item active"><span>פניות ושיח יזום</span></a>
-                    <a href="/alerts" class="nav-item"><span>תגבורים והתאמות</span></a>
-                    <a href="/progress" class="nav-item"><span>התקדמות ומשחוק</span></a>
-                    <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
-                </nav>
+            <nav class="main-nav">
+                <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
+                <a href="/student-cases" class="nav-item"><span>תיקי סטודנטים</span></a>
+                <a href="/tickets" class="nav-item active"><span>פניות ושיח יזום</span></a>
+                <a href="/alerts" class="nav-item"><span>תגבורים והתאמות</span></a>
+                <a href="/progress" class="nav-item"><span>התקדמות ומשחוק</span></a>
+                <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+            </nav>
             <div class="sidebar-footer">
                 <a href="#" class="settings-link">הגדרות</a>
             </div>
@@ -86,7 +90,8 @@
                                     <button type="button" style="text-decoration: underline;">U</button>
                                     <button type="button">≡</button>
                                 </div>
-                                <textarea id="ticketContent" name="content" placeholder="הקלד כאן את תוכן הפנייה..." required></textarea>
+                                <textarea id="ticketContent" name="content" placeholder="הקלד כאן את תוכן הפנייה..."
+                                    required></textarea>
                             </div>
                         </div>
 
@@ -105,4 +110,5 @@
     <script src="/JS/new-ticket.js"></script>
     <script src="/JS/chatbot.js"></script>
 </body>
+
 </html>
