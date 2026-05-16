@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             userMessageInput.value = '';
 
             try {
-                const response = await fetch('http://vmedu473.mtacloud.co.il:5000/chatbot/message', {
+                const response = await fetch('/chatbot/message', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -64,15 +64,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (data.reply) {
                     addMessage(data.reply, 'bot-message');
-                } else if (data.answer) {
-                    addMessage(data.answer, 'bot-message'); // לגיבוי אם היא תשנה
+                } else if (data.reply) {
+                    addMessage(data.reply, 'bot-message'); // לגיבוי אם היא תשנה
                 }
 
-                addMessage(data.answer, 'bot-message');
+                addMessage(data.reply, 'bot-message');
 
             } catch (error) {
                 console.error('שגיאה בשליחת הבקשה:', error);
-                addMessage('אירעה שגיאה בחיבור לשרת. בדקי שהשרת Flask עדיין רץ.', 'bot-message');
+                addMessage(`שגיאה: ${error.message}`, 'bot-message'); // show actual error
             }
         });
     }
