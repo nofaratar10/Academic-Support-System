@@ -1,0 +1,59 @@
+/* להוסיף אולי לעמוד הבית וככה זה יופיע כל הזמן בזמן השהות באתר - כפתור צף שיופיע מעל הכל */
+.chatbot-bubble {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #339af0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+/* הטקסט שמופיע מעל הכפתור - הפעם מוצמד לימין */
+.chatbot-bubble::after {
+    content: "התייעצות עם הצ'אטבוט";
+    position: absolute;
+    bottom: 75px; 
+    left: 0; /* מצמיד את תחילת הטקסט לקו של הכפתור */
+    background-color: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* החץ הקטן - גם הוא מוזז שמאלה כדי שיהיה מעל הכפתור */
+.chatbot-bubble::before {
+    content: "";
+    position: absolute;
+    bottom: 63px;
+    left: 20px; 
+    border: 6px solid transparent;
+    border-top-color: #333;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* הצגה במעבר עכבר */
+.chatbot-bubble:hover::after,
+.chatbot-bubble:hover::before {
+    opacity: 1;
+}
+
+.chatbot-bubble:hover {
+    transform: scale(1.1);
+    background-color: #228be6;
+}

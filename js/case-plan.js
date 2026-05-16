@@ -29,10 +29,10 @@ function showToast(message) {
 }
 
 function setTabs(studentIdValue) {
-  detailsTab.href = `student-details.html?id=${studentIdValue}`;
-  documentsTab.href = `case-documents.html?id=${studentIdValue}`;
-  planTab.href = `case-plan.html?id=${studentIdValue}`;
-  summaryTab.href = `student-summary.html?id=${studentIdValue}`;
+  detailsTab.href = `/student-details?id=${studentIdValue}`;
+  documentsTab.href = `/case-documents?id=${studentIdValue}`;
+  planTab.href = `/case-plan?id=${studentIdValue}`;
+  summaryTab.href = `/student-summary?id=${studentIdValue}`;
 }
 
 async function loadStudent() {

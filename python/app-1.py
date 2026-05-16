@@ -1,19 +1,13 @@
-
 from flask import Flask, jsonify, request, send_from_directory
-import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import date
-# from dotenv import load_dotenv  
-# import google.generativeai as genai  
-
-#load_dotenv()
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-#GEMINI_KEY = os.getenv("GEMINI_API_KEY")
-#genai.configure(api_key=GEMINI_KEY)
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://livu_user:12345678@localhost/livu_db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -66,50 +60,6 @@ class SupportFile(db.Model):
     urgency_level = db.Column(db.String(50), nullable=True)
     summary = db.Column(db.Text, nullable=True)
 
-class Ticket(db.Model):
-    __tablename__ = "tickets"
-
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey("students.student_id"), nullable=False)
-    subject = db.Column(db.String(150), nullable=False)
-    status = db.Column(db.String(50), nullable=False, default="new")
-    
-    messages = db.relationship("Message", backref="ticket", lazy=True, cascade="all, delete-orphan")
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "student_id": self.student_id,
-            "student_name": f"{self.student.first_name} {self.student.last_name}" if self.student else "סטודנט כללי",
-            "subject": self.subject,
-            "status": self.status,
-            "messages": [msg.to_dict() for msg in sorted(self.messages, key=lambda m: m.id)]
-        }
-
-
-class Message(db.Model):
-    __tablename__ = "messages"
-
-    id = db.Column(db.Integer, primary_key=True)
-    ticket_id = db.Column(db.Integer, db.ForeignKey("tickets.id"), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    sender_role = db.Column(db.String(50), nullable=False) # 'student' or 'coordinator'
-    sender_name = db.Column(db.String(100), nullable=False)
-    recipient_name = db.Column(db.String(100), nullable=False)
-    timestamp = db.Column(db.String(50), nullable=False)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "ticket_id": self.ticket_id,
-            "content": self.content,
-            "sender_role": self.sender_role,
-            "sender_name": self.sender_name,
-            "recipient_name": self.recipient_name,
-            "timestamp": self.timestamp
-        }
-
-
     def to_dict(self):
         return {
             "case_id": self.case_id,
@@ -120,22 +70,143 @@ class Message(db.Model):
             "summary": self.summary,
         }
 
+class Ticket(db.Model):
+    __tablename__ = "tickets"
+
+    ticket_id = db.Column(db.Integer, primary_key=True)
+    recipient = db.Column(db.String(100), nullable=False)
+    cc = db.Column(db.String(100), nullable=True)
+    subject = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(50), nullable=False, default="חדש")
+    created_at = db.Column(db.Date, nullable=False, default=date.today)
+
+    def to_dict(self):
+        return {
+            "ticket_id": self.ticket_id,
+            "recipient": self.recipient,
+            "cc": self.cc,
+            "subject": self.subject,
+            "content": self.content,
+            "status": self.status,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
 
 @app.route("/")
 def home():
-    return send_from_directory("HTML", "student-cases.html")
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "student-cases.html")
+
+@app.route("/student-cases")
+def student_cases():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "student-cases.html")
+
+
+@app.route("/student-details")
+def student_details():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "student-details.html")
+
+
+@app.route("/case-documents")
+def case_documents():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "case-documents.html")
+
+
+@app.route("/case-plan")
+def case_plan():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "case-plan.html")
+
+
+@app.route("/student-summary")
+def student_summary():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "student-summary.html")
+
+
+@app.route("/new-case")
+def new_case():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "new-case.html")
+
+
+@app.route("/dashboard")
+def dashboard():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "dashboard.html")
+
+
+@app.route("/tickets")
+def tickets():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "tickets.html")
+
+@app.route("/new-ticket")
+def new_ticket():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "new-ticket.html")
+
+
+@app.route("/view-ticket")
+def view_ticket():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "view-ticket.html")
+
+
+@app.route("/alerts")
+def alerts():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "alerts.html")
+
+
+@app.route("/progress")
+def progress():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "progress.html")
+
+
+@app.route("/reports")
+def reports():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "reports.html")
 
 @app.route('/CSS/<path:filename>')
 def css_files(filename):
-    return send_from_directory('CSS', filename)
+    return send_from_directory(os.path.join(BASE_DIR, "CSS"), filename)
 
 @app.route('/JS/<path:filename>')
 def js_files(filename):
-    return send_from_directory('JS', filename)
+    return send_from_directory(os.path.join(BASE_DIR, "js"), filename)
 
 @app.route('/HTML/<path:filename>')
 def html_files(filename):
-    return send_from_directory('HTML', filename)
+    return send_from_directory(os.path.join(BASE_DIR, "html"), filename)
+
+# API routes
+
+@app.route("/api/tickets", methods=["GET"])
+def get_tickets():
+    tickets = Ticket.query.order_by(Ticket.ticket_id.desc()).all()
+    return jsonify([ticket.to_dict() for ticket in tickets])
+
+
+@app.route("/api/tickets", methods=["POST"])
+def create_ticket():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No JSON body provided"}), 400
+
+    if not data.get("recipient") or not data.get("subject") or not data.get("content"):
+        return jsonify({"error": "recipient, subject and content are required"}), 400
+
+    ticket = Ticket(
+        recipient=data.get("recipient"),
+        cc=data.get("cc"),
+        subject=data.get("subject"),
+        content=data.get("content"),
+        status=data.get("status", "חדש")
+    )
+
+    db.session.add(ticket)
+    db.session.commit()
+
+    return jsonify(ticket.to_dict()), 201
+
+
+@app.route("/api/tickets/<int:ticket_id>", methods=["GET"])
+def get_ticket(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    return jsonify(ticket.to_dict())
 
 @app.route("/students", methods=["GET"])
 def get_students():
@@ -210,87 +281,8 @@ def seed_students():
 
     return jsonify({"message": "demo students seeded successfully"})
 
-@app.route("/summarize", methods=["POST"])
-def summarize_text():
-    data = request.get_json()
-    if not data or "text" not in data:
-        return jsonify({"error": "No text provided"}), 400
 
-    original_text = data["text"]
-
-    try:
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        prompt = f"""סכם את השיחה בפורמט הבא בדיוק:
-        סיכום: ...
-        נקודות: 
-        * ...
-        משימות:
-        * ...
-
-        השיחה: {original_text}"""
-
-        response = model.generate_content(prompt)
-        return jsonify({"summary_result": response.text})
-
-    except Exception as e:
-        print(f"Error with Gemini: {e}")
-        return jsonify({"error": "Failed to generate summary"}), 500
-
-# שליפת כל הפניות (עבור טבלת הפניות tickets.html)
-@app.route("/tickets", methods=["GET"])
-def get_tickets():
-    tickets = Ticket.query.all()
-    return jsonify([ticket.to_dict() for ticket in tickets])
-
-
-# שליפת פנייה ספציפית כולל ההודעות שלה (עבור view-ticket.html)
-@app.route("/tickets/<int:ticket_id>", methods=["GET"])
-def get_ticket(ticket_id):
-    ticket = Ticket.query.get_or_404(ticket_id)
-    return jsonify(ticket.to_dict())
-
-
-# שליחת תגובה חדשה לפנייה קיימת (מיועד לתיבת התגובה שלך)
-@app.route("/tickets/<int:ticket_id>/messages", methods=["POST"])
-def add_message(ticket_id):
-    ticket = Ticket.query.get_or_404(ticket_id)
-    data = request.get_json()
-
-    if not data or not data.get("content"):
-        return jsonify({"error": "Content is required"}), 400
-
-    from datetime import datetime
-    new_msg = Message(
-        ticket_id=ticket_id,
-        content=data["content"],
-        sender_role=data.get("sender_role", "coordinator"),
-        sender_name=data.get("sender_name", "רכזת"),
-        recipient_name=data.get("recipient_name", "סטודנט"),
-        timestamp=data.get("timestamp", datetime.now().strftime("%d/%m/%y | %H:%M"))
-    )
-
-    db.session.add(new_msg)
-    
-    # עדכון סטטוס הפנייה ברגע שהרכזת משיבה
-    if data.get("sender_role") == "coordinator":
-        ticket.status = "pending"
-
-    db.session.commit()
-    return jsonify(new_msg.to_dict()), 201
-
-"""
-# הקוד הישן שרץ רק בלוקאלי ולא בדוקר:
 if __name__ == "__main__":
     with app.app_context():
       db.create_all()
-
     app.run(host="0.0.0.0", port=5000, debug=True)
-
-    app.run(debug=True)
-"""
-# הקוד החדש שבאמת ירוץ:
-if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(host="0.0.0.0", port=5000, debug=True)
-
