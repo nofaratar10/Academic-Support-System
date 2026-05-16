@@ -12,15 +12,6 @@ app = Flask(__name__)
 CORS(app)
 
 
-def get_gemini_client():
-    api_key = os.getenv("GEMINI_API_KEY")
-
-    if not api_key:
-        raise ValueError("Missing GEMINI_API_KEY in .env")
-
-    return genai.Client(api_key=api_key)
-
-
 @app.route("/")
 def home():
     return render_template("chatbot.html")
@@ -104,10 +95,9 @@ def chatbot_message():
 """
 
     try:
-        client = get_gemini_client()
-
+        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             contents=prompt
         )
 
@@ -123,4 +113,4 @@ def chatbot_message():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5001)
