@@ -64,11 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (data.reply) {
                     addMessage(data.reply, 'bot-message');
-                } else if (data.reply) {
-                    addMessage(data.reply, 'bot-message'); // לגיבוי אם היא תשנה
                 }
-
-                addMessage(data.reply, 'bot-message');
 
             } catch (error) {
                 console.error('שגיאה בשליחת הבקשה:', error);

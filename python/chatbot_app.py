@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-from google import genai
 from pathlib import Path
+import requests
 import os
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -95,14 +95,15 @@ def chatbot_message():
 """
 
     try:
-        client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt
-        )
+        api_key = os.getenv("GEMINI_API_KEY")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        res = requests.post(url, json=payload)
+        res.raise_for_status()
+        reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
 
         return jsonify({
-            "reply": response.text
+            "reply": reply
         })
 
     except Exception as e:
