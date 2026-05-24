@@ -1,21 +1,80 @@
-/* הוספת סגנונות ספציפיים לכפתורי הסטטוס מהתמונה */
-    .status-pill.new { background-color: #e6fcf5; color: #0ca678; } /* ירוק בהיר */
-    .status-pill.waiting { background-color: #fff9db; color: #f08c00; } /* צהוב */
-    .status-pill.urgent { background-color: #fff5f5; color: #fa5252; } /* אדום */
-    .status-pill.in-progress { background-color: #e7f5ff; color: #228be6; } /* כחול */
-    
-    .action-btn {
-      background-color: #339af0;
-      color: white;
-      border: none;
-      padding: 4px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    
-    .footer-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 20px;
-    }
+/* כפתורי סינון כיוון */
+.direction-btn {
+  padding: 6px 16px;
+  border: 1px solid #d7dce3;
+  border-radius: 20px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  color: #555;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.direction-btn.active {
+  background: #339af0;
+  color: #fff;
+  border-color: #339af0;
+}
+
+.direction-btn:hover:not(.active) {
+  background: #f0f4ff;
+}
+
+/* כותרת הכרטיס עם סינון */
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e9edf3;
+}
+
+.direction-filters {
+  display: flex;
+  gap: 8px;
+}
+
+/* סטטוסים */
+.status-pill {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-pill.new        { background: #e6fcf5; color: #0ca678; }
+.status-pill.waiting    { background: #fff9db; color: #f08c00; }
+.status-pill.urgent     { background: #fff5f5; color: #fa5252; }
+.status-pill.status-progress { background: #e7f5ff; color: #228be6; }
+.status-pill.status-closed   { background: #f1f3f5; color: #868e96; }
+.status-pill.status-open     { background: #e6fcf5; color: #0ca678; }
+.status-pill.status-pending  { background: #fff9db; color: #f08c00; }
+
+/* footer */
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+}
+
+.footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+}
+.status-pill.status-urgent  { background: #fff5f5; color: #fa5252; }
+.status-pill.status-open    { background: #e6fcf5; color: #0ca678; }
+.status-pill.status-pending { background: #fff9db; color: #f08c00; }
+.status-pill.status-progress { background: #e7f5ff; color: #228be6; }
+.status-pill.status-closed  { background: #f1f3f5; color: #868e96; }
+
+.students-table .status-pill {
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}

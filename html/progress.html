@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>התקדמות ומשחוק - מערכת ליווי</title>
+  <link rel="stylesheet" href="/CSS/site.css" />
+  <link rel="stylesheet" href="/CSS/progress.css" />
+</head>
+<body class="page">
+  <div class="layout">
+
+    <aside class="right-sidebar">
+      <div class="brand">מערכת ליווי</div>
+      <nav class="main-nav">
+        <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
+        <a href="/student-cases" class="nav-item"><span>תיקי סטודנטים</span></a>
+        <a href="/tickets" class="nav-item"><span>פניות ושיח יזום</span></a>
+        <a href="/alerts" class="nav-item"><span>תגבורים והתאמות</span></a>
+        <a href="/progress" class="nav-item active"><span>התקדמות ומשחוק</span></a>
+        <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="#" class="settings-link">הגדרות</a>
+      </div>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-right">
+          <h1 class="page-title">התקדמות ומשחוק</h1>
+        </div>
+        <div class="topbar-center">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="חיפוש סטודנט..." />
+          </div>
+        </div>
+        <div class="topbar-left">
+          <button class="icon-btn">🔔</button>
+          <div class="user-name">פולינה (רכזת)</div>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <div class="summary-grid" id="summaryGrid">
+          <div class="summary-box">
+            <div class="summary-num" id="totalDone">-</div>
+            <div class="summary-label">משימות הושלמו</div>
+          </div>
+          <div class="summary-box">
+            <div class="summary-num" id="totalInProgress">-</div>
+            <div class="summary-label">בביצוע</div>
+          </div>
+          <div class="summary-box">
+            <div class="summary-num" id="totalPoints">-</div>
+            <div class="summary-label">סה"כ נקודות</div>
+          </div>
+          <div class="summary-box">
+            <div class="summary-num" id="totalAlerts">-</div>
+            <div class="summary-label">דורשים תשומת לב</div>
+          </div>
+        </div>
+
+        <div class="progress-grid">
+
+          <div class="table-card leaderboard-card">
+            <div class="card-header">
+              <h3>לוח מובילים 🏆</h3>
+            </div>
+            <div id="leaderboardList"></div>
+          </div>
+
+          <div class="table-card alerts-card">
+            <div class="card-header">
+              <h3>התראות 🔔</h3>
+            </div>
+            <div id="alertsList"></div>
+          </div>
+
+        </div>
+
+        <div class="table-card">
+          <div class="card-header">
+            <h3>התקדמות כל הסטודנטים</h3>
+            <span id="studentCount" style="font-size:13px; color:#64748b;"></span>
+          </div>
+          <div id="allStudentsList"></div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/JS/progress.js"></script>
+</body>
+</html>
