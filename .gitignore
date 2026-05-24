@@ -6,3 +6,4 @@ python/venv/
 python/__pycache__/
 *.pyc
 python/app.log
+python/chatbot.log

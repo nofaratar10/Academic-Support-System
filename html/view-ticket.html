@@ -7,83 +7,74 @@
   <link rel="stylesheet" href="/CSS/site.css" />
   <link rel="stylesheet" href="/CSS/view-ticket.css" />
   <link rel="stylesheet" href="/CSS/Chatbot.css" />
+  <style>
+    .reply-card { margin-top: 16px; padding: 16px; }
+    .reply-card h4 { margin-bottom: 10px; }
+    .reply-card textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical; }
+    .reply-footer { display: flex; justify-content: flex-start; margin-top: 10px; }
+    #messagesContainer { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+  </style>
 </head>
 <body class="page">
 
-    <div class="layout">
-        <aside class="right-sidebar">
-        <div class="brand">מערכת ליווי</div>
-        <nav class="main-nav">
-            <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
-            <a href="/student-cases" class="nav-item"><span>תיקי סטודנטים</span></a>
-            <a href="/tickets" class="nav-item active"><span>פניות ושיח יזום</span></a>
-            <a href="/alerts" class="nav-item"><span>תגבורים והתאמות</span></a>
-            <a href="/progress" class="nav-item"><span>התקדמות ומשחוק</span></a>
-            <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
-        </nav>
-        </aside>
+  <div class="layout">
+    <aside class="right-sidebar">
+      <div class="brand">מערכת ליווי</div>
+      <nav class="main-nav">
+        <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
+        <a href="/student-cases" class="nav-item"><span>תיקי סטודנטים</span></a>
+        <a href="/tickets" class="nav-item active"><span>פניות ושיח יזום</span></a>
+        <a href="/alerts" class="nav-item"><span>תגבורים והתאמות</span></a>
+        <a href="/progress" class="nav-item"><span>התקדמות ומשחוק</span></a>
+        <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+      </nav>
+    </aside>
 
-        <div class="main-area">
-        <header class="topbar">
-            <div class="topbar-right">
-            <h1 class="page-title">פנייה פתוחה</h1>
-            </div>
-            <div class="topbar-left">
-            <button class="icon-btn">🔔</button>
-            <div class="user-name">פולינה (רכזת)</div>
-            </div>
-        </header>
-
-        <main class="content">
-            <div class="ticket-container">
-            <!-- כותרת הפנייה וסטטוס -->
-            <div class="ticket-header-card table-card">
-                <button class="back-btn" onclick="history.back()">&#10094;</button>
-                <div class="header-info">
-                <h2>תיאום תגבור</h2>
-                <span class="status-pill status-progress">בטיפול</span>
-                </div>
-            </div>
-            <!-- הודעה ראשונה (סטודנט) -->
-            <div class="message-card incoming">
-                <div class="message-meta">
-                <span class="timestamp">14/08/26 | 10:30</span>
-                <div class="sender-info">
-                    <strong>מאת:</strong> יוסי כהן <br>
-                    <strong>אל:</strong> רכזת מילואים
-                </div>
-                </div>
-                <div class="message-body">
-                שלום, <br><br>
-                לאחר מספר מפגשי תגבור שהתקיימו לאחרונה, אני עדיין מרגיש קושי בהבנת החומר. <br>
-                למרות שהתגבור היה מועיל, אני מרגיש שחלק מהנושאים עדיין לא ברורים לי...
-                </div>
-            </div>
-
-            <!-- הודעה שנייה (תגובת רכזת) -->
-            <div class="message-card outgoing">
-                <div class="message-meta">
-                <span class="timestamp">14/08/26 | 10:45</span>
-                <div class="sender-info">
-                    <strong>מאת:</strong> רכזת מילואים <br>
-                    <strong>אל:</strong> יוסי כהן
-                </div>
-                </div>
-                <div class="message-body">
-                שלום יוסי, <br>
-                תודה שפנית ושיתפת בקושי - זה חשוב מאוד. <br>
-                קושי גם לאחר תגבור הוא דבר שכיח...
-                </div>
-            </div>
-            </div>
-        </main>
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-right">
+          <h1 class="page-title">פנייה פתוחה</h1>
         </div>
-    </div>
+        <div class="topbar-left">
+          <button class="icon-btn">🔔</button>
+          <div class="user-name">פולינה (רכזת)</div>
+        </div>
+      </header>
 
-    <div class="chatbot-bubble" id="globalChatbot" title="">
-        <span>🤖</span>
+      <main class="content">
+        <div class="ticket-container">
+
+          <!-- כותרת הפנייה -->
+          <div class="ticket-header-card table-card">
+            <button class="back-btn" onclick="window.location.href='/tickets'">&#10094;</button>
+            <div class="header-info">
+              <h2 id="ticketSubject">טוען...</h2>
+              <span class="status-pill" id="ticketStatus"></span>
+            </div>
+          </div>
+
+          <!-- שרשור הודעות -->
+          <div id="messagesContainer"></div>
+
+          <!-- שדה תגובה -->
+          <div class="table-card reply-card">
+            <h4>תגובה</h4>
+            <textarea id="replyContent" placeholder="כתבי תגובה..."></textarea>
+            <div class="reply-footer">
+              <button class="primary-btn" id="sendReplyBtn">שליחה</button>
+            </div>
+          </div>
+
+        </div>
+      </main>
     </div>
-    <script src="/JS/view-ticket.js"></script>
-    <script src="/JS/chatbot.js"></script>
+  </div>
+
+  <div class="chatbot-bubble" id="globalChatbot">
+    <span>🤖</span>
+  </div>
+
+  <script src="/JS/view-ticket.js"></script>
+  <script src="/JS/chatbot.js"></script>
 </body>
 </html>

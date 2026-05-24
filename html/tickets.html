@@ -4,20 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>פניות ושיח יזום - מערכת ליווי</title>
-  <!-- חיבור לקבצי ה-CSS הקיימים שלך -->
-
   <link rel="stylesheet" href="/CSS/site.css" />
   <link rel="stylesheet" href="/CSS/student-cases.css" />
   <link rel="stylesheet" href="/CSS/tickets.css" />
+  <style>
+    .direction-btn { padding: 6px 14px; border: 1px solid #ddd; border-radius: 20px; background: #fff; cursor: pointer; font-size: 13px; color: #555; }
+    .direction-btn.active { background: #339af0; color: #fff; border-color: #339af0; }
+    .direction-btn:hover:not(.active) { background: #f0f4ff; }
+  </style>
   <link rel="stylesheet" href="/CSS/Chatbot.css" />
-  <link rel="stylesheet" href="../python/static/Chatbot.css" />
 </head>
-
 <body class="page">
+
   <div class="layout">
     <aside class="right-sidebar">
       <div class="brand">מערכת ליווי</div>
-
       <nav class="main-nav">
         <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
         <a href="/student-cases" class="nav-item"><span>תיקי סטודנטים</span></a>
@@ -26,7 +27,6 @@
         <a href="/progress" class="nav-item"><span>התקדמות ומשחוק</span></a>
         <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
       </nav>
-
       <div class="sidebar-footer">
         <a href="#" class="settings-link">הגדרות</a>
       </div>
@@ -37,13 +37,11 @@
         <div class="topbar-right">
           <h1 class="page-title">פניות ושיח יזום</h1>
         </div>
-
         <div class="topbar-center">
           <div class="search-box">
             <input type="text" id="ticketSearch" placeholder="חיפוש סטודנט / פנייה..." />
           </div>
         </div>
-
         <div class="topbar-left">
           <button class="icon-btn">🔔</button>
           <div class="user-name">פולינה (רכזת)</div>
@@ -57,64 +55,61 @@
               <label>שנה סטודנטיאלית:</label>
               <input type="text" value='תשפ"ו (2025–2026)' />
             </div>
-
             <div class="filter-group">
               <label>שנה:</label>
               <input type="text" placeholder="שנה א" />
             </div>
-
             <div class="filter-group">
               <label>סמסטר:</label>
               <input type="text" placeholder="סמסטר א" />
             </div>
           </div>
-
           <div class="filters-row second-row">
             <div class="filter-group wide">
               <label>סינון:</label>
-              <input type="text" id="filterInput" placeholder="שם/מס' סטודנט/סטטוס/נושא" />
+              <input type="text" id="filterInput" placeholder="שם/מס' סטודנט/סטטוס" />
             </div>
           </div>
         </section>
 
         <section class="table-card">
-          <div class="details-header">
-            <h3>פניות נכנסות</h3>
+          <div class="details-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>פניות</h3>
+            <div class="direction-filters" style="display:flex; gap:8px;">
+              <button class="direction-btn active" data-dir="all">הכל</button>
+              <button class="direction-btn" data-dir="incoming">נכנסות</button>
+              <button class="direction-btn" data-dir="outgoing">יוצאות</button>
+            </div>
           </div>
 
           <table class="students-table">
             <thead>
               <tr>
                 <th>מס'</th>
-                <th>נמען</th>
+                <th>שולח</th>
                 <th>נושא</th>
                 <th>סטטוס</th>
                 <th>פעולה</th>
               </tr>
             </thead>
-
             <tbody id="ticketsTableBody"></tbody>
           </table>
 
-          <div class="footer-actions">
-            <button class="secondary-link" onclick="window.location.href='/student-cases'">« חזור</button>
-
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <a href="#" style="color: #339af0; text-decoration: none; font-weight: bold;">פניות יוצאות »</a>
-              <button class="primary-btn" onclick="location.href='/new-ticket'">פנייה חדשה +</button>
-            </div>
+          <div class="table-footer">
+            <button class="secondary-link">«</button>
+            <button class="primary-btn big-btn" onclick="location.href='/new-ticket'">פנייה חדשה +</button>
           </div>
         </section>
       </main>
     </div>
   </div>
 
-  <div class="chatbot-bubble" id="globalChatbot" title="">
+  <div class="chatbot-bubble" id="globalChatbot">
     <span>🤖</span>
   </div>
-    <script src="/JS/ticket.js"></script>
-    <script src="/JS/chatbot.js"></script>
-  </div>
-  <script src="../python/static/chatbot.js"></script>
+
+  <script src="/JS/ticket.js"></script>
+  <script src="/JS/chatbot.js"></script>
 </body>
 </html>
+<!-- style בתוך הHTML עד שנדע איפה קובץ tickets.css -->
