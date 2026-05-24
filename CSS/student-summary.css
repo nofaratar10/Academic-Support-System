@@ -58,3 +58,50 @@
 .result-box li {
   margin-bottom: 4px;
 }
+
+/* ===== אלמנטים חדשים לבחירת סוג הקלט (טקסט / קובץ) ===== */
+
+.input-type-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 0 12px;
+}
+
+.selector-btn {
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+/* כפתור לחוץ/פעיל */
+.selector-btn.active {
+  background: #0056b3;
+  color: white;
+  border-color: #0056b3;
+}
+
+/* אזור העלאת קבצים */
+.file-upload-zone {
+  border: 2px dashed #ccc;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  background: #fdfdfd;
+}
+
+.file-instructions {
+  margin-top: 8px;
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* קלאס חובה להסתרת קונטיינרים שלא נבחרו */
+.hidden {
+  display: none !important;
+}

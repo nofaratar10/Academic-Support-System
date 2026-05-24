@@ -76,9 +76,24 @@
           <div class="details-body">
 
             <!-- קלט שיחה -->
-            <div class="field full-width">
+            <div class="input-type-selector">
+            <button class="selector-btn active" id="selectTextMode">⌨️ הדבקת טקסט</button>
+            <button class="selector-btn" id="selectFileMode">📁 העלאת הקלטה / סרטון</button>
+          </div>
+
+          <div class="details-body">
+
+            <div id="textModeContainer" class="field full-width">
               <label>תוכן השיחה</label>
               <textarea id="conversationText" placeholder="הדביקי כאן את תוכן השיחה עם הסטודנט..."></textarea>
+            </div>
+
+            <div id="fileModeContainer" class="field full-width hidden">
+              <label>העלאת קובץ שיחה (הקלטת זום, טימס, אודיו וכדומה)</label>
+              <div class="file-upload-zone">
+                <input type="file" id="conversationFile" accept="audio/*,video/*" />
+                <p class="file-instructions">ניתן להעלות קבצי וידאו (mp4) או אודיו (mp3, m4a, wav)</p>
+              </div>
             </div>
 
             <!-- כפתור -->
