@@ -109,9 +109,24 @@
     </div>
   </div>
 
-  <div class="chatbot-bubble" id="globalChatbot" title="">
+  <div class="chatbot-bubble" id="globalChatbot" title="התייעצות עם הצ'אטבוט">
     <span>🤖</span>
-  </div>
+    </div>
+
+    <div class="chatbot-container" style="display: none;">
+        <div class="chat-header">
+            <h3>⚙️ עוזר AI - ליווי מילואים</h3>
+            <button type="button" class="close-chat-btn" id="closeChat">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">שלום פולינה, במה אוכל לסייע לך בטיפול בפניות היום?</div>
+        </div>
+        <form class="chat-input-area" id="chatForm">
+            <input type="text" id="userMessage" placeholder="הקלידי שאלה או פרטי פנייה..." autocomplete="off" />
+            <button type="submit">שלח</button>
+        </form>
+    </div>
+
     <script src="/JS/ticket.js"></script>
     <script src="/JS/chatbot.js"></script>
   </div>
