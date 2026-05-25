@@ -3,7 +3,8 @@ from flask import Flask, jsonify, request, send_from_directory
 import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from datetime import date
+from datetime import date, datetime
+from process3 import init_process3
 # from dotenv import load_dotenv  
 # import google.generativeai as genai  
 
@@ -32,6 +33,7 @@ class Student(db.Model):
     phone = db.Column(db.String(20), nullable=True)
 
     support_files = db.relationship("SupportFile", backref="student", lazy=True)
+    # tasks relationship is added dynamically by process3.init_process3()
 
     def to_dict(self):
         latest_support_file = None
@@ -119,6 +121,10 @@ class Message(db.Model):
             "urgency_level": self.urgency_level,
             "summary": self.summary,
         }
+
+
+# Register Process 3 (Task model + /students-progress routes)
+init_process3(app, db, Student)
 
 
 @app.route("/")
