@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>פנייה פתוחה - מערכת ליווי</title>
+  <link rel="stylesheet" href="/CSS/site.css" />
+  <link rel="stylesheet" href="/CSS/view-ticket.css" />
+  <link rel="stylesheet" href="/CSS/Chatbot.css" />
+  <style>
+    .reply-card { margin-top: 16px; padding: 16px; }
+    .reply-card h4 { margin-bottom: 10px; }
+    .reply-card textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical; }
+    .reply-footer { display: flex; justify-content: flex-start; margin-top: 10px; }
+    #messagesContainer { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+  </style>
+</head>
+<body class="page">
+
+  <div class="layout">
+    <aside class="right-sidebar">
+      <div class="brand">מערכת ליווי</div>
+      <nav class="main-nav">
+        <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
+        <a href="/student-cases" class="nav-item"><span>תיקי סטודנטים</span></a>
+        <a href="/tickets" class="nav-item active"><span>פניות ושיח יזום</span></a>
+        <a href="/alerts" class="nav-item"><span>תגבורים והתאמות</span></a>
+        <a href="/progress" class="nav-item"><span>התקדמות ומשחוק</span></a>
+        <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+      </nav>
+    </aside>
+
+    <div class="main-area">
+      <header class="topbar">
+        <div class="topbar-right">
+          <h1 class="page-title">פנייה פתוחה</h1>
+        </div>
+        <div class="topbar-left">
+          <button class="icon-btn">🔔</button>
+          <div class="user-name">פולינה (רכזת)</div>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="ticket-container">
+
+          <!-- כותרת הפנייה -->
+          <div class="ticket-header-card table-card">
+            <button class="back-btn" onclick="window.location.href='/tickets'">&#10094;</button>
+            <div class="header-info">
+              <h2 id="ticketSubject">טוען...</h2>
+              <span class="status-pill" id="ticketStatus"></span>
+            </div>
+          </div>
+
+          <!-- שרשור הודעות -->
+          <div id="messagesContainer"></div>
+
+          <!-- שדה תגובה -->
+          <div class="table-card reply-card">
+            <h4>תגובה</h4>
+            <textarea id="replyContent" placeholder="כתבי תגובה..."></textarea>
+            <div class="reply-footer">
+              <button class="primary-btn" id="sendReplyBtn">שליחה</button>
+            </div>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </div>
+
+    <div class="chatbot-bubble" id="globalChatbot" title="התייעצות עם הצ'אטבוט">
+    <span>🤖</span>
+    </div>
+
+    <div class="chatbot-container" style="display: none;">
+        <div class="chat-header">
+            <h3>⚙️ עוזר AI - ליווי מילואים</h3>
+            <button type="button" class="close-chat-btn" id="closeChat">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">שלום פולינה, במה אוכל לסייע לך בטיפול בפניות היום?</div>
+        </div>
+        <form class="chat-input-area" id="chatForm">
+            <input type="text" id="userMessage" placeholder="הקלידי שאלה או פרטי פנייה..." autocomplete="off" />
+            <button type="submit">שלח</button>
+        </form>
+    </div>
+
+    <script src="/JS/view-ticket.js"></script>
+    <script src="/JS/chatbot.js"></script>
+</body>
+</html>

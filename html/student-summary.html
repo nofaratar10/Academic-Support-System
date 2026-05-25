@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>סיכומי שיחה - מערכת ליווי</title>
 
-  <link rel="stylesheet" href="../CSS/site.css" />
-  <link rel="stylesheet" href="../CSS/student-summary.css" />
+  <link rel="stylesheet" href="/CSS/site.css" />
+  <link rel="stylesheet" href="/CSS/student-summary.css" />
 </head>
 
 <body class="page">
@@ -17,12 +18,12 @@
       <div class="brand">מערכת ליווי</div>
 
       <nav class="main-nav">
-        <a href="dashboard.html" class="nav-item">דשבורד</a>
-        <a href="student-cases.html" class="nav-item active">תיקי סטודנטים</a>
-        <a href="tickets.html" class="nav-item">פניות ושיח יזום</a>
-        <a href="alerts.html" class="nav-item">תגבורים והתאמות</a>
-        <a href="progress.html" class="nav-item">התקדמות ומשחוק</a>
-        <a href="reports.html" class="nav-item">דוחות ואחזור מידע</a>
+        <a href="/dashboard" class="nav-item">דשבורד</a>
+        <a href="/student-cases" class="nav-item active">תיקי סטודנטים</a>
+        <a href="/tickets" class="nav-item">פניות ושיח יזום</a>
+        <a href="/alerts" class="nav-item">תגבורים והתאמות</a>
+        <a href="/progress" class="nav-item">התקדמות ומשחוק</a>
+        <a href="/reports" class="nav-item">דוחות ואחזור מידע</a>
       </nav>
 
       <div class="sidebar-footer">
@@ -53,7 +54,7 @@
       <!-- 🧑‍🎓 פרטי סטודנט -->
       <section class="student-bar">
         <h2 class="student-name">שם הסטודנט</h2>
-        <button class="back" onclick="window.location.href='student-cases.html'">←</button>
+        <button class="back" onclick="window.location.href='/student-cases'">←</button>
       </section>
 
       <!-- 📑 טאבים -->
@@ -75,9 +76,24 @@
           <div class="details-body">
 
             <!-- קלט שיחה -->
-            <div class="field full-width">
+            <div class="input-type-selector">
+            <button class="selector-btn active" id="selectTextMode">⌨️ הדבקת טקסט</button>
+            <button class="selector-btn" id="selectFileMode">📁 העלאת הקלטה / סרטון</button>
+          </div>
+
+          <div class="details-body">
+
+            <div id="textModeContainer" class="field full-width">
               <label>תוכן השיחה</label>
               <textarea id="conversationText" placeholder="הדביקי כאן את תוכן השיחה עם הסטודנט..."></textarea>
+            </div>
+
+            <div id="fileModeContainer" class="field full-width hidden">
+              <label>העלאת קובץ שיחה (הקלטת זום, טימס, אודיו וכדומה)</label>
+              <div class="file-upload-zone">
+                <input type="file" id="conversationFile" accept="audio/*,video/*" />
+                <p class="file-instructions">ניתן להעלות קבצי וידאו (mp4) או אודיו (mp3, m4a, wav)</p>
+              </div>
             </div>
 
             <!-- כפתור -->
@@ -119,4 +135,5 @@
 
   <script src="../JS/student-summary.js"></script>
 </body>
+
 </html>

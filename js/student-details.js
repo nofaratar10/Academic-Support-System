@@ -46,10 +46,10 @@ function getStatusClass(status) {
 }
 
 function setTabs(studentIdValue) {
-  document.getElementById("detailsTab").href = `student-details.html?id=${studentIdValue}`;
-  document.getElementById("documentsTab").href = `case-documents.html?id=${studentIdValue}`;
-  document.getElementById("planTab").href = `case-plan.html?id=${studentIdValue}`;
-  document.getElementById("summaryTab").href = `student-summary.html?id=${studentIdValue}`;
+  document.getElementById("detailsTab").href = `/student-details?id=${studentIdValue}`;
+  document.getElementById("documentsTab").href = `/case-documents?id=${studentIdValue}`;
+  document.getElementById("planTab").href = `/case-plan?id=${studentIdValue}`;
+  document.getElementById("summaryTab").href = `/student-summary?id=${studentIdValue}`;
 }
 
 async function loadStudent() {

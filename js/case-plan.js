@@ -1,5 +1,3 @@
-const API_BASE_URL = "http://vmedu473.mtacloud.co.il:5000";
-
 const params = new URLSearchParams(window.location.search);
 const studentId = params.get("id");
 
@@ -25,14 +23,20 @@ const taskStatusInput = document.getElementById("taskStatus");
 function showToast(message) {
   toast.textContent = message;
   toast.classList.add("visible");
-  window.setTimeout(() => toast.classList.remove("visible"), 2200);
+  setTimeout(() => toast.classList.remove("visible"), 2200);
 }
 
-function setTabs(studentIdValue) {
-  detailsTab.href = `student-details.html?id=${studentIdValue}`;
-  documentsTab.href = `case-documents.html?id=${studentIdValue}`;
-  planTab.href = `case-plan.html?id=${studentIdValue}`;
-  summaryTab.href = `student-summary.html?id=${studentIdValue}`;
+function setTabs(id) {
+  detailsTab.href = `/student-details?id=${id}`;
+  documentsTab.href = `/case-documents?id=${id}`;
+  planTab.href = `/case-plan?id=${id}`;
+  summaryTab.href = `/student-summary?id=${id}`;
+}
+
+function getStatusClass(status) {
+  if (status === "הושלם") return "status-pill status-closed";
+  if (status === "בביצוע") return "status-pill status-progress";
+  return "status-pill status-open";
 }
 
 async function loadStudent() {
@@ -40,118 +44,74 @@ async function loadStudent() {
     studentHeader.textContent = "לא נבחר סטודנט";
     return;
   }
-
   try {
-    const response = await fetch(`${API_BASE_URL}/students/${studentId}`);
-    if (!response.ok) throw new Error("Student not found");
-
-    const student = await response.json();
+    const res = await fetch(`/students/${studentId}`);
+    if (!res.ok) throw new Error();
+    const student = await res.json();
     const fullName = `${student.first_name || ""} ${student.last_name || ""}`.trim();
-
     studentHeader.textContent = `${fullName} | ${student.student_id}`;
     setTabs(student.student_id);
-  } catch (error) {
-    console.error(error);
+  } catch {
     studentHeader.textContent = "שגיאה בטעינת הנתונים";
   }
 }
 
 async function loadTasks() {
   try {
-    const response = await fetch(`${API_BASE_URL}/students/${studentId}/tasks`);
-    if (!response.ok) throw new Error("Failed to load tasks");
-
-    const tasks = await response.json();
+    const res = await fetch(`/students/${studentId}/tasks`);
+    if (!res.ok) throw new Error();
+    const tasks = await res.json();
     renderTasks(tasks);
-  } catch (error) {
-    console.error(error);
-    planTableBody.innerHTML = `<tr><td colspan="5">שגיאה בטעינת המשימות</td></tr>`;
+  } catch {
+    planTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">שגיאה בטעינת המשימות</td></tr>`;
   }
 }
 
 function renderTasks(tasks) {
   planTableBody.innerHTML = "";
-
   if (!tasks.length) {
-    planTableBody.innerHTML = `<tr><td colspan="5">אין משימות לסטודנט זה</td></tr>`;
+    planTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">אין משימות עדיין</td></tr>`;
     return;
   }
-
   tasks.forEach((item) => {
     const row = document.createElement("tr");
-
     row.innerHTML = `
       <td>${item.task || ""}</td>
       <td>${item.description || ""}</td>
       <td>${item.dueDate || ""}</td>
-      <td>${item.status || "פתוח"}</td>
+      <td><span class="${getStatusClass(item.status)}">${item.status || "פתוח"}</span></td>
       <td>
         <button class="btn" type="button" onclick="deleteTask(${item.task_id})">מחיקה</button>
       </td>
     `;
-
     planTableBody.appendChild(row);
   });
 }
 
-async function addTask() {
-  const task = prompt("כתבי קטגוריית משימה / שם משימה:");
-  if (!task) return;
-
-  const description = prompt("כתבי תיאור משימה:") || "";
-  const dueDate = prompt("כתבי תאריך יעד:") || new Date().toLocaleDateString("he-IL");
-  const status = prompt("כתבי סטטוס: פתוח / בביצוע / הושלם") || "פתוח";
-
+window.deleteTask = async function(taskId) {
+  if (!confirm("למחוק את המשימה?")) return;
   try {
-    const response = await fetch(`${API_BASE_URL}/students/${studentId}/tasks`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        task,
-        description,
-        dueDate,
-        status
-      })
-    });
-
-    if (!response.ok) throw new Error("Failed to create task");
-
-    await loadTasks();
-    showToast("המשימה נוספה");
-  } catch (error) {
-    console.error(error);
-    alert("שגיאה בהוספת משימה");
-  }
-}
-
-window.deleteTask = async function deleteTask(taskId) {
-  const confirmDelete = confirm("למחוק את המשימה?");
-  if (!confirmDelete) return;
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
-      method: "DELETE"
-    });
-
-    if (!response.ok) throw new Error("Failed to delete task");
-
+    const res = await fetch(`/tasks/${taskId}`, { method: "DELETE" });
+    if (!res.ok) throw new Error();
     await loadTasks();
     showToast("המשימה נמחקה");
-  } catch (error) {
-    console.error(error);
+  } catch {
     alert("שגיאה במחיקת משימה");
   }
 };
 
 addTaskBtn.addEventListener("click", () => {
+  taskNameInput.value = "";
+  taskDescriptionInput.value = "";
+  taskDueDateInput.value = "";
+  taskStatusInput.value = "פתוח";
   taskModal.classList.add("visible");
 });
 
 cancelTaskBtn.addEventListener("click", () => {
   taskModal.classList.remove("visible");
 });
+
 saveTaskBtn.addEventListener("click", async () => {
   const task = taskNameInput.value.trim();
   const description = taskDescriptionInput.value.trim();
@@ -159,33 +119,22 @@ saveTaskBtn.addEventListener("click", async () => {
   const status = taskStatusInput.value;
 
   if (!task) {
-    alert("צריך למלא שם משימה");
+    alert("יש למלא שם משימה");
     return;
   }
 
   try {
-    const response = await fetch(`http://vmedu473.mtacloud.co.il:5000/students/${studentId}/tasks`, {
+    const res = await fetch(`/students/${studentId}/tasks`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        task,
-        description,
-        dueDate,
-        status
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task, description, dueDate, status })
     });
-
-    if (!response.ok) throw new Error();
-
+    if (!res.ok) throw new Error();
     taskModal.classList.remove("visible");
     await loadTasks();
     showToast("המשימה נוספה");
-
-  } catch (err) {
-    console.error(err);
-    alert("שגיאה");
+  } catch {
+    alert("שגיאה בהוספת משימה");
   }
 });
 

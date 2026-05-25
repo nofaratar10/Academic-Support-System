@@ -4,46 +4,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>תיקי סטודנטים - מערכת ליווי</title>
-  <link rel="stylesheet" href="../CSS/site.css" />
-  <link rel="stylesheet" href="../CSS/student-cases.css" />
+  <link rel="stylesheet" href="/CSS/site.css" />
+  <link rel="stylesheet" href="/CSS/student-cases.css" />
 </head>
 <body class="page">
 
   <div class="layout">
 
     <aside class="right-sidebar">
-      <div class="brand">מערכת ליווי</div>
+  <div class="brand">מערכת ליווי</div>
 
-      <nav class="main-nav">
-        <a href="dashboard.html" class="nav-item">
-          <span>דשבורד</span>
-        </a>
+  <nav class="main-nav">
+    <a href="/dashboard" class="nav-item">
+      <span>דשבורד</span>
+    </a>
 
-        <a href="student-cases.html" class="nav-item active">
-          <span>תיקי סטודנטים</span>
-        </a>
+    <a href="/student-cases" class="nav-item active">
+      <span>תיקי סטודנטים</span>
+    </a>
 
-        <a href="tickets.html" class="nav-item">
-          <span>פניות ושיח יזום</span>
-        </a>
+    <a href="/tickets" class="nav-item">
+      <span>פניות ושיח יזום</span>
+    </a>
 
-        <a href="alerts.html" class="nav-item">
-          <span>תגבורים והתאמות</span>
-        </a>
+    <a href="/alerts" class="nav-item">
+      <span>תגבורים והתאמות</span>
+    </a>
 
-        <a href="progress.html" class="nav-item">
-          <span>התקדמות ומשחוק</span>
-        </a>
+    <a href="/progress" class="nav-item">
+      <span>התקדמות ומשחוק</span>
+    </a>
 
-        <a href="reports.html" class="nav-item">
-          <span>דוחות ואחזור מידע</span>
-        </a>
-      </nav>
+    <a href="/reports" class="nav-item">
+      <span>דוחות ואחזור מידע</span>
+    </a>
+  </nav>
 
-      <div class="sidebar-footer">
-        <a href="#" class="settings-link">הגדרות</a>
-      </div>
-    </aside>
+  <div class="sidebar-footer">
+    <a href="#" class="settings-link">הגדרות</a>
+  </div>
+</aside>
 
     <div class="main-area">
 
@@ -107,7 +107,7 @@
 
           <div class="table-footer">
             <button class="secondary-link">«</button>
-            <a href="new-case.html" class="primary-btn big-btn"> פתיחת תיק חדש</a>                                                  
+            <a href="/new-case" class="primary-btn big-btn"> פתיחת תיק חדש</a>                                                  
           </div>
         </section>
       </main>
@@ -162,7 +162,7 @@
           <td><span class="${getSupportStatusClass(student.support_status)}">${supportStatus}</span></td>
           <td>${student.task_status || "הושלם"}</td>
           <td>
-            <a href="student-details.html?id=${student.student_id}" class="primary-btn">תיק ליווי מלא</a>
+            <a href="/student-details?id=${student.student_id}" class="primary-btn">תיק ליווי מלא</a>
           </td>
         `;
         tableBody.appendChild(row);
@@ -194,7 +194,7 @@
 
     async function loadStudents() {
       try {
-        const response = await fetch("http://vmedu473.mtacloud.co.il:5000/students");
+        const response = await fetch("/students");
         if (!response.ok) {
           throw new Error("Failed to load students");
         }

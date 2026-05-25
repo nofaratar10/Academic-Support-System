@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>פנייה חדשה - מערכת ליווי</title>
+    <!-- חיבור לקבצים הקיימים שלך -->
+    <link rel="stylesheet" href="/CSS/site.css" />
+    <!-- חיבור לקובץ ה-CSS החדש שיצרנו למטה -->
+    <link rel="stylesheet" href="/CSS/new-ticket.css" />
+    <link rel="stylesheet" href="/CSS/Chatbot.css" />
+    <link rel="stylesheet" href="../python/static/Chatbot.css" />
+
+</head>
+
+<body class="page">
+
+    <div class="layout">
+        <aside class="right-sidebar">
+            <div class="brand">מערכת ליווי</div>
+            <nav class="main-nav">
+                <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
+                <a href="/student-cases" class="nav-item"><span>תיקי סטודנטים</span></a>
+                <a href="/tickets" class="nav-item active"><span>פניות ושיח יזום</span></a>
+                <a href="/alerts" class="nav-item"><span>תגבורים והתאמות</span></a>
+                <a href="/progress" class="nav-item"><span>התקדמות ומשחוק</span></a>
+                <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="settings-link">הגדרות</a>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div class="topbar-right">
+                    <h1 class="page-title">פנייה חדשה</h1>
+                </div>
+                <div class="topbar-center">
+                    <div class="search-box">
+                        <input type="text" placeholder="חיפוש סטודנט / פנייה..." />
+                    </div>
+                </div>
+                <div class="topbar-left">
+                    <button class="icon-btn">🔔</button>
+                    <div class="user-name">פולינה (רכזת)</div>
+                </div>
+            </header>
+
+            <main class="content">
+                <div class="form-container table-card">
+                    <div class="form-header">
+                        <button class="back-btn" onclick="history.back()">&#10094;</button>
+                        <h2>פנייה חדשה</h2>
+                    </div>
+
+                    <form id="newTicketForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="recipient">נמען</label>
+                                <select id="recipient" name="recipient" required>
+                                    <option value="">בחירת נמען (סטודנט, מרצה..)</option>
+                                    <option value="student_1">יוסי כהן (סטודנט)</option>
+                                    <option value="lecturer_1">ד"ר לוי (מרצה)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cc">העתק</label>
+                                <select id="cc" name="cc">
+                                    <option value=""></option>
+                                    <option value="admin">רכזת לימודים</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">נושא</label>
+                            <input type="text" id="subject" name="subject" placeholder="בחירת נושא" required />
+                        </div>
+
+                        <div class="form-group">
+                            <label>תוכן הפנייה</label>
+                            <div class="editor-container">
+                                <div class="editor-toolbar">
+                                    <button type="button" title="צירוף קובץ">📎</button>
+                                    <button type="button" style="font-weight: bold;">B</button>
+                                    <button type="button" style="font-style: italic;">I</button>
+                                    <button type="button" style="text-decoration: underline;">U</button>
+                                    <button type="button">≡</button>
+                                </div>
+                                <textarea id="ticketContent" name="content" placeholder="הקלד כאן את תוכן הפנייה..."
+                                    required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-footer">
+                            <button type="submit" class="primary-btn submit-btn">שלייחת פניה</button>
+                        </div>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="chatbot-bubble" id="globalChatbot" title="התייעצות עם הצ'אטבוט">
+    <span>🤖</span>
+    </div>
+
+    <div class="chatbot-container" style="display: none;">
+        <div class="chat-header">
+            <h3>⚙️ עוזר AI - ליווי מילואים</h3>
+            <button type="button" class="close-chat-btn" id="closeChat">&times;</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">שלום פולינה, במה אוכל לסייע לך בטיפול בפניות היום?</div>
+        </div>
+        <form class="chat-input-area" id="chatForm">
+            <input type="text" id="userMessage" placeholder="הקלידי שאלה או פרטי פנייה..." autocomplete="off" />
+            <button type="submit">שלח</button>
+        </form>
+    </div>
+
+    <script src="/JS/new-ticket.js"></script>
+    <script src="/JS/chatbot.js"></script>
+</body>
+
+</html>
