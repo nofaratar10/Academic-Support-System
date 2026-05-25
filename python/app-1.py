@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import date
+from process3 import init_process3
 import os
 
 app = Flask(__name__)
@@ -26,6 +27,7 @@ class Student(db.Model):
     phone = db.Column(db.String(20), nullable=True)
 
     support_files = db.relationship("SupportFile", backref="student", lazy=True)
+    # tasks relationship is added dynamically by process3.init_process3()
 
     def to_dict(self):
         latest_support_file = None
@@ -148,7 +150,7 @@ class TicketMessage(db.Model):
 
 
 # ─── Static routes ───────────────────────────────────────────
-
+init_process3(app, db, Student, Task)
 @app.route("/")
 def home():
     return send_from_directory(os.path.join(BASE_DIR, "html"), "student-cases.html")
