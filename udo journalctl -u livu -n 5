@@ -1,0 +1,20 @@
+[0;1;32m●[0m livu.service - LIVU Flask System
+     Loaded: loaded (/etc/systemd/system/livu.service; enabled; vendor preset: enabled)
+     Active: [0;1;32mactive (running)[0m since Wed 2026-05-20 15:22:11 IDT; 2min 24s ago
+   Main PID: 916335 (python3)
+      Tasks: 3 (limit: 4550)
+     Memory: 82.8M
+     CGroup: /system.slice/livu.service
+             ├─916335 /usr/bin/python3 /home/meronan/Academic-Support-System/python/app-1.py
+             └─916356 /usr/bin/python3 /home/meronan/Academic-Support-System/python/app-1.py
+
+May 20 15:23:27 vmedu473 python3[916356]: 5.29.210.240 - - [20/May/2026 15:23:27] "GET /students/1 HTTP/1.1" 200 -
+May 20 15:23:28 vmedu473 python3[916356]: 5.29.210.240 - - [20/May/2026 15:23:28] "GET /case-plan?id=1 HTTP/1.1" 304 -
+May 20 15:23:28 vmedu473 python3[916356]: 5.29.210.240 - - [20/May/2026 15:23:28] "GET /CSS/site.css HTTP/1.1" 304 -
+May 20 15:23:28 vmedu473 python3[916356]: 5.29.210.240 - - [20/May/2026 15:23:28] "GET /JS/case-plan.js HTTP/1.1" 304 -
+May 20 15:23:28 vmedu473 python3[916356]: 5.29.210.240 - - [20/May/2026 15:23:28] "GET /CSS/case-plan.css HTTP/1.1" 304 -
+May 20 15:23:28 vmedu473 python3[916356]: 5.29.210.240 - - [20/May/2026 15:23:28] "GET /students/1/tasks HTTP/1.1" 404 -
+May 20 15:23:28 vmedu473 python3[916356]: 5.29.210.240 - - [20/May/2026 15:23:28] "GET /students/1 HTTP/1.1" 200 -
+May 20 15:23:51 vmedu473 python3[916356]: 5.29.210.240 - - [20/May/2026 15:23:51] "POST /students/1/tasks HTTP/1.1" 404 -
+May 20 15:24:10 vmedu473 python3[916356]: 5.29.210.240 - - [20/May/2026 15:24:10] "GET /CSS/site.css HTTP/1.1" 304 -
+May 20 15:24:10 vmedu473 python3[916356]: 5.29.210.240 - - [20/May/2026 15:24:10] "GET /CSS/case-plan.css HTTP/1.1" 304 -

@@ -7,15 +7,15 @@ function getInitials(first, last) {
 
 function getBarColor(pct) {
   if (pct === 100) return "#0ca678";
-  if (pct >= 50) return "#228be6";
-  if (pct > 0) return "#ef9f27";
+  if (pct >= 70) return "#228be6";
+  if (pct >= 40) return "#ef9f27";
+  if (pct > 0) return "#ffd43b";
   return "#e5e7eb";
 }
 
 function getAlertClass(alert) {
   if (alert === "לא התחיל") return "alert-row alert-danger";
-  if (alert === "משימה באיחור") return "alert-row alert-warning";
-  if (alert === "ירידה בקצב") return "alert-row alert-warning";
+  if (alert === "משימה באיחור" || alert === "ירידה בקצב") return "alert-row alert-warning";
   return "";
 }
 
@@ -134,18 +134,44 @@ function filterAndRender() {
 
 async function loadProgress() {
   try {
-    const res = await fetch("/api/progress");
-    if (!res.ok) throw new Error();
-    allData = await res.json();
+    // קריאת fetch אמיתית לשרת לפיוני ה-API
+    const res = await fetch("/api/progress"); 
+    if (!res.ok) throw new Error("שגיאה בתגובת השרת");
+    
+    const serverData = await res.json();
+
+    allData = serverData.map(student => {
+      const nameParts = student.name ? student.name.split(" ") : ["", ""];
+      
+      const total = student.total_tasks || 0;
+      const completed = student.completed_tasks || 0;
+      
+      let computedAlert = "";
+      if (student.progress < 40) computedAlert = "לא התחיל";
+      if (student.status === "איחור") computedAlert = "משימה באיחור";
+
+      return {
+        student_id: student.student_id,
+        first_name: nameParts[0] || "סטודנט",
+        last_name: nameParts.slice(1).join(" ") || "",
+        pct: student.progress || 0, 
+        done: completed,
+        in_progress: student.in_progress_tasks || 0, 
+        total_tasks: total,
+        points: student.points || 0,
+        alert: computedAlert
+      };
+    });
 
     renderSummary(allData);
     renderLeaderboard(allData);
     renderAlerts(allData);
     renderAllStudents(allData);
+    
   } catch (err) {
-    console.error(err);
+    console.error("שגיאה קריטית בטעינת הנתונים מהשרת:", err);
     document.getElementById("allStudentsList").innerHTML =
-      `<div class="empty-row">שגיאה בטעינת הנתונים</div>`;
+      `<div class="empty-row" style="color:#fa5252;">⚠️ שגיאה בתקשורת עם השרת. ודא ששרת ה-Backend מופעל.</div>`;
   }
 }
 
