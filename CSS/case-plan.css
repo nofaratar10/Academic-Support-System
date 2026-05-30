@@ -70,6 +70,27 @@
     grid-column: span 1;
     max-width: none;
   }
+
+  /* Table needs a minimum width so it scrolls inside .table-card */
+  .plan-table {
+    min-width: 520px;
+  }
+}
+
+@media (max-width: 600px) {
+  .plan-top-fields {
+    padding: 0 14px 14px;
+  }
+
+  .plan-header {
+    padding: 14px 14px 8px;
+  }
+
+  .plan-table thead th,
+  .plan-table tbody td {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
 }
 .modal-overlay {
   position: fixed;

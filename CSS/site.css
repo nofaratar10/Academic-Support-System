@@ -372,6 +372,12 @@ textarea:focus {
     flex-wrap: wrap;
   }
 
+  /* Active border flips from right-edge to bottom-edge in horizontal nav */
+  .nav-item.active {
+    border-right: none;
+    border-bottom: 3px solid #2563eb;
+  }
+
   .sidebar-footer {
     margin-top: 16px;
     padding-top: 0;
@@ -381,6 +387,15 @@ textarea:focus {
     grid-template-columns: 1fr;
     height: auto;
     padding: 16px;
+    gap: 10px;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .topbar-left {
+    justify-content: flex-start;
   }
 
   .content {
@@ -389,5 +404,112 @@ textarea:focus {
 
   .student-bar {
     padding: 0 16px;
+  }
+
+  /* Tables scroll horizontally instead of overflowing */
+  .table-card {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── Small phones ── */
+@media (max-width: 600px) {
+  .brand {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  /* Nav scrolls horizontally so all items remain reachable */
+  .main-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .main-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-item {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  .nav-item.active {
+    padding: 10px 12px;
+  }
+
+  .content {
+    padding: 12px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .user-name {
+    font-size: 14px;
+  }
+
+  .student-bar {
+    padding: 0 12px;
+    min-height: 52px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .student-name {
+    font-size: 15px;
+  }
+
+  .tabs {
+    padding: 10px 10px 0;
+    gap: 4px;
+  }
+
+  .tab {
+    min-width: 88px;
+    height: 40px;
+    font-size: 13px;
+    padding: 0 8px;
+  }
+
+  .primary-btn,
+  .btn.primary {
+    min-width: 80px;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .btn {
+    min-width: 70px;
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .big-btn {
+    min-width: 110px;
+    height: 40px;
+  }
+
+  .table-footer {
+    padding: 12px 14px;
+    gap: 8px;
+  }
+
+  .status-pill {
+    padding: 5px 10px;
+    font-size: 12px;
+    min-width: 50px;
+  }
+
+  .filters-card {
+    padding: 12px;
   }
 }

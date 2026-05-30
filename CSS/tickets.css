@@ -78,3 +78,38 @@
   font-size: 14px;
   font-weight: 600;
 }
+
+@media (max-width: 760px) {
+  /* Header row wraps: title on top, filter buttons below */
+  .details-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .direction-filters {
+    flex-wrap: wrap;
+  }
+
+  .footer-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* Table needs a minimum width so it scrolls inside .table-card */
+  .students-table {
+    min-width: 480px;
+  }
+}
+
+@media (max-width: 600px) {
+  .direction-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .students-table thead th,
+  .students-table tbody td {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+}
