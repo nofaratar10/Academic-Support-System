@@ -252,9 +252,6 @@ def js_files(filename):
 def html_files(filename):
     return send_from_directory(os.path.join(BASE_DIR, "html"), filename)
 
-@app.route("/chatbot")
-def chatbot_home():
-    return render_template("chatbot.html")
 
 
 # ─── Students API ─────────────────────────────────────────────────────────────
