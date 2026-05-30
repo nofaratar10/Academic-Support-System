@@ -45,5 +45,35 @@
 .form-actions {
   margin-top: 24px;
   display: flex;
+  gap: 10px;
   justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 760px) {
+  .new-case-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .new-case-card {
+    margin: 12px;
+    padding: 18px;
+  }
+}
+
+@media (max-width: 600px) {
+  .new-case-card {
+    margin: 8px;
+    padding: 14px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions .btn,
+  .form-actions .primary-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }

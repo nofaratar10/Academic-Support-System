@@ -164,3 +164,41 @@
   .summary-grid { grid-template-columns: repeat(2, 1fr); }
   .progress-grid { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 600px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .summary-box {
+    padding: 12px 8px;
+  }
+
+  .summary-num {
+    font-size: 22px;
+  }
+
+  .summary-label {
+    font-size: 12px;
+  }
+
+  .progress-grid {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .card-header {
+    padding: 12px 14px;
+  }
+
+  .student-row {
+    padding: 10px 14px;
+  }
+
+  .alert-row {
+    padding: 8px 14px;
+    margin: 6px 8px;
+  }
+}

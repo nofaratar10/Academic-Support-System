@@ -67,4 +67,33 @@
   .filters-row {
     flex-direction: column;
   }
+
+  .filter-group label {
+    white-space: normal;
+    font-size: 13px;
+  }
+
+  /* Table needs a minimum width so it scrolls inside .table-card */
+  .students-table {
+    min-width: 520px;
+  }
+}
+
+@media (max-width: 600px) {
+  .filters-card {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .filter-group {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .students-table thead th,
+  .students-table tbody td {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
 }
