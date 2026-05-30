@@ -7,3 +7,8 @@ python/__pycache__/
 *.pyc
 python/app.log
 python/chatbot.log
+=======
+*.pyc
+*.db
+instance/
+
