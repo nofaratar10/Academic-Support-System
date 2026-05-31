@@ -1,29 +1,19 @@
-from flask import Flask, jsonify, request, send_from_directory, render_template
+from flask import Flask, jsonify, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from dotenv import load_dotenv
-from pathlib import Path
-from datetime import date, datetime, timedelta
-import requests
+from datetime import date
 import os
-
-# ─── App & Config ────────────────────────────────────────────────────────────
-
-PYTHON_DIR = Path(__file__).resolve().parent
-load_dotenv(PYTHON_DIR / ".env")
-
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 app = Flask(__name__)
 CORS(app)
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://livu_user:12345678@localhost/livu_db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
-
-# ─── Models ───────────────────────────────────────────────────────────────────
 
 class Student(db.Model):
     __tablename__ = "students"
@@ -36,6 +26,7 @@ class Student(db.Model):
     phone = db.Column(db.String(20), nullable=True)
 
     support_files = db.relationship("SupportFile", backref="student", lazy=True)
+    # tasks relationship is added dynamically by process3.init_process3()
 
     def to_dict(self):
         latest_support_file = None
@@ -157,33 +148,7 @@ class TicketMessage(db.Model):
         }
 
 
-# ─── Helper Functions ─────────────────────────────────────────────────────────
-
-def _parse_due_date(value):
-    if value is None or value == "":
-        return None
-    if isinstance(value, datetime):
-        return value.date()
-    if isinstance(value, date):
-        return value
-    if isinstance(value, str):
-        value = value.strip()
-        if not value:
-            return None
-        for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y"):
-            try:
-                return datetime.strptime(value, fmt).date()
-            except ValueError:
-                continue
-        try:
-            return datetime.fromisoformat(value.replace("Z", "+00:00")).date()
-        except ValueError:
-            return None
-    return None
-
-
-# ─── Static Routes ────────────────────────────────────────────────────────────
-
+# ─── Static routes ───────────────────────────────────────────
 @app.route("/")
 def home():
     return send_from_directory(os.path.join(BASE_DIR, "html"), "student-cases.html")
@@ -253,8 +218,7 @@ def html_files(filename):
     return send_from_directory(os.path.join(BASE_DIR, "html"), filename)
 
 
-
-# ─── Students API ─────────────────────────────────────────────────────────────
+# ─── Students API ───────────────────────────────────────────
 
 @app.route("/students", methods=["GET"])
 def get_students():
@@ -286,7 +250,7 @@ def create_student():
     return jsonify(student.to_dict()), 201
 
 
-# ─── Tasks API ────────────────────────────────────────────────────────────────
+# ─── Tasks API ───────────────────────────────────────────────
 
 @app.route("/students/<int:student_id>/tasks", methods=["GET"])
 def get_tasks(student_id):
@@ -320,7 +284,7 @@ def delete_task(task_id):
     return jsonify({"message": "deleted"}), 200
 
 
-# ─── Tickets API ──────────────────────────────────────────────────────────────
+# ─── Tickets API ─────────────────────────────────────────────
 
 @app.route("/api/tickets", methods=["GET"])
 def get_tickets():
@@ -388,7 +352,7 @@ def add_ticket_message(ticket_id):
     return jsonify(message.to_dict()), 201
 
 
-# ─── Seed ─────────────────────────────────────────────────────────────────────
+# ─── Seed ────────────────────────────────────────────────────
 
 @app.route("/seed-students", methods=["GET"])
 def seed_students():
@@ -423,184 +387,36 @@ def seed_students():
     db.session.add_all(support_files)
     db.session.commit()
     return jsonify({"message": "demo students seeded successfully"})
+# ─── Chatbot API ─────────────────────────────────────────────
 
-
-# ─── Progress Routes (from process3.py) ───────────────────────────────────────
-
-@app.route("/students-progress", methods=["GET"])
-def get_students_progress():
-    today = date.today()
-    students = Student.query.all()
-    result = []
-    completed_statuses = {"completed", "הושלם", "בוצע", "סגור"}
-
-    for student in students:
-        tasks = Task.query.filter_by(student_id=student.student_id).all()
-        total_tasks = len(tasks)
-
-        completed_tasks = [t for t in tasks if str(t.status or "").strip().lower() in completed_statuses]
-
-        overdue_tasks = [
-            t for t in tasks
-            if str(t.status or "").strip().lower() not in completed_statuses
-            and _parse_due_date(t.due_date) is not None
-            and _parse_due_date(t.due_date) < today
-        ]
-
-        open_tasks = [
-            t for t in tasks
-            if str(t.status or "").strip().lower() not in completed_statuses
-            and (_parse_due_date(t.due_date) is None or _parse_due_date(t.due_date) >= today)
-        ]
-
-        completed_count = len(completed_tasks)
-        open_count      = len(open_tasks)
-        overdue_count   = len(overdue_tasks)
-
-        progress = round((completed_count / total_tasks) * 100) if total_tasks > 0 else 0
-
-        total_points = sum((getattr(t, "points", 10) or 10) for t in completed_tasks)
-
-        if progress <= 39:
-            progress_status = "מתחיל"
-        elif progress <= 69:
-            progress_status = "בתהליך"
-        else:
-            progress_status = "מתקדם"
-
-        result.append({
-            "student_id":      student.student_id,
-            "name":            f"{student.first_name} {student.last_name}",
-            "progress":        progress,
-            "completed_tasks": completed_count,
-            "total_tasks":     total_tasks,
-            "open_tasks":      open_count,
-            "overdue_tasks":   overdue_count,
-            "points":          total_points,
-            "status":          progress_status,
-        })
-
-    return jsonify(result)
-
-@app.route("/seed-tasks", methods=["GET"])
-def seed_tasks():
-    if Task.query.count() > 0:
-        return jsonify({"message": "tasks already exist"})
-
-    demo_tasks = [
-        Task(student_id=1, task="הגשת עבודה סמינריונית", status="הושלם",
-             due_date=date.today().isoformat(), description=""),
-        Task(student_id=1, task="קריאת חומר קורס", status="הושלם",
-             due_date=date.today().isoformat(), description=""),
-        Task(student_id=1, task="פגישה עם מנחה", status="הושלם",
-             due_date=date.today().isoformat(), description=""),
-        Task(student_id=1, task="הכנת מצגת", status="פתוח",
-             due_date=(date.today() + timedelta(days=7)).isoformat(), description=""),
-        Task(student_id=2, task="קריאת מאמרים", status="הושלם",
-             due_date=date.today().isoformat(), description=""),
-        Task(student_id=2, task="הגשת תרגיל", status="פתוח",
-             due_date=(date.today() + timedelta(days=3)).isoformat(), description=""),
-        Task(student_id=2, task="בחינת אמצע", status="פתוח",
-             due_date=(date.today() - timedelta(days=5)).isoformat(), description=""),
-    ]
-
-    db.session.add_all(demo_tasks)
-    db.session.commit()
-    return jsonify({"message": "demo tasks seeded successfully"})
-
-
-# ─── Chatbot API (from chatbot_app.py) ────────────────────────────────────────
-
-@app.route("/chat", methods=["GET", "POST"])
 @app.route("/chatbot/message", methods=["GET", "POST"])
 def chatbot_message():
     if request.method == "GET":
         return jsonify({"status": "chatbot route is working"})
 
     data = request.get_json()
-
     if not data or not data.get("message"):
         return jsonify({"error": "message is required"}), 400
 
     user_message = data["message"]
-
-    prompt = f"""
-אתה עוזר AI פנימי במערכת ליווי סטודנטים עבור רכזת מילואים.
-
-המשתמשת במערכת היא רכזת מילואים, ולכן כל תשובה צריכה להיות מופנית אליה בלבד.
-אין לפנות ישירות לסטודנט, אלא אם אתה מציע לרכזת נוסח אפשרי לשליחה אליו.
-
-מטרתך היא לסייע לרכזת:
-- להבין את מצב הפנייה.
-- לסווג את סוג הבעיה.
-- לזהות רמת דחיפות.
-- להבין איזה מידע חסר.
-- להחליט מה הצעד הבא בטיפול.
-- להמליץ על גורם מתאים להמשך טיפול.
-- להכין נוסח אפשרי לתגובה לסטודנט.
-
-סוגי פניות אפשריים:
-- היעדרות עקב מילואים
-- דחיית הגשה
-- בקשה למועד מיוחד
-- השלמת חומר לימודי
-- קושי מול מרצה
-- עומס לימודי לאחר חזרה ממילואים
-- בקשה להתאמות
-- צורך בליווי אישי
-- מצוקה חריגה או צורך בהפניה לגורם נוסף
-
-כללים חשובים:
-- אל תקבל החלטות סופיות במקום הרכזת.
-- אל תאשר זכויות, התאמות, מועדים או חריגים באופן סופי.
-- אל תמציא נהלים שאינם מופיעים במידע הקיים.
-- אל תאבחן מצב רפואי או נפשי.
-- אם חסר מידע, ציין במפורש מה צריך לברר.
-- אם יש חשש למצוקה חריפה, המלץ לרכזת להפנות לגורם מקצועי מתאים.
-- ענה בעברית, בטון מקצועי, ברור ותכליתי.
-
-החזר תשובה במבנה הבא:
-
-סיכום הפנייה:
-...
-
-סיווג הפנייה:
-...
-
-רמת דחיפות:
-נמוכה / בינונית / גבוהה
-
-מידע חסר:
-...
-
-המלצה לרכזת:
-...
-
-גורם מומלץ להמשך טיפול:
-...
-
-נוסח אפשרי לשליחה לסטודנט:
-...
-
-המידע שהוזן על ידי הרכזת:
-{user_message}
-"""
+    prompt = f"""אתה עוזר AI פנימי במערכת ליווי סטודנטים עבור רכזת מילואים.
+סייע לרכזת להבין את מצב הפנייה, לסווג את הבעיה, לזהות דחיפות ולהמליץ על הצעד הבא.
+ענה בעברית, בטון מקצועי וברור.
+המידע: {user_message}"""
 
     try:
+        import requests as req
+        from dotenv import load_dotenv
+        load_dotenv()
         api_key = os.getenv("GEMINI_API_KEY")
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
-        payload = {"contents": [{"parts": [{"text": prompt}]}]}
-        res = requests.post(url, json=payload)
+        res = req.post(url, json={{"contents": [{{"parts": [{{"text": prompt}}]}}]}})
         res.raise_for_status()
         reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
-
-        return jsonify({"reply": reply})
-
+        return jsonify({{"reply": reply}})
     except Exception as e:
-        return jsonify({"error": "Chatbot failed", "details": str(e)}), 500
+        return jsonify({{"error": "Chatbot failed", "details": str(e)}}), 500
 
-
-# ─── Entry Point ──────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     with app.app_context():
