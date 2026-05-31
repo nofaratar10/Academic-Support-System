@@ -105,3 +105,33 @@
 .hidden {
   display: none !important;
 }
+
+@media (max-width: 760px) {
+  .input-type-selector {
+    flex-direction: column;
+    padding: 0 8px;
+  }
+
+  .selector-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .summary-shell {
+    padding: 12px;
+  }
+
+  .file-upload-zone {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .result-box {
+    padding: 12px;
+  }
+
+  .summary-result {
+    gap: 14px;
+  }
+}

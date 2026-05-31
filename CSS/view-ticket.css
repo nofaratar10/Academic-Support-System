@@ -157,3 +157,53 @@
 .send-reply-btn:hover {
     background-color: #228be6;
 }
+
+@media (max-width: 760px) {
+    .ticket-container {
+        gap: 14px;
+    }
+
+    .ticket-header-card {
+        padding: 12px 16px;
+    }
+
+    .header-info h2 {
+        font-size: 1.1rem;
+    }
+
+    .header-info {
+        gap: 10px;
+        margin-right: 12px;
+    }
+
+    /* Wider bubbles on narrow screens */
+    .message-card {
+        max-width: 90%;
+    }
+}
+
+@media (max-width: 600px) {
+    .message-meta {
+        padding: 10px 14px;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .message-body {
+        padding: 14px;
+        font-size: 0.9rem;
+    }
+
+    .reply-area-card {
+        padding: 14px;
+    }
+
+    .reply-actions {
+        justify-content: stretch;
+    }
+
+    .send-reply-btn {
+        width: 100%;
+        padding: 12px;
+    }
+}

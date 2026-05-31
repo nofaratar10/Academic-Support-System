@@ -199,3 +199,22 @@
 .close-chat-btn:hover {
     color: #ff3b30; /* הופך לאדום עדין כשעומדים עליו */
 }
+
+@media (max-width: 480px) {
+    .chatbot-bubble {
+        bottom: 16px;
+        left: 16px;
+        width: 52px;
+        height: 52px;
+        font-size: 20px;
+    }
+
+    /* Chatbot panel fills most of the screen on phones */
+    .chatbot-container {
+        width: calc(100vw - 24px);
+        left: 12px;
+        bottom: 84px;
+        height: min(420px, 60vh);
+        padding: 14px;
+    }
+}

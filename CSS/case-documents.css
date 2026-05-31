@@ -73,4 +73,21 @@
     max-width: none;
     width: 100%;
   }
+
+  /* Table needs a minimum width so it scrolls inside .table-card */
+  .documents-table {
+    min-width: 520px;
+  }
+}
+
+@media (max-width: 600px) {
+  .documents-header {
+    padding: 14px 14px 8px;
+  }
+
+  .documents-table thead th,
+  .documents-table tbody td {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
 }
