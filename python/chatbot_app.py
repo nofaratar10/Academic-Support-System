@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
-from dotenv import load_dotenv
 from pathlib import Path
 import requests
+from dotenv import load_dotenv
+load_dotenv()
 import os
+
 
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
@@ -111,6 +113,45 @@ def chatbot_message():
             "error": "Chatbot failed",
             "details": str(e)
         }), 500
+    
+   # ─── Chatbot API ─────────────────────────────────────────────
+
+@app.route("/chat", methods=["GET", "POST"])
+@app.route("/chatbot/message", methods=["GET", "POST"])
+def chatbot_message():
+    if request.method == "GET":
+        return jsonify({"status": "chatbot route is working"})
+
+    data = request.get_json()
+    if not data or not data.get("message"):
+        return jsonify({"error": "message is required"}), 400
+
+    user_message = data["message"]
+
+    prompt = f"""
+אתה עוזר AI פנימי במערכת ליווי סטודנטים עבור רכזת מילואים.
+המשתמשת במערכת היא רכזת מילואים, ולכן כל תשובה צריכה להיות מופנית אליה בלבד.
+
+מטרתך היא לסייע לרכזת להבין את מצב הפנייה, לסווג את סוג הבעיה, לזהות רמת דחיפות, ולהמליץ על הצעד הבא.
+
+ענה בעברית, בטון מקצועי, ברור ותכליתי.
+
+המידע שהוזן על ידי הרכזת:
+{user_message}
+"""
+
+    try:
+        import requests as req
+        api_key = os.getenv("GEMINI_API_KEY")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        res = req.post(url, json=payload)
+        res.raise_for_status()
+        reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+        return jsonify({"reply": reply})
+
+    except Exception as e:
+        return jsonify({"error": "Chatbot failed", "details": str(e)}), 500
 
 
 if __name__ == "__main__":

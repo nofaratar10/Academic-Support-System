@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import date
-from process3 import init_process3
 import os
 
 app = Flask(__name__)
@@ -150,7 +149,6 @@ class TicketMessage(db.Model):
 
 
 # ─── Static routes ───────────────────────────────────────────
-init_process3(app, db, Student, Task)
 @app.route("/")
 def home():
     return send_from_directory(os.path.join(BASE_DIR, "html"), "student-cases.html")
@@ -389,6 +387,35 @@ def seed_students():
     db.session.add_all(support_files)
     db.session.commit()
     return jsonify({"message": "demo students seeded successfully"})
+# ─── Chatbot API ─────────────────────────────────────────────
+
+@app.route("/chatbot/message", methods=["GET", "POST"])
+def chatbot_message():
+    if request.method == "GET":
+        return jsonify({"status": "chatbot route is working"})
+
+    data = request.get_json()
+    if not data or not data.get("message"):
+        return jsonify({"error": "message is required"}), 400
+
+    user_message = data["message"]
+    prompt = f"""אתה עוזר AI פנימי במערכת ליווי סטודנטים עבור רכזת מילואים.
+סייע לרכזת להבין את מצב הפנייה, לסווג את הבעיה, לזהות דחיפות ולהמליץ על הצעד הבא.
+ענה בעברית, בטון מקצועי וברור.
+המידע: {user_message}"""
+
+    try:
+        import requests as req
+        from dotenv import load_dotenv
+        load_dotenv()
+        api_key = os.getenv("GEMINI_API_KEY")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+        res = req.post(url, json={{"contents": [{{"parts": [{{"text": prompt}}]}}]}})
+        res.raise_for_status()
+        reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+        return jsonify({{"reply": reply}})
+    except Exception as e:
+        return jsonify({{"error": "Chatbot failed", "details": str(e)}}), 500
 
 
 if __name__ == "__main__":
