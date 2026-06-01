@@ -17,6 +17,13 @@ BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 app = Flask(__name__)
 CORS(app)
 
+# Folder to save files
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://livu_user:12345678@localhost/livu_db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -154,6 +161,30 @@ class TicketMessage(db.Model):
             "sender": self.sender,
             "content": self.content,
             "created_at": self.created_at.strftime("%d/%m/%y | %H:%M") if self.created_at else None
+        }
+
+
+class Document(db.Model):
+    __tablename__ = "documents"
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("students.student_id"), nullable=False)
+    name = db.Column(db.String(150), nullable=False)        
+    filename = db.Column(db.String(250), nullable=False)    
+    doc_type = db.Column(db.String(100), nullable=False)    
+    upload_date = db.Column(db.String(50), nullable=False)  
+    status = db.Column(db.String(50), nullable=False, default="הועלה")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "student_id": self.student_id,
+            "name": self.name,
+            "filename": self.filename,
+            "doc_type": self.doc_type,
+            "upload_date": self.upload_date,
+            "status": self.status,
+            "url": f"/uploads/{self.filename}"
         }
 
 
@@ -699,6 +730,72 @@ def create_support_file():
     db.session.add(support_file)
     db.session.commit()
     return jsonify(support_file.to_dict()), 201
+
+
+# ─── Documents Management API ────────────────────────────────────────────────
+
+@app.route("/students/<int:student_id>/documents", methods=["GET"])
+def get_student_documents(student_id):
+    Student.query.get_or_404(student_id)
+    documents = Document.query.filter_by(student_id=student_id).all()
+    return jsonify([doc.to_dict() for doc in documents])
+
+@app.route("/students/<int:student_id>/documents", methods=["POST"])
+def upload_student_document(student_id):
+    Student.query.get_or_404(student_id)
+    
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    file = request.files['file']
+    doc_name = request.form.get("name")
+    doc_type = request.form.get("type")
+    
+    if file.filename == '' or not doc_name or not doc_type:
+        return jsonify({"error": "Missing file, document name, or document type"}), 400
+
+    try:
+        import uuid
+        from werkzeug.utils import secure_filename
+        
+        file_ext = os.path.splitext(file.filename)[1]
+        unique_filename = f"{student_id}_{uuid.uuid4().hex}{file_ext}"
+        
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], unique_filename)
+        file.save(file_path)
+        
+        new_doc = Document(
+            student_id=student_id,
+            name=doc_name,
+            filename=unique_filename,
+            doc_type=doc_type,
+            upload_date=datetime.now().strftime("%d/%m/%Y")
+        )
+        db.session.add(new_doc)
+        db.session.commit()
+        
+        return jsonify(new_doc.to_dict()), 201
+    except Exception as e:
+        return jsonify({"error": "Failed to upload document", "details": str(e)}), 500
+
+@app.route("/documents/<int:doc_id>", methods=["DELETE"])
+def delete_document(doc_id):
+    doc = Document.query.get_or_404(doc_id)
+    try:
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], doc.filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            
+        db.session.delete(doc)
+        db.session.commit()
+        return jsonify({"message": "Document deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to delete document", "details": str(e)}), 500
+
+@app.route("/uploads/<path:filename>")
+def download_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
 
 # ─── Entry Point ──────────────────────────────────────────────────────────────
 

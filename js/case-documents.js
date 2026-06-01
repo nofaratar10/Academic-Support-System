@@ -1,6 +1,8 @@
 const params = new URLSearchParams(window.location.search);
 const studentId = params.get("id");
 
+const API_BASE_URL = window.location.origin; 
+
 const studentHeader = document.getElementById("studentHeader");
 const documentsTableBody = document.getElementById("documentsTableBody");
 const toast = document.getElementById("toast");
@@ -12,6 +14,7 @@ const summaryTab = document.getElementById("summaryTab");
 
 const docNameInput = document.getElementById("docName");
 const docTypeSelect = document.getElementById("docType");
+const filePickerInput = document.getElementById("filePicker"); 
 const addDocumentBtn = document.getElementById("addDocumentBtn");
 
 function showToast(message) {
@@ -27,79 +30,105 @@ function setTabs(studentIdValue) {
   summaryTab.href = `/student-summary?id=${studentIdValue}`;
 }
 
-function getStorageKey() {
-  return `student_documents_${studentId}`;
-}
+async function renderDocuments() {
+  if (!studentId) return;
 
-function getDocuments() {
-  const raw = localStorage.getItem(getStorageKey());
-  return raw ? JSON.parse(raw) : [];
-}
+  try {
+    const response = await fetch(`${API_BASE_URL}/students/${studentId}/documents`);
+    if (!response.ok) throw new Error("Failed to load documents");
+    
+    const documents = await response.json();
+    documentsTableBody.innerHTML = "";
 
-function saveDocuments(documents) {
-  localStorage.setItem(getStorageKey(), JSON.stringify(documents));
-}
+    if (documents.length === 0) {
+      documentsTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" class="empty-row" style="text-align:center; padding: 20px; color: #888;">אין מסמכים פתוחים בתיק זה עדיין 📄</td>
+        </tr>
+      `;
+      return;
+    }
 
-function renderDocuments() {
-  const documents = getDocuments();
-  documentsTableBody.innerHTML = "";
-
-  if (documents.length === 0) {
-    documentsTableBody.innerHTML = `
-      <tr>
-        <td colspan="5" class="empty-row">אין מסמכים עדיין</td>
-      </tr>
-    `;
-    return;
+    documents.forEach((doc) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><a href="${API_BASE_URL}${doc.url}" target="_blank" style="color: #2563eb; font-weight: 600; text-decoration: underline;">📄 ${doc.name}</a></td>
+        <td>${doc.doc_type}</td>
+        <td>${doc.upload_date}</td>
+        <td><span class="status-pill status-open">${doc.status}</span></td>
+        <td>
+          <button class="btn" type="button" style="color: red; border-color: #fca5a5;" onclick="deleteDocument(${doc.id})">מחיקה</button>
+        </td>
+      `;
+      documentsTableBody.appendChild(row);
+    });
+  } catch (error) {
+    console.error(error);
+    documentsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">שגיאה בטעינת רשימת המסמכים מהשרת.</td></tr>`;
   }
-
-  documents.forEach((doc, index) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${doc.name}</td>
-      <td>${doc.type}</td>
-      <td>${doc.uploadDate}</td>
-      <td><span class="status-pill status-open">${doc.status}</span></td>
-      <td>
-        <button class="btn" type="button" onclick="deleteDocument(${index})">מחיקה</button>
-      </td>
-    `;
-    documentsTableBody.appendChild(row);
-  });
 }
 
-window.deleteDocument = function deleteDocument(index) {
-  const documents = getDocuments();
-  documents.splice(index, 1);
-  saveDocuments(documents);
-  renderDocuments();
-  showToast("המסמך נמחק");
+window.deleteDocument = async function deleteDocument(docId) {
+  if (!confirm("האם את בטוחה שברצונך למחוק מסמך זה? ⚠️")) return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/documents/${docId}`, {
+      method: "DELETE"
+    });
+
+    if (response.ok) {
+      renderDocuments();
+      showToast("המסמך נמחק בהצלחה");
+    } else {
+      showToast("שגיאה במחיקת המסמך מהשרת");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("בעיית חיבור לשרת בזמן המחיקה");
+  }
 };
 
-function addDocument() {
+async function addDocument() {
   const name = docNameInput.value.trim();
   const type = docTypeSelect.value;
+  const file = filePickerInput.files[0]; 
 
-  if (!name || !type) {
-    showToast("יש למלא שם מסמך וסוג התאמה");
+  if (!name || !type || !file) {
+    alert("חובה למלא שם מסמך, לבחור סוג התאמה ולצרף קובץ פיזי מהמחשב! 📂");
     return;
   }
 
-  const documents = getDocuments();
-  documents.push({
-    name,
-    type,
-    uploadDate: new Date().toLocaleDateString("he-IL"),
-    status: "הועלה"
-  });
+  addDocumentBtn.disabled = true;
+  addDocumentBtn.innerText = "מעלה קובץ...";
 
-  saveDocuments(documents);
-  renderDocuments();
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("name", name);
+  formData.append("type", type);
 
-  docNameInput.value = "";
-  docTypeSelect.value = "";
+  try {
+    const response = await fetch(`${API_BASE_URL}/students/${studentId}/documents`, {
+      method: "POST",
+      body: formData 
+    });
 
-  showToast("המסמך נוסף");
+    if (response.ok) {
+      showToast("המסמך הועלה ונשמר בהצלחה 🎉");
+      docNameInput.value = "";
+      docTypeSelect.value = "";
+      filePickerInput.value = ""; 
+      renderDocuments(); 
+    } else {
+      const errData = await response.json();
+      alert("שגיאה בהעלאה: " + (errData.error || "תקלת שרת"));
+    }
+  } catch (error) {
+    console.error(error);
+    alert("בעיית חיבור לשרת: לא ניתן להעלות את הקובץ.");
+  } finally {
+    addDocumentBtn.innerText = "העלאת מסמך +";
+    addDocumentBtn.disabled = false;
+  }
 }
 
 async function loadStudent() {
@@ -109,19 +138,17 @@ async function loadStudent() {
   }
 
   try {
-    const response = await fetch(`http://vmedu473.mtacloud.co.il:5000/students/${studentId}`);
-    if (!response.ok) {
-      throw new Error("Student not found");
-    }
+    const response = await fetch(`${API_BASE_URL}/students/${studentId}`);
+    if (!response.ok) throw new Error("Student not found");
 
     const student = await response.json();
     const fullName = `${student.first_name || ""} ${student.last_name || ""}`.trim();
 
-    studentHeader.textContent = `${fullName} | ${student.student_id}`;
+    studentHeader.textContent = `${fullName} | מס' סטודנט: ${student.student_id}`;
     setTabs(student.student_id);
   } catch (error) {
     console.error(error);
-    studentHeader.textContent = "שגיאה בטעינת הנתונים";
+    studentHeader.textContent = "שגיאה בטעינת נתוני סטודנט";
   }
 }
 
