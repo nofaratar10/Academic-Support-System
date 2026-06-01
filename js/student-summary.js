@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://vmedu473.mtacloud.co.il:5000";
+const API_BASE_URL = window.location.origin;
 
 document.addEventListener("DOMContentLoaded", () => {
 
