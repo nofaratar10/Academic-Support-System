@@ -599,6 +599,106 @@ def chatbot_message():
     except Exception as e:
         return jsonify({"error": "Chatbot failed", "details": str(e)}), 500
 
+# ─── Summarize & Audio Transcription API (שדרוג סיכומי שיחה) ─────────────────
+
+@app.route("/summarize", methods=["POST"])
+def summarize_text():
+    data = request.get_json()
+    if not data or "text" not in data:
+        return jsonify({"error": "No text provided"}), 400
+
+    original_text = data["text"]
+    prompt = f"""סכם את השיחה הבאה בפורמט הבא בדיוק:
+סיכום: [כתוב כאן סיכום קצר ותמציתי של מה שהיה בשיחה]
+נקודות:
+* [נקודה מרכזית 1]
+* [נקודה מרכזית 2]
+משימות:
+* [משימה להמשך 1]
+* [משימה להמשך 2]
+
+השיחה: {original_text}"""
+
+    try:
+        api_key = os.getenv("GEMINI_API_KEY")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        res = requests.post(url, json=payload)
+        res.raise_for_status()
+        reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+        
+        return jsonify({"summary_result": reply})
+    except Exception as e:
+        return jsonify({"error": "Failed to generate summary", "details": str(e)}), 500
+
+
+@app.route("/summarize-audio", methods=["POST"])
+def summarize_audio():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    try:
+        import base64
+        file_data = file.read()
+        encoded_file = base64.b64encode(file_data).decode('utf-8')
+        mime_type = file.content_type
+
+        prompt = """הקשב להקלטת השיחה הבאה (זו יכולה להיות הקלטת זום או שיחה קולית).
+תמלל את השיחה בלבך, ולאחר מכן סכם אותה בפורמט הבא בדיוק:
+סיכום: [כתוב כאן סיכום קצר ותמציתי של מה שנאמר בהקלטה]
+נקודות:
+* [נקודה מרכזית 1]
+* [נקודה מרכזית 2]
+משימות:
+* [משימה להמשך 1]
+* [משימה להמשך 2]"""
+
+        api_key = os.getenv("GEMINI_API_KEY")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+        
+        payload = {
+            "contents": [{
+                "parts": [
+                    {
+                        "inlineData": {
+                            "mimeType": mime_type,
+                            "data": encoded_file
+                        }
+                    },
+                    {
+                        "text": prompt
+                    }
+                ]
+            }]
+        }
+
+        res = requests.post(url, json=payload)
+        res.raise_for_status()
+        reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+
+        return jsonify({"summary_result": reply})
+    except Exception as e:
+        return jsonify({"error": "Failed to process audio file", "details": str(e)}), 500
+
+
+@app.route("/support-files", methods=["POST"])
+def create_support_file():
+    data = request.get_json()
+    if not data or not data.get("student_id") or not data.get("summary"):
+        return jsonify({"error": "student_id and summary are required"}), 400
+        
+    support_file = SupportFile(
+        student_id=data["student_id"],
+        summary=data["summary"],
+        status=data.get("status", "Open")
+    )
+    db.session.add(support_file)
+    db.session.commit()
+    return jsonify(support_file.to_dict()), 201
 
 # ─── Entry Point ──────────────────────────────────────────────────────────────
 
