@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מערכת ליווי - דשבורד ניהול</title>
+  <link rel="stylesheet" href="/CSS/site.css" />
+  <link rel="stylesheet" href="/CSS/student-cases.css" />
+  <link rel="stylesheet" href="/CSS/dashboard.css" />
+  <link rel="stylesheet" href="/CSS/demo.css" />
+</head>
+
+<body class="page">
+
+  <div class="layout">
+
+    <aside class="right-sidebar">
+      <div class="brand">מערכת ליווי</div>
+      <nav class="main-nav">
+        <a href="/dashboard" class="nav-item active" title="לא מיושם בסדנה">
+          <span>דשבורד</span>
+        </a>
+        <a href="/student-cases" class="nav-item">
+          <span>תיקי סטודנטים</span>
+        </a>
+        <a href="/tickets" class="nav-item">
+          <span>פניות ושיח יזום</span>
+        </a>
+        <a href="/adjustments" class="nav-item" title="לא מיושם בסדנה">
+          <span>תגבורים והתאמות</span>
+        </a>
+        <a href="/progress" class="nav-item">
+          <span>התקדמות ומשחוק</span>
+        </a>
+        <a href="/reports" class="nav-item" title="לא מיושם בסדנה">
+          <span>דוחות ואחזור מידע</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="#" class="settings-link" title="לא מיושם בסדנה">הגדרות</a>
+      </div>
+    </aside>
+
+    <div class="main-area">
+
+      <header class="topbar">
+        <div class="topbar-right">
+          <h1 class="page-title">דשבורד</h1>
+        </div>
+        <div class="topbar-center">
+          <div class="search-box">
+            <input type="text" placeholder="חיפוש סטודנט / פנייה..." />
+          </div>
+        </div>
+        <div class="topbar-left">
+          <button class="icon-btn">🔔</button>
+          <div class="user-name">פולינה (רכזת)</div>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <div class="demo-page-banner">
+          <span class="banner-icon">⚠️</span>
+          <div class="banner-text">
+            <p>עמוד זה נועד להמחשת חווית המשתמש המלאה ואינו מחובר לנתונים חיים בסדנה זו.</p>
+          </div>
+        </div>
+
+        <section class="dashboard-stats-grid">
+          <div class="stat-box card-blue">
+            <span class="box-title">סטודנטים בליווי פעיל</span>
+            <span class="box-number">134</span>
+            <span class="box-desc">עפ"י מדדי המערכת</span>
+          </div>
+          <div class="stat-box card-orange">
+            <span class="box-title">פניות חדשות</span>
+            <span class="box-number">12</span>
+            <span class="box-desc">מהשבוע האחרון</span>
+          </div>
+          <div class="stat-box card-green">
+            <span class="box-title">אחוז נוכחות</span>
+            <span class="box-number">81%</span>
+            <span class="box-desc">מבוסס על מדדי התקדמות</span>
+          </div>
+          <div class="stat-box card-red">
+            <span class="box-title">חריגים</span>
+            <span class="box-number">2</span>
+            <span class="box-desc">מהשבוע האחרון</span>
+          </div>
+        </section>
+
+        <div class="dashboard-main-split">
+          
+          <section class="table-card table-section">
+            <div class="section-header-row">
+              <h2 class="section-block-title">סטודנטים בטיפול</h2>
+            </div>
+            <table class="students-table">
+              <thead>
+                <tr>
+                  <th>מס' סטודנט</th>
+                  <th>שם</th>
+                  <th>סטטוס ליווי</th>
+                  <th>סטטוס משימות</th>
+                  <th>פעולה</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>12361</td>
+                  <td>דנה כהן</td>
+                  <td><span class="status-pill status-open">פתוח</span></td>
+                  <td>מעקב הגשות</td>
+                  <td><a href="/student-details?id=12361" class="primary-btn text-link-btn">תיק ליווי מלא</a></td>
+                </tr>
+                <tr>
+                  <td>12382</td>
+                  <td>שרה חדד</td>
+                  <td><span class="status-pill status-closed">סגור</span></td>
+                  <td>הושלם</td>
+                  <td><a href="/student-details?id=12382" class="primary-btn text-link-btn">תיק ליווי מלא</a></td>
+                </tr>
+                <tr>
+                  <td>12346</td>
+                  <td>ישראל ישראלי</td>
+                  <td><span class="status-pill status-pending">מושהה</span></td>
+                  <td>ממתין לאישור</td>
+                  <td><a href="/student-details?id=12346" class="primary-btn text-link-btn">תיק ליווי מלא</a></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="table-footer-actions">
+              <a href="/new-case" class="primary-btn big-btn">פתיחת תיק חדש</a>
+            </div>
+          </section>
+
+          <aside class="alerts-sidebar-panel">
+            <h2 class="panel-block-title">התראות ופעילויות אחרונות</h2>
+            <div class="alerts-list">
+              
+              <div class="alert-list-item item-urgent">
+                <div class="alert-icon-wrapper text-red">🚨</div>
+                <div class="alert-item-content">
+                  <p class="alert-main-text"><strong>ישראל ישראלי</strong> דורש מעקב דחוף!</p>
+                  <span class="alert-time-stamp">לפני 3 שעות</span>
+                </div>
+              </div>
+
+              <div class="alert-list-item item-info">
+                <div class="alert-icon-wrapper text-blue">🔔</div>
+                <div class="alert-item-content">
+                  <p class="alert-main-text">התקבלה הודעה חדשה מ<strong>אבי לוי</strong>.</p>
+                  <span class="alert-time-stamp">היום</span>
+                </div>
+              </div>
+
+              <div class="alert-list-item item-success">
+                <div class="alert-icon-wrapper text-green">✓</div>
+                <div class="alert-item-content">
+                  <p class="alert-main-text">סיכום שיחה עם <strong>שרה חדד</strong> מוכן לאישור.</p>
+                  <span class="alert-time-stamp">לפני 20 דק'</span>
+                </div>
+              </div>
+
+              <div class="alert-list-item item-info">
+                <div class="alert-icon-wrapper text-blue">🔔</div>
+                <div class="alert-item-content">
+                  <p class="alert-main-text">הסטודנטית <strong>דנה כהן</strong> מילאה טופס פנייה חדש.</p>
+                  <span class="alert-time-stamp">לפני שעה</span>
+                </div>
+              </div>
+
+            </div>
+          </aside>
+
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+</body>
+</html>
