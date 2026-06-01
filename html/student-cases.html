@@ -13,38 +13,38 @@
   <div class="layout">
 
     <aside class="right-sidebar">
-  <div class="brand">מערכת ליווי</div>
+      <div class="brand">מערכת ליווי</div>
 
-  <nav class="main-nav">
-    <a href="/dashboard" class="nav-item">
-      <span>דשבורד</span>
-    </a>
+      <nav class="main-nav">
+        <a href="/dashboard" class="nav-item" title="לא מיושם בסדנה">
+          <span>דשבורד</span>
+        </a>
 
-    <a href="/student-cases" class="nav-item active">
-      <span>תיקי סטודנטים</span>
-    </a>
+        <a href="/student-cases" class="nav-item active">
+          <span>תיקי סטודנטים</span>
+        </a>
 
-    <a href="/tickets" class="nav-item">
-      <span>פניות ושיח יזום</span>
-    </a>
+        <a href="/tickets" class="nav-item">
+          <span>פניות ושיח יזום</span>
+        </a>
 
-    <a href="/alerts" class="nav-item">
-      <span>תגבורים והתאמות</span>
-    </a>
+        <a href="/adjustments" class="nav-item" title="לא מיושם בסדנה">
+          <span>תגבורים והתאמות</span>
+        </a>
 
-    <a href="/progress" class="nav-item">
-      <span>התקדמות ומשחוק</span>
-    </a>
+        <a href="/progress" class="nav-item">
+          <span>התקדמות ומשחוק</span>
+        </a>
 
-    <a href="/reports" class="nav-item">
-      <span>דוחות ואחזור מידע</span>
-    </a>
-  </nav>
+        <a href="/reports" class="nav-item" title="לא מיושם בסדנה">
+          <span>דוחות ואחזור מידע</span>
+        </a>
+      </nav>
 
-  <div class="sidebar-footer">
-    <a href="#" class="settings-link">הגדרות</a>
-  </div>
-</aside>
+      <div class="sidebar-footer">
+        <a href="#" class="settings-link" title="לא מיושם בסדנה">הגדרות</a>
+      </div>
+    </aside>
 
     <div class="main-area">
 
@@ -117,106 +117,7 @@
   </div>
 
   <script src="/JS/chatbot-widget.js"></script>
-  <script>
-    const tableBody = document.getElementById("studentsTableBody");
-    const searchInput = document.getElementById("searchInput");
-    const filterInput = document.getElementById("filterInput");
-
-    let allStudents = [];
-
-    function getSupportStatusClass(status) {
-      if (!status) return "status-pill status-pending";
-
-      const normalized = status.toLowerCase();
-
-      if (normalized.includes("open") || normalized.includes("פתוח")) {
-        return "status-pill status-open";
-      }
-      if (normalized.includes("closed") || normalized.includes("סגור")) {
-        return "status-pill status-closed";
-      }
-      return "status-pill status-pending";
-    }
-
-    function translateSupportStatus(status) {
-      if (!status) return "מושהה";
-
-      const normalized = status.toLowerCase();
-
-      if (normalized.includes("open")) return "פתוח";
-      if (normalized.includes("closed")) return "סגור";
-      if (normalized.includes("pending")) return "מושהה";
-
-      return status;
-    }
-
-    function renderStudents(students) {
-      tableBody.innerHTML = "";
-
-      students.forEach((student) => {
-        const fullName = `${student.first_name || ""} ${student.last_name || ""}`.trim();
-        const supportStatus = translateSupportStatus(student.support_status || "Open");
-
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${student.student_id}</td>
-          <td>${fullName}</td>
-          <td><span class="${getSupportStatusClass(student.support_status)}">${supportStatus}</span></td>
-          <td>${student.task_status || "הושלם"}</td>
-          <td>
-            <a href="/student-details?id=${student.student_id}" class="primary-btn">תיק ליווי מלא</a>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
-
-    function filterStudents() {
-      const searchValue = searchInput.value.trim().toLowerCase();
-      const filterValue = filterInput.value.trim().toLowerCase();
-
-      const filteredStudents = allStudents.filter((student) => {
-        const fullName = `${student.first_name || ""} ${student.last_name || ""}`.trim();
-        const supportStatus = translateSupportStatus(student.support_status || "Open");
-
-        const rowText = `
-          ${student.student_id}
-          ${fullName}
-          ${supportStatus}
-          ${student.task_status || ""}
-          ${student.email || ""}
-          ${student.phone || ""}
-        `.toLowerCase();
-
-        return rowText.includes(searchValue) && rowText.includes(filterValue);
-      });
-
-      renderStudents(filteredStudents);
-    }
-
-    async function loadStudents() {
-      try {
-        const response = await fetch("/students");
-        if (!response.ok) {
-          throw new Error("Failed to load students");
-        }
-
-        allStudents = await response.json();
-        renderStudents(allStudents);
-      } catch (error) {
-        console.error(error);
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="5">שגיאה בטעינת הסטודנטים. ודאי שהשרת רץ ושיש נתונים במסד.</td>
-          </tr>
-        `;
-      }
-    }
-
-    searchInput.addEventListener("input", filterStudents);
-    filterInput.addEventListener("input", filterStudents);
-
-    loadStudents();
-  </script>
+  <script src="/JS/student-cases.js"></script>
+  <script src="/js/search.js"> </script>
 </body>
 </html>

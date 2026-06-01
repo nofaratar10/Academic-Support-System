@@ -5,9 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>פנייה חדשה - מערכת ליווי</title>
-    <!-- חיבור לקבצים הקיימים שלך -->
     <link rel="stylesheet" href="/CSS/site.css" />
-    <!-- חיבור לקובץ ה-CSS החדש שיצרנו למטה -->
     <link rel="stylesheet" href="/CSS/new-ticket.css" />
     <link rel="stylesheet" href="/CSS/Chatbot.css" />
 
@@ -19,15 +17,32 @@
         <aside class="right-sidebar">
             <div class="brand">מערכת ליווי</div>
             <nav class="main-nav">
-                <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
-                <a href="/student-cases" class="nav-item"><span>תיקי סטודנטים</span></a>
-                <a href="/tickets" class="nav-item active"><span>פניות ושיח יזום</span></a>
-                <a href="/alerts" class="nav-item"><span>תגבורים והתאמות</span></a>
-                <a href="/progress" class="nav-item"><span>התקדמות ומשחוק</span></a>
-                <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+                <a href="/dashboard.html" class="nav-item" title="לא מיושם בסדנה">
+                <span>דשבורד</span>
+                </a>
+
+                <a href="/student-cases.html" class="nav-item">
+                <span>תיקי סטודנטים</span>
+                </a>
+
+                <a href="/tickets.html" class="nav-item active">
+                <span>פניות ושיח יזום</span>
+                </a>
+
+                <a href="/adjustments.html" class="nav-item" title="לא מיושם בסדנה">
+                <span>תגבורים והתאמות</span>
+                </a>
+
+                <a href="/progress.html" class="nav-item">
+                <span>התקדמות ומשחוק</span>
+                </a>
+
+                <a href="/reports.html" class="nav-item" title="לא מיושם בסדנה">
+                <span>דוחות ואחזור מידע</span>
+                </a>
             </nav>
             <div class="sidebar-footer">
-                <a href="#" class="settings-link">הגדרות</a>
+                <a href="#" class="settings-link" title="לא מיושם בסדנה">הגדרות</a>
             </div>
         </aside>
 
@@ -37,9 +52,6 @@
                     <h1 class="page-title">פנייה חדשה</h1>
                 </div>
                 <div class="topbar-center">
-                    <div class="search-box">
-                        <input type="text" placeholder="חיפוש סטודנט / פנייה..." />
-                    </div>
                 </div>
                 <div class="topbar-left">
                     <button class="icon-btn">🔔</button>
@@ -95,7 +107,7 @@
                         </div>
 
                         <div class="form-footer">
-                            <button type="submit" class="primary-btn submit-btn">שלייחת פניה</button>
+                            <button type="submit" class="primary-btn submit-btn">שליחת פניה</button>
                         </div>
                     </form>
                 </div>

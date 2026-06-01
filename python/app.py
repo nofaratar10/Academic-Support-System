@@ -228,9 +228,9 @@ def new_ticket():
 def view_ticket():
     return send_from_directory(os.path.join(BASE_DIR, "html"), "view-ticket.html")
 
-@app.route("/alerts")
-def alerts():
-    return send_from_directory(os.path.join(BASE_DIR, "html"), "alerts.html")
+@app.route("/adjustments")
+def adjustments():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "adjustments.html")
 
 @app.route("/progress")
 def progress():

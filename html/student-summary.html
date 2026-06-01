@@ -2,37 +2,52 @@
 <html lang="he" dir="rtl">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>סיכומי שיחה - מערכת ליווי</title>
 
-  <link rel="stylesheet" href="/CSS/site.css" />
-  <link rel="stylesheet" href="/CSS/student-summary.css" />
-  <link rel="stylesheet" href="/CSS/Chatbot.css" />
+  <link rel="stylesheet" href="/CSS/site.css"/>
+  <link rel="stylesheet" href="/CSS/student-summary.css"/>
+  <link rel="stylesheet" href="/CSS/Chatbot.css"/>
 </head>
 
 <body class="page">
   <div class="layout">
 
-    <!-- SIDEBAR -->
     <aside class="right-sidebar">
       <div class="brand">מערכת ליווי</div>
 
       <nav class="main-nav">
-        <a href="/dashboard" class="nav-item">דשבורד</a>
-        <a href="/student-cases" class="nav-item active">תיקי סטודנטים</a>
-        <a href="/tickets" class="nav-item">פניות ושיח יזום</a>
-        <a href="/alerts" class="nav-item">תגבורים והתאמות</a>
-        <a href="/progress" class="nav-item">התקדמות ומשחוק</a>
-        <a href="/reports" class="nav-item">דוחות ואחזור מידע</a>
+        <a href="/dashboard" class="nav-item" title="לא מיושם בסדנה">
+          <span>דשבורד</span>
+        </a>
+
+        <a href="/student-cases" class="nav-item active">
+          <span>תיקי סטודנטים</span>
+        </a>
+
+        <a href="/tickets" class="nav-item">
+          <span>פניות ושיח יזום</span>
+        </a>
+
+        <a href="/adjustments" class="nav-item" title="לא מיושם בסדנה">
+          <span>תגבורים והתאמות</span>
+        </a>
+
+        <a href="/progress" class="nav-item">
+          <span>התקדמות ומשחוק</span>
+        </a>
+
+        <a href="/reports" class="nav-item" title="לא מיושם בסדנה">
+          <span>דוחות ואחזור מידע</span>
+        </a>
       </nav>
 
       <div class="sidebar-footer">
-        <a href="#" class="settings-link">הגדרות</a>
+        <a href="#" class="settings-link" title="לא מיושם בסדנה">הגדרות</a>
       </div>
     </aside>
 
-    <!-- MAIN -->
     <div class="main-area">
 
       <header class="topbar">
@@ -52,13 +67,11 @@
         </div>
       </header>
 
-      <!-- 🧑‍🎓 פרטי סטודנט -->
       <section class="student-bar">
         <h2 class="student-name">שם הסטודנט</h2>
         <button class="back" onclick="window.location.href='/student-cases'">←</button>
       </section>
 
-      <!-- 📑 טאבים -->
       <div class="tabs" role="tablist" aria-label="לשוניות תיק">
         <a class="tab" id="detailsTab" href="student-details.html">פרטים</a>
         <a class="tab" id="documentsTab" href="case-documents.html">מסמכי התאמות</a>
@@ -66,7 +79,6 @@
         <a class="tab active" id="summaryTab" href="student-summary.html">סיכומי שיחה</a>
       </div>
 
-      <!-- כרטיס ראשי -->
       <main class="content">
         <section class="table-card summary-shell">
 
@@ -76,7 +88,6 @@
 
           <div class="details-body">
 
-            <!-- קלט שיחה -->
             <div class="input-type-selector">
             <button class="selector-btn active" id="selectTextMode">⌨️ הדבקת טקסט</button>
             <button class="selector-btn" id="selectFileMode">📁 העלאת הקלטה / סרטון</button>
@@ -97,12 +108,10 @@
               </div>
             </div>
 
-            <!-- כפתור -->
             <div class="actions">
               <button class="primary-btn">✨ יצירת סיכום</button>
             </div>
 
-            <!-- תוצאות -->
             <div class="summary-result">
 
               <div class="result-box">
