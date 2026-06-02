@@ -1,4 +1,3 @@
-/* כפתורי סינון כיוון */
 .direction-btn {
   padding: 6px 16px;
   border: 1px solid #d7dce3;
@@ -21,7 +20,6 @@
   background: #f0f4ff;
 }
 
-/* כותרת הכרטיס עם סינון */
 .details-header {
   display: flex;
   justify-content: space-between;
@@ -35,7 +33,6 @@
   gap: 8px;
 }
 
-/* סטטוסים */
 .status-pill {
   display: inline-block;
   padding: 4px 14px;

@@ -57,6 +57,12 @@
   color: #6b7280;
 }
 
+.filePicker {
+  flex: 1; 
+  min-width: 200px; 
+  padding-top: 8px;
+}
+
 @media (max-width: 760px) {
   .documents-shell {
     max-width: none;

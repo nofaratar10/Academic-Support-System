@@ -1,20 +1,20 @@
 const params = new URLSearchParams(window.location.search);
 const studentId = params.get("id");
 
-const studentHeader = document.getElementById("studentHeader");
+const studentHeader    = document.getElementById("studentHeader");
 const documentsTableBody = document.getElementById("documentsTableBody");
-const toast = document.getElementById("toast");
+const toast            = document.getElementById("toast");
 
 const detailsTab   = document.getElementById("detailsTab");
 const documentsTab = document.getElementById("documentsTab");
 const planTab      = document.getElementById("planTab");
 const summaryTab   = document.getElementById("summaryTab");
 
-const docNameInput    = document.getElementById("docName");
-const docTypeSelect   = document.getElementById("docType");
-const addDocumentBtn  = document.getElementById("addDocumentBtn");
+const docNameInput   = document.getElementById("docName");
+const docTypeSelect  = document.getElementById("docType");
+const addDocumentBtn = document.getElementById("addDocumentBtn");
 
-// ─── Status helpers (same logic as student-details.js) ──────
+// ─── Status helpers ──────────────────────────────────────────
 function getHebrewStatus(status) {
   if (!status) return "פתוח";
   const s = status.toLowerCase();
@@ -38,14 +38,14 @@ function updateStatusBadge(status) {
   pill.className   = getStudentStatusClass(status);
 }
 
-// ─── Toast ──────────────────────────────────────────────────
+// ─── Toast ───────────────────────────────────────────────────
 function showToast(message) {
   toast.textContent = message;
   toast.classList.add("visible");
   window.setTimeout(() => toast.classList.remove("visible"), 2200);
 }
 
-// ─── Tabs ───────────────────────────────────────────────────
+// ─── Tabs ────────────────────────────────────────────────────
 function setTabs(id) {
   detailsTab.href   = `/student-details?id=${id}`;
   documentsTab.href = `/case-documents?id=${id}`;
@@ -53,17 +53,17 @@ function setTabs(id) {
   summaryTab.href   = `/student-summary?id=${id}`;
 }
 
-// ─── Documents (localStorage) ───────────────────────────────
-function getStorageKey()       { return `student_documents_${studentId}`; }
-function getDocuments()        { const r = localStorage.getItem(getStorageKey()); return r ? JSON.parse(r) : []; }
-function saveDocuments(docs)   { localStorage.setItem(getStorageKey(), JSON.stringify(docs)); }
+// ─── Documents (localStorage) ────────────────────────────────
+function getStorageKey()     { return `student_documents_${studentId}`; }
+function getDocuments()      { const r = localStorage.getItem(getStorageKey()); return r ? JSON.parse(r) : []; }
+function saveDocuments(docs) { localStorage.setItem(getStorageKey(), JSON.stringify(docs)); }
 
 function renderDocuments() {
   const documents = getDocuments();
   documentsTableBody.innerHTML = "";
 
   if (!documents.length) {
-    documentsTableBody.innerHTML = `<tr><td colspan="5" class="empty-row">אין מסמכים עדיין</td></tr>`;
+    documentsTableBody.innerHTML = `<tr><td colspan="5" class="empty-row" style="text-align:center;padding:20px;color:#888;">אין מסמכים עדיין</td></tr>`;
     return;
   }
 
@@ -83,6 +83,7 @@ function renderDocuments() {
 }
 
 window.deleteDocument = function (index) {
+  if (!confirm("האם למחוק מסמך זה?")) return;
   const documents = getDocuments();
   documents.splice(index, 1);
   saveDocuments(documents);
@@ -106,7 +107,7 @@ function addDocument() {
   showToast("המסמך נוסף");
 }
 
-// ─── Load student ────────────────────────────────────────────
+// ─── Load student ─────────────────────────────────────────────
 async function loadStudent() {
   if (!studentId) {
     studentHeader.textContent = "לא נבחר סטודנט";

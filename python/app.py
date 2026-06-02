@@ -1,19 +1,36 @@
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from datetime import date
+from dotenv import load_dotenv
+from pathlib import Path
+from datetime import date, datetime, timedelta
+import requests
 import os
+
+# ─── App & Config ────────────────────────────────────────────────────────────
+
+PYTHON_DIR = Path(__file__).resolve().parent
+load_dotenv(PYTHON_DIR / ".env")
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 app = Flask(__name__)
 CORS(app)
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# Folder to save files
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://livu_user:12345678@localhost/livu_db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+
+# ─── Models ───────────────────────────────────────────────────────────────────
 
 class Student(db.Model):
     __tablename__ = "students"
@@ -26,7 +43,6 @@ class Student(db.Model):
     phone = db.Column(db.String(20), nullable=True)
 
     support_files = db.relationship("SupportFile", backref="student", lazy=True)
-    # tasks relationship is added dynamically by process3.init_process3()
 
     def to_dict(self):
         latest_support_file = None
@@ -148,7 +164,57 @@ class TicketMessage(db.Model):
         }
 
 
-# ─── Static routes ───────────────────────────────────────────
+class Document(db.Model):
+    __tablename__ = "documents"
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("students.student_id"), nullable=False)
+    name = db.Column(db.String(150), nullable=False)        
+    filename = db.Column(db.String(250), nullable=False)    
+    doc_type = db.Column(db.String(100), nullable=False)    
+    upload_date = db.Column(db.String(50), nullable=False)  
+    status = db.Column(db.String(50), nullable=False, default="הועלה")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "student_id": self.student_id,
+            "name": self.name,
+            "filename": self.filename,
+            "doc_type": self.doc_type,
+            "upload_date": self.upload_date,
+            "status": self.status,
+            "url": f"/uploads/{self.filename}"
+        }
+
+
+# ─── Helper Functions ─────────────────────────────────────────────────────────
+
+def _parse_due_date(value):
+    if value is None or value == "":
+        return None
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    if isinstance(value, str):
+        value = value.strip()
+        if not value:
+            return None
+        for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y"):
+            try:
+                return datetime.strptime(value, fmt).date()
+            except ValueError:
+                continue
+        try:
+            return datetime.fromisoformat(value.replace("Z", "+00:00")).date()
+        except ValueError:
+            return None
+    return None
+
+
+# ─── Static Routes ────────────────────────────────────────────────────────────
+
 @app.route("/")
 def home():
     return send_from_directory(os.path.join(BASE_DIR, "html"), "student-cases.html")
@@ -193,9 +259,9 @@ def new_ticket():
 def view_ticket():
     return send_from_directory(os.path.join(BASE_DIR, "html"), "view-ticket.html")
 
-@app.route("/alerts")
-def alerts():
-    return send_from_directory(os.path.join(BASE_DIR, "html"), "alerts.html")
+@app.route("/adjustments")
+def adjustments():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "adjustments.html")
 
 @app.route("/progress")
 def progress():
@@ -218,7 +284,8 @@ def html_files(filename):
     return send_from_directory(os.path.join(BASE_DIR, "html"), filename)
 
 
-# ─── Students API ───────────────────────────────────────────
+
+# ─── Students API ─────────────────────────────────────────────────────────────
 
 @app.route("/students", methods=["GET"])
 def get_students():
@@ -295,7 +362,7 @@ def create_student():
     return jsonify(student.to_dict()), 201
 
 
-# ─── Tasks API ───────────────────────────────────────────────
+# ─── Tasks API ────────────────────────────────────────────────────────────────
 
 @app.route("/students/<int:student_id>/tasks", methods=["GET"])
 def get_tasks(student_id):
@@ -362,7 +429,7 @@ def get_progress():
     return jsonify(result)
 
 
-# ─── Tickets API ─────────────────────────────────────────────
+# ─── Tickets API ──────────────────────────────────────────────────────────────
 
 @app.route("/api/tickets", methods=["GET"])
 def get_tickets():
@@ -438,7 +505,7 @@ def add_ticket_message(ticket_id):
     return jsonify(message.to_dict()), 201
 
 
-# ─── Seed ────────────────────────────────────────────────────
+# ─── Seed ─────────────────────────────────────────────────────────────────────
 
 @app.route("/seed-students", methods=["GET"])
 def seed_students():
@@ -473,36 +540,162 @@ def seed_students():
     db.session.add_all(support_files)
     db.session.commit()
     return jsonify({"message": "demo students seeded successfully"})
-
 # ─── Chatbot API ─────────────────────────────────────────────
 
+@app.route("/chat", methods=["GET", "POST"])
 @app.route("/chatbot/message", methods=["GET", "POST"])
 def chatbot_message():
     if request.method == "GET":
         return jsonify({"status": "chatbot route is working"})
 
     data = request.get_json()
+
     if not data or not data.get("message"):
         return jsonify({"error": "message is required"}), 400
 
     user_message = data["message"]
-    prompt = f"""אתה עוזר AI פנימי במערכת ליווי סטודנטים עבור רכזת מילואים.
-סייע לרכזת להבין את מצב הפנייה, לסווג את הבעיה, לזהות דחיפות ולהמליץ על הצעד הבא.
-ענה בעברית, בטון מקצועי וברור.
-המידע: {user_message}"""
+
+    prompt = f"""
+אתה עוזר AI פנימי במערכת ליווי סטודנטים עבור רכזת מילואים.
+
+המשתמשת במערכת היא רכזת מילואים, ולכן כל תשובה צריכה להיות מופנית אליה בלבד.
+אין לפנות ישירות לסטודנט, אלא אם אתה מציע לרכזת נוסח אפשרי לשליחה אליו.
+
+מטרתך היא לסייע לרכזת:
+- להבין את מצב הפנייה.
+- לסווג את סוג הבעיה.
+- לזהות רמת דחיפות.
+- להבין איזה מידע חסר.
+- להחליט מה הצעד הבא בטיפול.
+- להמליץ על גורם מתאים להמשך טיפול.
+- להכין נוסח אפשרי לתגובה לסטודנט.
+
+סוגי פניות אפשריים:
+- היעדרות עקב מילואים
+- דחיית הגשה
+- בקשה למועד מיוחד
+- השלמת חומר לימודי
+- קושי מול מרצה
+- עומס לימודי לאחר חזרה ממילואים
+- בקשה להתאמות
+- צורך בליווי אישי
+- מצוקה חריגה או צורך בהפניה לגורם נוסף
+
+כללים חשובים:
+- אל תקבל החלטות סופיות במקום הרכזת.
+- אל תאשר זכויות, התאמות, מועדים או חריגים באופן סופי.
+- אל תמציא נהלים שאינם מופיעים במידע הקיים.
+- אל תאבחן מצב רפואי או נפשי.
+- אם חסר מידע, ציין במפורש מה צריך לברר.
+- אם יש חשש למצוקה חריפה, המלץ לרכזת להפנות לגורם מקצועי מתאים.
+- ענה בעברית, בטון מקצועי, ברור ותכליתי.
+
+החזר תשובה במבנה הבא:
+
+סיכום הפנייה:
+...
+
+סיווג הפנייה:
+...
+
+רמת דחיפות:
+נמוכה / בינונית / גבוהה
+
+מידע חסר:
+...
+
+המלצה לרכזת:
+...
+
+גורם מומלץ להמשך טיפול:
+...
+
+נוסח אפשרי לשליחה לסטודנט:
+...
+
+המידע שהוזן על ידי הרכזת:
+{user_message}
+"""
 
     try:
-        import requests as req
-        from dotenv import load_dotenv
-        load_dotenv()
         api_key = os.getenv("GEMINI_API_KEY")
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
-        res = req.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        res = requests.post(url, json=payload)
         res.raise_for_status()
         reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+
         return jsonify({"reply": reply})
+
     except Exception as e:
         return jsonify({"error": "Chatbot failed", "details": str(e)}), 500
+
+# ─── Summarize & Audio Transcription API (שדרוג סיכומי שיחה) ─────────────────
+
+@app.route("/summarize", methods=["POST"])
+def summarize_text():
+    data = request.get_json()
+    if not data or "text" not in data:
+        return jsonify({"error": "No text provided"}), 400
+
+    original_text = data["text"]
+    prompt = f"""סכם את השיחה הבאה בפורמט הבא בדיוק:
+סיכום: [כתוב כאן סיכום קצר ותמציתי של מה שהיה בשיחה]
+נקודות:
+* [נקודה מרכזית 1]
+* [נקודה מרכזית 2]
+משימות:
+* [משימה להמשך 1]
+* [משימה להמשך 2]
+
+השיחה: {original_text}"""
+
+    try:
+        api_key = os.getenv("GEMINI_API_KEY")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        res = requests.post(url, json=payload)
+        res.raise_for_status()
+        reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+        
+        return jsonify({"summary_result": reply})
+    except Exception as e:
+        return jsonify({"error": "Failed to generate summary", "details": str(e)}), 500
+
+
+@app.route("/summarize-audio", methods=["POST"])
+def summarize_audio():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    try:
+        import base64
+        file_data = file.read()
+        encoded_file = base64.b64encode(file_data).decode('utf-8')
+        mime_type = file.content_type
+
+        prompt = """הקשב להקלטת השיחה הבאה (זו יכולה להיות הקלטת זום או שיחה קולית).
+תמלל את השיחה בלבך, ולאחר מכן סכם אותה בפורמט הבא בדיוק:
+סיכום: [כתוב כאן סיכום קצר ותמציתי של מה שנאמר בהקלטה]
+נקודות:
+* [נקודה מרכזית 1]
+* [נקודה מרכזית 2]
+משימות:
+* [משימה להמשך 1]
+* [משימה להמשך 2]"""
+
+        api_key = os.getenv("GEMINI_API_KEY")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+        res = req.post(url, json={{"contents": [{{"parts": [{{"text": prompt}}]}}]}})
+        res.raise_for_status()
+        reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+        return jsonify({{"reply": reply}})
+    except Exception as e:
+        return jsonify({{"error": "Chatbot failed", "details": str(e)}}), 500
 
 
 if __name__ == "__main__":

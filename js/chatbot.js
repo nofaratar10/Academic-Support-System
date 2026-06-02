@@ -6,9 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const userMessageInput = document.getElementById('userMessage');
     const chatMessages = document.getElementById('chatMessages');
 
-    // הכתובת של השרת המרכזי שלכן במכללה (פורט 5000)
-    const API_BASE_URL = "http://vmedu473.mtacloud.co.il:5000";
-
+// הכתובת מתעדכנת אוטומטית לפי המקום שבו האתר רץ (לוקאל או שרת המכללה)
+    const API_BASE_URL = window.location.origin;
+    
     // 1. 🔘 מנגנון פתיחה וסגירה של החלונית בלחיצה על הבועה העגולה
     if (bubble && chatContainer) {
         bubble.addEventListener('click', () => {

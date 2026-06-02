@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מערכת ליווי - תגבורים והתאמות</title>
+  <link rel="stylesheet" href="/CSS/site.css" />
+  <link rel="stylesheet" href="/CSS/student-cases.css" />
+  <link rel="stylesheet" href="/CSS/adjustments.css" />
+  <link rel="stylesheet" href="/CSS/demo.css" />
+</head>
+
+<body class="page">
+
+  <div class="layout">
+
+    <aside class="right-sidebar">
+      <div class="brand">מערכת ליווי</div>
+      <nav class="main-nav">
+        <a href="/dashboard" class="nav-item" title="לא מיושם בסדנה">
+          <span>דשבורד</span>
+        </a>
+        <a href="/student-cases" class="nav-item">
+          <span>תיקי סטודנטים</span>
+        </a>
+        <a href="/tickets" class="nav-item">
+          <span>פניות ושיח יזום</span>
+        </a>
+        <a href="/adjustments" class="nav-item active" title="לא מיושם בסדנה">
+          <span>תגבורים והתאמות</span>
+        </a>
+        <a href="/progress" class="nav-item">
+          <span>התקדמות ומשחוק</span>
+        </a>
+        <a href="/reports" class="nav-item" title="לא מיושם בסדנה">
+          <span>דוחות ואחזור מידע</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="#" class="settings-link" title="לא מיושם בסדנה">הגדרות</a>
+      </div>
+    </aside>
+
+    <div class="main-area">
+
+      <header class="topbar">
+        <div class="topbar-right">
+          <h1 class="page-title">תגבורים והתאמות</h1>
+        </div>
+        <div class="topbar-center">
+          <div class="search-box">
+            <input type="text" placeholder="חיפוש בקשת התאמה או קורס..." />
+          </div>
+        </div>
+        <div class="topbar-left">
+          <button class="icon-btn">🔔</button>
+          <div class="user-name">פולינה (רכזת)</div>
+        </div>
+      </header>
+
+      <main class="content">
+
+        <div class="demo-page-banner">
+          <span class="banner-icon">⚠️</span>
+          <div class="banner-text">
+            <p>עמוד זה נועד להמחשת חווית המשתמש המלאה ואינו מחובר לנתונים חיים בסדנה זו.</p>
+          </div>
+        </div>
+
+        <div class="adjustments-main-split">
+          
+          <section class="table-card adjustments-table-section">
+            <div class="section-header-row">
+              <h2 class="section-block-title">בקשות והתאמות אקדמיות</h2>
+            </div>
+            <table class="students-table">
+              <thead>
+                <tr>
+                  <th>מס' בקשה</th>
+                  <th>שם הסטודנט</th>
+                  <th>שם הקורס</th>
+                  <th>סוג הבקשה וההתאמה</th>
+                  <th>סטטוס</th>
+                  <th>פעולה</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>3103</td>
+                  <td>דוד מזרחי</td>
+                  <td>הסתברות</td>
+                  <td>אישור שעות תגבור לימודי פרטני</td>
+                  <td><span class="status-pill status-pending">בבדיקה</span></td>
+                  <td><button class="primary-btn table-open-btn">פתיחה</button></td>
+                </tr>
+                <tr>
+                  <td>3011</td>
+                  <td>רועי כהן</td>
+                  <td>מבוא למדמח</td>
+                  <td>פיצול בחינות או דחיית קורס</td>
+                  <td><span class="status-pill status-closed">נדחה</span></td>
+                  <td><button class="primary-btn table-open-btn">פתיחה</button></td>
+                </tr>
+                <tr>
+                  <td>3101</td>
+                  <td>יוסי כהן</td>
+                  <td>מבני נתונים</td>
+                  <td>תוספת זמן במבחנים 25%</td>
+                  <td><span class="status-pill status-open">מאושר</span></td>
+                  <td><button class="primary-btn table-open-btn">פתיחה</button></td>
+                </tr>
+                <tr>
+                  <td>3104</td>
+                  <td>נועה שלום</td>
+                  <td>מאקרו כלכלה</td>
+                  <td>מועד מיוחד (מועד ג') עקב שמ"פ</td>
+                  <td><span class="status-pill status-pending">בבדיקה</span></td>
+                  <td><button class="primary-btn table-open-btn">פתיחה</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <aside class="new-adjustment-panel">
+            <h2 class="panel-block-title">➕ הזנת בקשת התאמה/תגבור</h2>
+            <form class="dummy-form" onsubmit="return false;">
+              <div class="form-group-item">
+                <label>תעודת זהות / מס' סטודנט:</label>
+                <input type="text" placeholder="לדוגמה: 12345" disabled />
+              </div>
+              <div class="form-group-item">
+                <label>שם הקורס הרלוונטי:</label>
+                <input type="text" placeholder="לדוגמה: מבני נתונים" disabled />
+              </div>
+              <div class="form-group-item">
+                <label>סוג ההתאמה או העזרה הנדרשת:</label>
+                <select disabled>
+                  <option>תוספת זמן במבחנים</option>
+                  <option>אישור שעות תגבור לימודי פרטני</option>
+                  <option>פיצול בחינות או דחיית קורס</option>
+                </select>
+              </div>
+              <div class="form-group-item">
+                <label>הערות פולינה (רכזת ליווי):</label>
+                <textarea placeholder="פירוט צרכים אקדמיים (על סמך ימי המילואים או המצב הלימודי)..." disabled></textarea>
+              </div>
+              <button class="primary-btn submit-dummy-btn" disabled>שמירת בקשה זמנית</button>
+            </form>
+          </aside>
+
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+</body>
+</html>

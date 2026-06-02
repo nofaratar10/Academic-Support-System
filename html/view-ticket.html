@@ -1,19 +1,12 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>פנייה פתוחה - מערכת ליווי</title>
-  <link rel="stylesheet" href="/CSS/site.css" />
-  <link rel="stylesheet" href="/CSS/view-ticket.css" />
-  <link rel="stylesheet" href="/CSS/Chatbot.css" />
-  <style>
-    .reply-card { margin-top: 16px; padding: 16px; }
-    .reply-card h4 { margin-bottom: 10px; }
-    .reply-card textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; resize: vertical; }
-    .reply-footer { display: flex; justify-content: flex-start; margin-top: 10px; }
-    #messagesContainer { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
-  </style>
+  <link rel="stylesheet" href="/CSS/site.css"/>
+  <link rel="stylesheet" href="/CSS/view-ticket.css"/>
+  <link rel="stylesheet" href="/CSS/Chatbot.css"/>
 </head>
 <body class="page">
 
@@ -21,19 +14,41 @@
     <aside class="right-sidebar">
       <div class="brand">מערכת ליווי</div>
       <nav class="main-nav">
-        <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
-        <a href="/student-cases" class="nav-item"><span>תיקי סטודנטים</span></a>
-        <a href="/tickets" class="nav-item active"><span>פניות ושיח יזום</span></a>
-        <a href="/alerts" class="nav-item"><span>תגבורים והתאמות</span></a>
-        <a href="/progress" class="nav-item"><span>התקדמות ומשחוק</span></a>
-        <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
+        <a href="/dashboard.html" class="nav-item" title="לא מיושם בסדנה">
+          <span>דשבורד</span>
+        </a>
+
+        <a href="/student-cases.html" class="nav-item">
+          <span>תיקי סטודנטים</span>
+        </a>
+
+        <a href="/tickets.html" class="nav-item active">
+          <span>פניות ושיח יזום</span>
+        </a>
+
+        <a href="/adjustments.html" class="nav-item" title="לא מיושם בסדנה">
+          <span>תגבורים והתאמות</span>
+        </a>
+
+        <a href="/progress.html" class="nav-item">
+          <span>התקדמות ומשחוק</span>
+        </a>
+
+        <a href="/reports.html" class="nav-item" title="לא מיושם בסדנה">
+          <span>דוחות ואחזור מידע</span>
+        </a>
       </nav>
+      <div class="sidebar-footer">
+        <a href="#" class="settings-link" title="לא מיושם בסדנה">הגדרות</a>
+      </div>
     </aside>
 
     <div class="main-area">
       <header class="topbar">
         <div class="topbar-right">
           <h1 class="page-title">פנייה פתוחה</h1>
+        </div>
+        <div class="topbar-center">
         </div>
         <div class="topbar-left">
           <button class="icon-btn">🔔</button>
@@ -54,14 +69,14 @@
           </div>
 
           <!-- שרשור הודעות -->
-          <div id="messagesContainer"></div>
+          <div id="ticketMessagesContainer"></div>
 
           <!-- שדה תגובה -->
           <div class="table-card reply-card">
             <h4>תגובה</h4>
             <textarea id="replyContent" placeholder="כתבי תגובה..."></textarea>
             <div class="reply-footer">
-              <button class="primary-btn" id="sendReplyBtn">שליחה</button>
+              <button class="send-reply-btn" id="sendReplyBtn">שליחה</button>
             </div>
           </div>
 
