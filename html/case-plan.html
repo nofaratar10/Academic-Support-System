@@ -19,23 +19,18 @@
         <a href="/dashboard" class="nav-item" title="לא מיושם בסדנה">
           <span>דשבורד</span>
         </a>
-
         <a href="/student-cases" class="nav-item active">
           <span>תיקי סטודנטים</span>
         </a>
-
         <a href="/tickets" class="nav-item">
           <span>פניות ושיח יזום</span>
         </a>
-
-        <a href="/adjustments" class="nav-item" title="לא מיושם בסדנה">
+        <a href="/alerts" class="nav-item" title="לא מיושם בסדנה">
           <span>תגבורים והתאמות</span>
         </a>
-
         <a href="/progress" class="nav-item">
           <span>התקדמות ומשחוק</span>
         </a>
-
         <a href="/reports" class="nav-item" title="לא מיושם בסדנה">
           <span>דוחות ואחזור מידע</span>
         </a>
@@ -52,13 +47,11 @@
         <div class="topbar-right">
           <h1 class="page-title">תיק ליווי</h1>
         </div>
-
         <div class="topbar-center">
           <div class="search-box">
             <input type="text" placeholder="חיפוש סטודנט / פנייה..." />
           </div>
         </div>
-
         <div class="topbar-left">
           <button class="icon-btn" type="button">🔔</button>
           <div class="user-name">פולינה (רכזת)</div>
@@ -66,21 +59,19 @@
       </header>
 
       <section class="student-bar" aria-label="פרטי סטודנט">
-        <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
-        <button
-          class="back"
-          type="button"
-          aria-label="חזרה"
-          onclick="window.location.href='/student-cases'">
-          ←
-        </button>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
+          <span class="status-pill" id="statusPill"></span>
+        </div>
+        <button class="back" type="button" aria-label="חזרה"
+          onclick="window.location.href='/student-cases'">←</button>
       </section>
 
       <div class="tabs" role="tablist" aria-label="לשוניות תיק">
-        <a class="tab" id="detailsTab" href="student-details.html">פרטים</a>
-        <a class="tab" id="documentsTab" href="case-documents.html">מסמכי התאמות</a>
-        <a class="tab active" id="planTab" href="case-plan.html">תוכנית ליווי</a>
-        <a class="tab" id="summaryTab" href="student-summary.html">סיכומי שיחה</a>
+        <a class="tab" id="detailsTab" href="/student-details">פרטים</a>
+        <a class="tab" id="documentsTab" href="/case-documents">מסמכי התאמות</a>
+        <a class="tab active" id="planTab" href="/case-plan">תוכנית ליווי</a>
+        <a class="tab" id="summaryTab" href="/student-summary">סיכומי שיחה</a>
       </div>
 
       <main class="content">
@@ -127,44 +118,45 @@
 
     </div>
   </div>
+
   <div class="modal-overlay" id="taskModal">
-  <div class="task-modal">
-    <h3>הוספת משימה חדשה</h3>
+    <div class="task-modal">
+      <h3>הוספת משימה חדשה</h3>
 
-    <div class="field">
-      <label for="taskName">משימה / קטגוריה</label>
-      <input id="taskName" type="text" placeholder="לדוגמה: פגישה עם מלווה" />
-    </div>
+      <div class="field">
+        <label for="taskName">משימה / קטגוריה</label>
+        <input id="taskName" type="text" placeholder="לדוגמה: פגישה עם מלווה" />
+      </div>
 
-    <div class="field">
-      <label for="taskDescription">תיאור</label>
-      <input id="taskDescription" type="text" placeholder="פירוט המשימה" />
-    </div>
+      <div class="field">
+        <label for="taskDescription">תיאור</label>
+        <input id="taskDescription" type="text" placeholder="פירוט המשימה" />
+      </div>
 
-    <div class="field">
-      <label for="taskDueDate">תאריך יעד</label>
-      <input id="taskDueDate" type="date" />
-    </div>
+      <div class="field">
+        <label for="taskDueDate">תאריך יעד</label>
+        <input id="taskDueDate" type="date" />
+      </div>
 
-    <div class="field">
-      <label for="taskStatus">סטטוס</label>
-      <select id="taskStatus">
-        <option value="פתוח">פתוח</option>
-        <option value="בביצוע">בביצוע</option>
-        <option value="הושלם">הושלם</option>
-      </select>
-    </div>
+      <div class="field">
+        <label for="taskStatus">סטטוס</label>
+        <select id="taskStatus">
+          <option value="פתוח">פתוח</option>
+          <option value="בביצוע">בביצוע</option>
+          <option value="הושלם">הושלם</option>
+        </select>
+      </div>
 
-    <div class="modal-actions">
-      <button class="btn" type="button" id="cancelTaskBtn">ביטול</button>
-      <button class="primary-btn" type="button" id="saveTaskBtn">שמירה</button>
+      <div class="modal-actions">
+        <button class="btn" type="button" id="cancelTaskBtn">ביטול</button>
+        <button class="primary-btn" type="button" id="saveTaskBtn">שמירה</button>
+      </div>
     </div>
   </div>
-</div>
 
   <div class="toast" id="toast" role="status" aria-live="polite">המשימה נוספה</div>
 
-  <script src="../JS/case-plan.js"></script>
+  <script src="/JS/case-plan.js"></script>
   <script src="/JS/chatbot-widget.js"></script>
 </body>
 </html>

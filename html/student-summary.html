@@ -2,13 +2,13 @@
 <html lang="he" dir="rtl">
 
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>סיכומי שיחה - מערכת ליווי</title>
 
-  <link rel="stylesheet" href="/CSS/site.css"/>
-  <link rel="stylesheet" href="/CSS/student-summary.css"/>
-  <link rel="stylesheet" href="/CSS/Chatbot.css"/>
+  <link rel="stylesheet" href="/CSS/site.css" />
+  <link rel="stylesheet" href="/CSS/student-summary.css" />
+  <link rel="stylesheet" href="/CSS/Chatbot.css" />
 </head>
 
 <body class="page">
@@ -21,23 +21,18 @@
         <a href="/dashboard" class="nav-item" title="לא מיושם בסדנה">
           <span>דשבורד</span>
         </a>
-
         <a href="/student-cases" class="nav-item active">
           <span>תיקי סטודנטים</span>
         </a>
-
         <a href="/tickets" class="nav-item">
           <span>פניות ושיח יזום</span>
         </a>
-
-        <a href="/adjustments" class="nav-item" title="לא מיושם בסדנה">
+        <a href="/alerts" class="nav-item" title="לא מיושם בסדנה">
           <span>תגבורים והתאמות</span>
         </a>
-
         <a href="/progress" class="nav-item">
           <span>התקדמות ומשחוק</span>
         </a>
-
         <a href="/reports" class="nav-item" title="לא מיושם בסדנה">
           <span>דוחות ואחזור מידע</span>
         </a>
@@ -54,29 +49,31 @@
         <div class="topbar-right">
           <h1 class="page-title">תיק ליווי</h1>
         </div>
-
         <div class="topbar-center">
           <div class="search-box">
             <input type="text" placeholder="חיפוש סטודנט / פנייה..." />
           </div>
         </div>
-
         <div class="topbar-left">
           <button class="icon-btn" type="button">🔔</button>
           <div class="user-name">פולינה (רכזת)</div>
         </div>
       </header>
 
-      <section class="student-bar">
-        <h2 class="student-name">שם הסטודנט</h2>
-        <button class="back" onclick="window.location.href='/student-cases'">←</button>
+      <section class="student-bar" aria-label="פרטי סטודנט">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
+          <span class="status-pill" id="statusPill"></span>
+        </div>
+        <button class="back" type="button" aria-label="חזרה"
+          onclick="window.location.href='/student-cases'">←</button>
       </section>
 
       <div class="tabs" role="tablist" aria-label="לשוניות תיק">
-        <a class="tab" id="detailsTab" href="student-details.html">פרטים</a>
-        <a class="tab" id="documentsTab" href="case-documents.html">מסמכי התאמות</a>
-        <a class="tab" id="planTab" href="case-plan.html">תוכנית ליווי</a>
-        <a class="tab active" id="summaryTab" href="student-summary.html">סיכומי שיחה</a>
+        <a class="tab" id="detailsTab" href="/student-details">פרטים</a>
+        <a class="tab" id="documentsTab" href="/case-documents">מסמכי התאמות</a>
+        <a class="tab" id="planTab" href="/case-plan">תוכנית ליווי</a>
+        <a class="tab active" id="summaryTab" href="/student-summary">סיכומי שיחה</a>
       </div>
 
       <main class="content">
@@ -89,11 +86,9 @@
           <div class="details-body">
 
             <div class="input-type-selector">
-            <button class="selector-btn active" id="selectTextMode">⌨️ הדבקת טקסט</button>
-            <button class="selector-btn" id="selectFileMode">📁 העלאת הקלטה / סרטון</button>
-          </div>
-
-          <div class="details-body">
+              <button class="selector-btn active" id="selectTextMode">⌨️ הדבקת טקסט</button>
+              <button class="selector-btn" id="selectFileMode">📁 העלאת הקלטה / סרטון</button>
+            </div>
 
             <div id="textModeContainer" class="field full-width">
               <label>תוכן השיחה</label>
@@ -113,28 +108,24 @@
             </div>
 
             <div class="summary-result">
-
               <div class="result-box">
                 <h4>סיכום כללי</h4>
                 <p id="summaryOutput"></p>
               </div>
-
               <div class="result-box">
                 <h4>נקודות מרכזיות</h4>
                 <ul id="pointsOutput"></ul>
               </div>
-
               <div class="result-box">
                 <h4>משימות להמשך</h4>
                 <ul id="tasksOutput"></ul>
               </div>
-
             </div>
 
-          </div>
+            <div class="table-footer">
+              <button class="btn">שמירה</button>
+            </div>
 
-          <div class="table-footer">
-            <button class="btn">שמירה</button>
           </div>
 
         </section>
@@ -143,7 +134,7 @@
     </div>
   </div>
 
-  <script src="../JS/student-summary.js"></script>
+  <script src="/JS/student-summary.js"></script>
   <script src="/JS/chatbot-widget.js"></script>
 </body>
 

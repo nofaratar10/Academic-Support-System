@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>מסמכי התאמות - מערכת ליווי</title>
-  <link rel="stylesheet" href="/CSS/site.css"/>
-  <link rel="stylesheet" href="/CSS/case-documents.css"/>
-  <link rel="stylesheet" href="/CSS/Chatbot.css"/>
+  <link rel="stylesheet" href="/CSS/site.css" />
+  <link rel="stylesheet" href="/CSS/case-documents.css" />
+  <link rel="stylesheet" href="/CSS/Chatbot.css" />
 </head>
 <body class="page">
 
@@ -16,33 +16,16 @@
       <div class="brand">מערכת ליווי</div>
 
       <nav class="main-nav">
-        <a href="/dashboard.html" class="nav-item" title="לא מיושם בסדנה">
-          <span>דשבורד</span>
-        </a>
-
-        <a href="/student-cases.html" class="nav-item active">
-          <span>תיקי סטודנטים</span>
-        </a>
-
-        <a href="/tickets.html" class="nav-item">
-          <span>פניות ושיח יזום</span>
-        </a>
-
-        <a href="/adjustments.html" class="nav-item" title="לא מיושם בסדנה">
-          <span>תגבורים והתאמות</span>
-        </a>
-
-        <a href="/progress.html" class="nav-item">
-          <span>התקדמות ומשחוק</span>
-        </a>
-
-        <a href="/reports.html" class="nav-item" title="לא מיושם בסדנה">
-          <span>דוחות ואחזור מידע</span>
-        </a>
+        <a href="/dashboard" class="nav-item"><span>דשבורד</span></a>
+        <a href="/student-cases" class="nav-item active"><span>תיקי סטודנטים</span></a>
+        <a href="/tickets" class="nav-item"><span>פניות ושיח יזום</span></a>
+        <a href="/alerts" class="nav-item"><span>תגבורים והתאמות</span></a>
+        <a href="/progress" class="nav-item"><span>התקדמות ומשחוק</span></a>
+        <a href="/reports" class="nav-item"><span>דוחות ואחזור מידע</span></a>
       </nav>
 
       <div class="sidebar-footer">
-        <a href="#" class="settings-link" title="לא מיושם בסדנה">הגדרות</a>
+        <a href="#" class="settings-link">הגדרות</a>
       </div>
     </aside>
 
@@ -52,10 +35,11 @@
         <div class="topbar-right">
           <h1 class="page-title">תיק ליווי</h1>
         </div>
-
         <div class="topbar-center">
+          <div class="search-box">
+            <input type="text" placeholder="חיפוש סטודנט / פנייה..." />
+          </div>
         </div>
-
         <div class="topbar-left">
           <button class="icon-btn" type="button">🔔</button>
           <div class="user-name">פולינה (רכזת)</div>
@@ -63,21 +47,19 @@
       </header>
 
       <section class="student-bar" aria-label="פרטי סטודנט">
-        <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
-        <button
-          class="back"
-          type="button"
-          aria-label="חזרה"
-          onclick="window.location.href='student-cases.html'">
-          ←
-        </button>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
+          <span class="status-pill" id="statusPill"></span>
+        </div>
+        <button class="back" type="button" aria-label="חזרה"
+          onclick="window.location.href='/student-cases'">←</button>
       </section>
 
       <div class="tabs" role="tablist" aria-label="לשוניות תיק">
-        <a class="tab" id="detailsTab" href="student-details.html">פרטים</a>
-        <a class="tab active" id="documentsTab" href="case-documents.html">מסמכי התאמות</a>
-        <a class="tab" id="planTab" href="case-plan.html">תוכנית ליווי</a>
-        <a class="tab" id="summaryTab" href="student-summary.html">סיכומי שיחה</a>
+        <a class="tab" id="detailsTab" href="/student-details">פרטים</a>
+        <a class="tab active" id="documentsTab" href="/case-documents">מסמכי התאמות</a>
+        <a class="tab" id="planTab" href="/case-plan">תוכנית ליווי</a>
+        <a class="tab" id="summaryTab" href="/student-summary">סיכומי שיחה</a>
       </div>
 
       <main class="content">
@@ -109,10 +91,7 @@
                 <option>אבחון דידקטי</option>
                 <option>טופס התאמות</option>
               </select>
-
-              <input type="file" id="filePicker" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
-             
-              <button class="primary-btn" type="button" id="addDocumentBtn">העלאת מסמך</button>
+              <button class="primary-btn" type="button" id="addDocumentBtn">העלאת מסמך +</button>
             </div>
           </div>
         </section>

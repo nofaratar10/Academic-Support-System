@@ -297,6 +297,41 @@ def get_student(student_id):
     student = Student.query.get_or_404(student_id)
     return jsonify(student.to_dict())
 
+@app.route("/students/<int:student_id>/status", methods=["PATCH"])
+def update_student_status(student_id):
+    Student.query.get_or_404(student_id)
+    data = request.get_json()
+    if not data or not data.get("status"):
+        return jsonify({"error": "status is required"}), 400
+
+    status = data["status"]
+
+    support_file = SupportFile.query.filter_by(student_id=student_id).order_by(SupportFile.case_id.desc()).first()
+    if support_file:
+        support_file.status = status
+    else:
+        db.session.add(SupportFile(student_id=student_id, open_date=date.today(), status=status))
+
+    db.session.commit()
+    return jsonify({"message": "status updated", "status": status}), 200
+
+@app.route("/students/<int:student_id>", methods=["DELETE"])
+def delete_student(student_id):
+    student = Student.query.get_or_404(student_id)
+
+    # Delete ticket_messages → tickets → tasks → support_files → student
+    ticket_ids = [t.ticket_id for t in Ticket.query.filter_by(student_id=student_id).all()]
+    if ticket_ids:
+        TicketMessage.query.filter(TicketMessage.ticket_id.in_(ticket_ids)).delete(synchronize_session=False)
+        Ticket.query.filter(Ticket.ticket_id.in_(ticket_ids)).delete(synchronize_session=False)
+
+    Task.query.filter_by(student_id=student_id).delete(synchronize_session=False)
+    SupportFile.query.filter_by(student_id=student_id).delete(synchronize_session=False)
+
+    db.session.delete(student)
+    db.session.commit()
+    return jsonify({"message": "deleted"}), 200
+
 @app.route("/students", methods=["POST"])
 def create_student():
     data = request.get_json()
@@ -313,6 +348,16 @@ def create_student():
         phone=data.get("phone"),
     )
     db.session.add(student)
+    db.session.flush()
+
+    # Create initial support file with chosen status (default: Open)
+    status = data.get("status", "Open")
+    support_file = SupportFile(
+        student_id=student.student_id,
+        open_date=date.today(),
+        status=status
+    )
+    db.session.add(support_file)
     db.session.commit()
     return jsonify(student.to_dict()), 201
 
@@ -349,6 +394,39 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
     return jsonify({"message": "deleted"}), 200
+
+
+# ─── Progress API ────────────────────────────────────────────
+
+@app.route("/api/progress", methods=["GET"])
+def get_progress():
+    students = Student.query.all()
+    today = date.today().isoformat()
+    result = []
+
+    for student in students:
+        tasks = Task.query.filter_by(student_id=student.student_id).all()
+        total = len(tasks)
+        completed = sum(1 for t in tasks if t.status == "הושלם")
+        in_progress = sum(1 for t in tasks if t.status == "בביצוע")
+        progress = round(completed / total * 100) if total > 0 else 0
+        points = completed * 10
+        has_overdue = any(
+            t.due_date and t.due_date < today and t.status != "הושלם"
+            for t in tasks
+        )
+        result.append({
+            "student_id": student.student_id,
+            "name": f"{student.first_name} {student.last_name}",
+            "total_tasks": total,
+            "completed_tasks": completed,
+            "in_progress_tasks": in_progress,
+            "progress": progress,
+            "points": points,
+            "status": "איחור" if has_overdue else "תקין"
+        })
+
+    return jsonify(result)
 
 
 # ─── Tickets API ──────────────────────────────────────────────────────────────
@@ -392,6 +470,14 @@ def create_ticket():
 def get_ticket(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
     return jsonify(ticket.to_dict())
+
+@app.route("/api/tickets/<int:ticket_id>", methods=["DELETE"])
+def delete_ticket(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    TicketMessage.query.filter_by(ticket_id=ticket_id).delete(synchronize_session=False)
+    db.session.delete(ticket)
+    db.session.commit()
+    return jsonify({"message": "deleted"}), 200
 
 @app.route("/api/tickets/<int:ticket_id>/messages", methods=["GET"])
 def get_ticket_messages(ticket_id):
@@ -454,93 +540,7 @@ def seed_students():
     db.session.add_all(support_files)
     db.session.commit()
     return jsonify({"message": "demo students seeded successfully"})
-
-
-# ─── Progress Routes (from process3.py) ───────────────────────────────────────
-
-@app.route("/students-progress", methods=["GET"])
-def get_students_progress():
-    today = date.today()
-    students = Student.query.all()
-    result = []
-    completed_statuses = {"completed", "הושלם", "בוצע", "סגור"}
-
-    for student in students:
-        tasks = Task.query.filter_by(student_id=student.student_id).all()
-        total_tasks = len(tasks)
-
-        completed_tasks = [t for t in tasks if str(t.status or "").strip().lower() in completed_statuses]
-
-        overdue_tasks = [
-            t for t in tasks
-            if str(t.status or "").strip().lower() not in completed_statuses
-            and _parse_due_date(t.due_date) is not None
-            and _parse_due_date(t.due_date) < today
-        ]
-
-        open_tasks = [
-            t for t in tasks
-            if str(t.status or "").strip().lower() not in completed_statuses
-            and (_parse_due_date(t.due_date) is None or _parse_due_date(t.due_date) >= today)
-        ]
-
-        completed_count = len(completed_tasks)
-        open_count      = len(open_tasks)
-        overdue_count   = len(overdue_tasks)
-
-        progress = round((completed_count / total_tasks) * 100) if total_tasks > 0 else 0
-
-        total_points = sum((getattr(t, "points", 10) or 10) for t in completed_tasks)
-
-        if progress <= 39:
-            progress_status = "מתחיל"
-        elif progress <= 69:
-            progress_status = "בתהליך"
-        else:
-            progress_status = "מתקדם"
-
-        result.append({
-            "student_id":      student.student_id,
-            "name":            f"{student.first_name} {student.last_name}",
-            "progress":        progress,
-            "completed_tasks": completed_count,
-            "total_tasks":     total_tasks,
-            "open_tasks":      open_count,
-            "overdue_tasks":   overdue_count,
-            "points":          total_points,
-            "status":          progress_status,
-        })
-
-    return jsonify(result)
-
-@app.route("/seed-tasks", methods=["GET"])
-def seed_tasks():
-    if Task.query.count() > 0:
-        return jsonify({"message": "tasks already exist"})
-
-    demo_tasks = [
-        Task(student_id=1, task="הגשת עבודה סמינריונית", status="הושלם",
-             due_date=date.today().isoformat(), description=""),
-        Task(student_id=1, task="קריאת חומר קורס", status="הושלם",
-             due_date=date.today().isoformat(), description=""),
-        Task(student_id=1, task="פגישה עם מנחה", status="הושלם",
-             due_date=date.today().isoformat(), description=""),
-        Task(student_id=1, task="הכנת מצגת", status="פתוח",
-             due_date=(date.today() + timedelta(days=7)).isoformat(), description=""),
-        Task(student_id=2, task="קריאת מאמרים", status="הושלם",
-             due_date=date.today().isoformat(), description=""),
-        Task(student_id=2, task="הגשת תרגיל", status="פתוח",
-             due_date=(date.today() + timedelta(days=3)).isoformat(), description=""),
-        Task(student_id=2, task="בחינת אמצע", status="פתוח",
-             due_date=(date.today() - timedelta(days=5)).isoformat(), description=""),
-    ]
-
-    db.session.add_all(demo_tasks)
-    db.session.commit()
-    return jsonify({"message": "demo tasks seeded successfully"})
-
-
-# ─── Chatbot API (from chatbot_app.py) ────────────────────────────────────────
+# ─── Chatbot API ─────────────────────────────────────────────
 
 @app.route("/chat", methods=["GET", "POST"])
 @app.route("/chatbot/message", methods=["GET", "POST"])
@@ -690,114 +690,13 @@ def summarize_audio():
 
         api_key = os.getenv("GEMINI_API_KEY")
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
-        
-        payload = {
-            "contents": [{
-                "parts": [
-                    {
-                        "inlineData": {
-                            "mimeType": mime_type,
-                            "data": encoded_file
-                        }
-                    },
-                    {
-                        "text": prompt
-                    }
-                ]
-            }]
-        }
-
-        res = requests.post(url, json=payload)
+        res = req.post(url, json={{"contents": [{{"parts": [{{"text": prompt}}]}}]}})
         res.raise_for_status()
         reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
-
-        return jsonify({"summary_result": reply})
+        return jsonify({{"reply": reply}})
     except Exception as e:
-        return jsonify({"error": "Failed to process audio file", "details": str(e)}), 500
+        return jsonify({{"error": "Chatbot failed", "details": str(e)}}), 500
 
-
-@app.route("/support-files", methods=["POST"])
-def create_support_file():
-    data = request.get_json()
-    if not data or not data.get("student_id") or not data.get("summary"):
-        return jsonify({"error": "student_id and summary are required"}), 400
-        
-    support_file = SupportFile(
-        student_id=data["student_id"],
-        summary=data["summary"],
-        status=data.get("status", "Open")
-    )
-    db.session.add(support_file)
-    db.session.commit()
-    return jsonify(support_file.to_dict()), 201
-
-
-# ─── Documents Management API ────────────────────────────────────────────────
-
-@app.route("/students/<int:student_id>/documents", methods=["GET"])
-def get_student_documents(student_id):
-    Student.query.get_or_404(student_id)
-    documents = Document.query.filter_by(student_id=student_id).all()
-    return jsonify([doc.to_dict() for doc in documents])
-
-@app.route("/students/<int:student_id>/documents", methods=["POST"])
-def upload_student_document(student_id):
-    Student.query.get_or_404(student_id)
-    
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    
-    file = request.files['file']
-    doc_name = request.form.get("name")
-    doc_type = request.form.get("type")
-    
-    if file.filename == '' or not doc_name or not doc_type:
-        return jsonify({"error": "Missing file, document name, or document type"}), 400
-
-    try:
-        import uuid
-        from werkzeug.utils import secure_filename
-        
-        file_ext = os.path.splitext(file.filename)[1]
-        unique_filename = f"{student_id}_{uuid.uuid4().hex}{file_ext}"
-        
-        file_path = os.path.join(app.config["UPLOAD_FOLDER"], unique_filename)
-        file.save(file_path)
-        
-        new_doc = Document(
-            student_id=student_id,
-            name=doc_name,
-            filename=unique_filename,
-            doc_type=doc_type,
-            upload_date=datetime.now().strftime("%d/%m/%Y")
-        )
-        db.session.add(new_doc)
-        db.session.commit()
-        
-        return jsonify(new_doc.to_dict()), 201
-    except Exception as e:
-        return jsonify({"error": "Failed to upload document", "details": str(e)}), 500
-
-@app.route("/documents/<int:doc_id>", methods=["DELETE"])
-def delete_document(doc_id):
-    doc = Document.query.get_or_404(doc_id)
-    try:
-        file_path = os.path.join(app.config["UPLOAD_FOLDER"], doc.filename)
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            
-        db.session.delete(doc)
-        db.session.commit()
-        return jsonify({"message": "Document deleted successfully"}), 200
-    except Exception as e:
-        return jsonify({"error": "Failed to delete document", "details": str(e)}), 500
-
-@app.route("/uploads/<path:filename>")
-def download_file(filename):
-    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
-
-
-# ─── Entry Point ──────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     with app.app_context():
