@@ -272,6 +272,7 @@ def progress():
 def reports():
     return send_from_directory(os.path.join(BASE_DIR, "html"), "reports.html")
 
+@app.route('/css/<path:filename>')
 @app.route('/CSS/<path:filename>')
 def css_files(filename):
     return send_from_directory(os.path.join(BASE_DIR, "CSS"), filename)
