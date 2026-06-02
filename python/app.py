@@ -230,6 +230,41 @@ def get_student(student_id):
     student = Student.query.get_or_404(student_id)
     return jsonify(student.to_dict())
 
+@app.route("/students/<int:student_id>/status", methods=["PATCH"])
+def update_student_status(student_id):
+    Student.query.get_or_404(student_id)
+    data = request.get_json()
+    if not data or not data.get("status"):
+        return jsonify({"error": "status is required"}), 400
+
+    status = data["status"]
+
+    support_file = SupportFile.query.filter_by(student_id=student_id).order_by(SupportFile.case_id.desc()).first()
+    if support_file:
+        support_file.status = status
+    else:
+        db.session.add(SupportFile(student_id=student_id, open_date=date.today(), status=status))
+
+    db.session.commit()
+    return jsonify({"message": "status updated", "status": status}), 200
+
+@app.route("/students/<int:student_id>", methods=["DELETE"])
+def delete_student(student_id):
+    student = Student.query.get_or_404(student_id)
+
+    # Delete ticket_messages → tickets → tasks → support_files → student
+    ticket_ids = [t.ticket_id for t in Ticket.query.filter_by(student_id=student_id).all()]
+    if ticket_ids:
+        TicketMessage.query.filter(TicketMessage.ticket_id.in_(ticket_ids)).delete(synchronize_session=False)
+        Ticket.query.filter(Ticket.ticket_id.in_(ticket_ids)).delete(synchronize_session=False)
+
+    Task.query.filter_by(student_id=student_id).delete(synchronize_session=False)
+    SupportFile.query.filter_by(student_id=student_id).delete(synchronize_session=False)
+
+    db.session.delete(student)
+    db.session.commit()
+    return jsonify({"message": "deleted"}), 200
+
 @app.route("/students", methods=["POST"])
 def create_student():
     data = request.get_json()
@@ -246,6 +281,16 @@ def create_student():
         phone=data.get("phone"),
     )
     db.session.add(student)
+    db.session.flush()
+
+    # Create initial support file with chosen status (default: Open)
+    status = data.get("status", "Open")
+    support_file = SupportFile(
+        student_id=student.student_id,
+        open_date=date.today(),
+        status=status
+    )
+    db.session.add(support_file)
     db.session.commit()
     return jsonify(student.to_dict()), 201
 
@@ -282,6 +327,39 @@ def delete_task(task_id):
     db.session.delete(task)
     db.session.commit()
     return jsonify({"message": "deleted"}), 200
+
+
+# ─── Progress API ────────────────────────────────────────────
+
+@app.route("/api/progress", methods=["GET"])
+def get_progress():
+    students = Student.query.all()
+    today = date.today().isoformat()
+    result = []
+
+    for student in students:
+        tasks = Task.query.filter_by(student_id=student.student_id).all()
+        total = len(tasks)
+        completed = sum(1 for t in tasks if t.status == "הושלם")
+        in_progress = sum(1 for t in tasks if t.status == "בביצוע")
+        progress = round(completed / total * 100) if total > 0 else 0
+        points = completed * 10
+        has_overdue = any(
+            t.due_date and t.due_date < today and t.status != "הושלם"
+            for t in tasks
+        )
+        result.append({
+            "student_id": student.student_id,
+            "name": f"{student.first_name} {student.last_name}",
+            "total_tasks": total,
+            "completed_tasks": completed,
+            "in_progress_tasks": in_progress,
+            "progress": progress,
+            "points": points,
+            "status": "איחור" if has_overdue else "תקין"
+        })
+
+    return jsonify(result)
 
 
 # ─── Tickets API ─────────────────────────────────────────────
@@ -325,6 +403,14 @@ def create_ticket():
 def get_ticket(ticket_id):
     ticket = Ticket.query.get_or_404(ticket_id)
     return jsonify(ticket.to_dict())
+
+@app.route("/api/tickets/<int:ticket_id>", methods=["DELETE"])
+def delete_ticket(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    TicketMessage.query.filter_by(ticket_id=ticket_id).delete(synchronize_session=False)
+    db.session.delete(ticket)
+    db.session.commit()
+    return jsonify({"message": "deleted"}), 200
 
 @app.route("/api/tickets/<int:ticket_id>/messages", methods=["GET"])
 def get_ticket_messages(ticket_id):
@@ -387,6 +473,7 @@ def seed_students():
     db.session.add_all(support_files)
     db.session.commit()
     return jsonify({"message": "demo students seeded successfully"})
+
 # ─── Chatbot API ─────────────────────────────────────────────
 
 @app.route("/chatbot/message", methods=["GET", "POST"])
@@ -410,12 +497,12 @@ def chatbot_message():
         load_dotenv()
         api_key = os.getenv("GEMINI_API_KEY")
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
-        res = req.post(url, json={{"contents": [{{"parts": [{{"text": prompt}}]}}]}})
+        res = req.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
         res.raise_for_status()
         reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
-        return jsonify({{"reply": reply}})
+        return jsonify({"reply": reply})
     except Exception as e:
-        return jsonify({{"error": "Chatbot failed", "details": str(e)}}), 500
+        return jsonify({"error": "Chatbot failed", "details": str(e)}), 500
 
 
 if __name__ == "__main__":
