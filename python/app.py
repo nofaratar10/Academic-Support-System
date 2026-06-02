@@ -6,6 +6,7 @@ from pathlib import Path
 from datetime import date, datetime, timedelta
 import requests
 import os
+import google.generativeai as genai
 
 # ─── App & Config ────────────────────────────────────────────────────────────
 
@@ -540,6 +541,7 @@ def seed_students():
     db.session.add_all(support_files)
     db.session.commit()
     return jsonify({"message": "demo students seeded successfully"})
+
 # ─── Chatbot API ─────────────────────────────────────────────
 
 @app.route("/chat", methods=["GET", "POST"])
@@ -630,7 +632,7 @@ def chatbot_message():
     except Exception as e:
         return jsonify({"error": "Chatbot failed", "details": str(e)}), 500
 
-# ─── Summarize & Audio Transcription API (שדרוג סיכומי שיחה) ─────────────────
+# ─── Summarize & Audio Transcription API  ─────────────────
 
 @app.route("/summarize", methods=["POST"])
 def summarize_text():
@@ -663,6 +665,8 @@ def summarize_text():
         return jsonify({"error": "Failed to generate summary", "details": str(e)}), 500
 
 
+# ─── Summarize Audio API ─────────────────────────
+
 @app.route("/summarize-audio", methods=["POST"])
 def summarize_audio():
     if 'file' not in request.files:
@@ -673,8 +677,8 @@ def summarize_audio():
         return jsonify({"error": "No selected file"}), 400
 
     try:
-        import base64
         file_data = file.read()
+        import base64
         encoded_file = base64.b64encode(file_data).decode('utf-8')
         mime_type = file.content_type
 
@@ -689,13 +693,30 @@ def summarize_audio():
 * [משימה להמשך 2]"""
 
         api_key = os.getenv("GEMINI_API_KEY")
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
-        res = req.post(url, json={{"contents": [{{"parts": [{{"text": prompt}}]}}]}})
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+        
+        payload = {
+            "contents": [{
+                "parts": [
+                    {
+                        "inlineData": {
+                            "mimeType": mime_type,
+                            "data": encoded_file
+                        }
+                    },
+                    {"text": prompt}
+                ]
+            }]
+        }
+        
+        res = requests.post(url, json=payload)
         res.raise_for_status()
         reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
-        return jsonify({{"reply": reply}})
+
+        return jsonify({"summary_result": reply})
+
     except Exception as e:
-        return jsonify({{"error": "Chatbot failed", "details": str(e)}}), 500
+        return jsonify({"error": "Failed to process audio file", "details": str(e)}), 500
 
 
 if __name__ == "__main__":
