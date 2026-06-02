@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
   
-
   document.getElementById("detailsTab").href = `/student-details?id=${studentId}`;
   document.getElementById("documentsTab").href = `/case-documents?id=${studentId}`;
   document.getElementById("planTab").href = `/case-plan?id=${studentId}`;
