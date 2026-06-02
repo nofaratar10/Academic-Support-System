@@ -107,6 +107,12 @@
     margin: 0;
 }
 
+.icon-btn-small {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
 .view-all-link {
     display: block;
     text-align: center;

@@ -3,37 +3,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const params    = new URLSearchParams(window.location.search);
   const studentId = params.get("id");
 
-  // ─── Status helpers ────────────────────────────────────────
-  function getHebrewStatus(status) {
-    if (!status) return "פתוח";
-    const s = status.toLowerCase();
-    if (s.includes("open"))    return "פתוח";
-    if (s.includes("closed"))  return "סגור";
-    if (s.includes("pending")) return "מושהה";
-    return status;
+  
+  if (!studentId) {
+    alert("לא נבחר סטודנט");
+    window.location.href = "/student-cases";
+    return;
   }
 
-  function getStudentStatusClass(status) {
-    const s = (status || "").toLowerCase();
-    if (s.includes("open")   || s.includes("פתוח"))  return "status-pill status-open";
-    if (s.includes("closed") || s.includes("סגור"))  return "status-pill status-closed";
-    return "status-pill status-pending";
-  }
+  // ===== 🔗 עדכון טאבים =====
+  document.getElementById("detailsTab").href = `/student-details?id=${studentId}`;
+  document.getElementById("documentsTab").href = `/case-documents?id=${studentId}`;
+  document.getElementById("planTab").href = `/case-plan?id=${studentId}`;
+  document.getElementById("summaryTab").href = `/student-summary?id=${studentId}`;
 
-  function updateStatusBadge(status) {
-    const pill = document.getElementById("statusPill");
-    if (!pill) return;
-    pill.textContent = getHebrewStatus(status);
-    pill.className   = getStudentStatusClass(status);
-  }
-
-  // ─── Tabs ──────────────────────────────────────────────────
-  function setTabs(id) {
-    document.getElementById("detailsTab").href   = `/student-details?id=${id}`;
-    document.getElementById("documentsTab").href = `/case-documents?id=${id}`;
-    document.getElementById("planTab").href      = `/case-plan?id=${id}`;
-    document.getElementById("summaryTab").href   = `/student-summary?id=${id}`;
-  }
+  // ===== 👤 טעינת שם סטודנט מהשרת =====
+  fetch(`${API_BASE_URL}/students/${studentId}`)
+    .then(res => res.json())
+    .then(student => {
+      document.querySelector(".student-name").textContent =
+        `${student.first_name} ${student.last_name}`;
+    });
 
   // ─── Load student header ───────────────────────────────────
   async function loadStudent() {
