@@ -6,13 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const studentId = params.get("id");
 
-  /*
+  
   if (!studentId) {
     alert("לא נבחר סטודנט");
     window.location.href = "/student-cases";
     return;
   }
-  */
+  
 
   // ===== 🔗 עדכון טאבים =====
   document.getElementById("detailsTab").href = `/student-details?id=${studentId}`;
