@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
     const tableBody = document.getElementById("studentsTableBody");
-    let allStudents = [];
 
     function getSupportStatusClass(status) {
         if (!status) return "status-pill status-pending";
@@ -41,13 +40,42 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>${fullName}</td>
                 <td><span class="${getSupportStatusClass(student.support_status)}">${supportStatus}</span></td>
                 <td>${student.task_status || "הושלם"}</td>
-                <td>
+                <td style="display:flex;gap:6px;align-items:center;">
                     <a href="/student-details?id=${student.student_id}" class="primary-btn">תיק ליווי מלא</a>
+                    <button class="delete-icon-btn delete-student-btn" data-id="${student.student_id}" title="מחיקת תיק">
+                        <span class="trash-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                                <path d="M10 11v6"></path>
+                                <path d="M14 11v6"></path>
+                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                            </svg>
+                        </span>
+                    </button>
                 </td>
             `;
             tableBody.appendChild(row);
         });
     }
+
+    async function deleteStudent(studentId) {
+        if (!confirm("האם למחוק את תיק הסטודנט? פעולה זו תמחק גם את כל הפניות והמשימות הקשורות.")) return;
+        try {
+            const res = await fetch(`/students/${studentId}`, { method: "DELETE" });
+            if (!res.ok) throw new Error();
+            await loadStudents();
+        } catch (err) {
+            console.error(err);
+            alert("שגיאה במחיקת הסטודנט");
+        }
+    }
+
+    tableBody.addEventListener("click", (e) => {
+        const btn = e.target.closest(".delete-student-btn");
+        if (!btn) return;
+        deleteStudent(btn.dataset.id);
+    });
 
     async function loadStudents() {
         try {
@@ -56,11 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error("Failed to load students");
             }
 
-            allStudents = await response.json();
-            renderStudents(allStudents);
-            
+            const students = await response.json();
+            renderStudents(students);
             window.dispatchEvent(new Event("dataLoaded"));
-            
+
         } catch (error) {
             console.error(error);
             tableBody.innerHTML = `

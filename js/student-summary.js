@@ -2,7 +2,7 @@ const API_BASE_URL = window.location.origin;
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ===== 📌 שליפת ID מה-URL =====
+
   const params = new URLSearchParams(window.location.search);
   const studentId = params.get("id");
 
@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("planTab").href = `/case-plan?id=${studentId}`;
   document.getElementById("summaryTab").href = `/student-summary?id=${studentId}`;
 
-  // ===== 👤 טעינת שם סטודנט מהשרת =====
   fetch(`${API_BASE_URL}/students/${studentId}`)
     .then(res => res.json())
     .then(student => {
@@ -28,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `${student.first_name} ${student.last_name}`;
     });
 
-  // ===== 🧠 אלמנטים ומצבי קלט =====
   const btn = document.querySelector(".primary-btn");
   const textarea = document.getElementById("conversationText");
   const fileInput = document.getElementById("conversationFile");
@@ -42,9 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const pointsOutput = document.getElementById("pointsOutput");
   const tasksOutput = document.getElementById("tasksOutput");
 
-  let currentMode = "text"; // מצב ברירת מחדל: text או file
+  let currentMode = "text"; 
 
-  // החלפת מצב להדבקת טקסט
   selectTextMode.addEventListener("click", () => {
     currentMode = "text";
     selectTextMode.classList.add("active");
@@ -53,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
     fileModeContainer.classList.add("hidden");
   });
 
-  // החלפת מצב להעלאת קובץ הקלטה
   selectFileMode.addEventListener("click", () => {
     currentMode = "file";
     selectFileMode.classList.add("active");
@@ -62,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
     textModeContainer.classList.add("hidden");
   });
 
-  // פונקציה שמפרקת את הטקסט שחוזר מה-AI ומציגה אותו בתיבות הנכונות במסך
   function displaySummaryResults(fullText) {
     summaryOutput.innerText = "";
     pointsOutput.innerHTML = "";
@@ -92,7 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== ✨ יצירת סיכום בעזרת AI =====
   btn.addEventListener("click", async () => {
     btn.disabled = true;
 
@@ -100,7 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
       let response;
 
       if (currentMode === "text") {
-        // מצב 1: שליחת טקסט רגיל (JSON)
         const text = textarea.value.trim();
         if (!text) return alert("תכניסי תוכן שיחה קודם 🙂");
 
@@ -113,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
       } else {
-        // מצב 2: שליחת קובץ הקלטה/סרטון (FormData)
         const file = fileInput.files[0];
         if (!file) return alert("אנא בחרי קובץ אודיו או וידאו להעלאה 📄");
 
@@ -124,14 +116,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         response = await fetch(`${API_BASE_URL}/summarize-audio`, {
           method: "POST",
-          body: formData // הדפדפן מגדיר את ה-Content-Type לבד כששולחים FormData
+          body: formData 
         });
       }
 
       const data = await response.json();
       if (data.error) throw new Error(data.error);
 
-      // הצגת התוצאות שחזרו מהשרת
       displaySummaryResults(data.summary_result);
 
     } catch (error) {
@@ -143,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===== 💾 שמירת הסיכום לבסיס הנתונים =====
   document.querySelector(".table-footer .btn").addEventListener("click", async () => {
     const summaryText = summaryOutput.innerText;
 

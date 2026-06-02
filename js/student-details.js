@@ -45,6 +45,13 @@ function getStatusClass(status) {
   return "status-pill status-pending";
 }
 
+function updateStatusBadge(status) {
+  const statusPill = document.getElementById("statusPill");
+  if (!statusPill) return;
+  statusPill.textContent = getHebrewStatus(status);
+  statusPill.className = getStatusClass(status);
+}
+
 function setTabs(studentIdValue) {
   document.getElementById("detailsTab").href = `/student-details?id=${studentIdValue}`;
   document.getElementById("documentsTab").href = `/case-documents?id=${studentIdValue}`;
@@ -59,7 +66,7 @@ async function loadStudent() {
   }
 
   try {
-    const response = await fetch(`http://vmedu473.mtacloud.co.il:5000/students/${studentId}`);;
+    const response = await fetch(`/students/${studentId}`);
     if (!response.ok) {
       throw new Error("Student not found");
     }
@@ -79,10 +86,14 @@ async function loadStudent() {
     setSelectValueOrAdd("track", student.track || "");
     setSelectValueOrAdd("semester", student.semester || "");
 
-    const statusPill = document.getElementById("statusPill");
     const supportStatus = student.support_status || "Open";
-    statusPill.textContent = getHebrewStatus(supportStatus);
-    statusPill.className = getStatusClass(supportStatus);
+
+    // Fill the editable status select
+    const statusSelect = document.getElementById("statusSelect");
+    if (statusSelect) statusSelect.value = supportStatus;
+
+    // Update the badge in the header bar
+    updateStatusBadge(supportStatus);
 
     setTabs(student.student_id);
   } catch (error) {
@@ -91,10 +102,37 @@ async function loadStudent() {
   }
 }
 
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  toast.classList.add("visible");
-  window.setTimeout(() => toast.classList.remove("visible"), 2200);
+
+  if (!studentId) return;
+
+  const selectedStatus = document.getElementById("statusSelect")?.value || "Open";
+  const submitBtn = form.querySelector('[type="submit"]');
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch(`/students/${studentId}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: selectedStatus })
+    });
+
+    if (!res.ok) throw new Error("שגיאה בשמירה");
+
+    // Update badge to reflect the new status
+    updateStatusBadge(selectedStatus);
+
+    toast.textContent = "הפרטים נשמרו";
+    toast.classList.add("visible");
+    window.setTimeout(() => toast.classList.remove("visible"), 2200);
+
+  } catch (err) {
+    console.error(err);
+    alert("שגיאה בשמירת הסטטוס");
+  } finally {
+    submitBtn.disabled = false;
+  }
 });
 
 refreshBtn.addEventListener("click", loadStudent);

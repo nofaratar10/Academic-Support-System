@@ -350,6 +350,34 @@ textarea:focus {
   display: block;
 }
 
+/* ─── Delete icon button ─────────────────────────────────── */
+.delete-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 6px;
+  border-radius: 7px;
+  color: #9ca3af;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.delete-icon-btn:hover {
+  background: #fff0f0;
+  color: #e03131;
+}
+
+.trash-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
