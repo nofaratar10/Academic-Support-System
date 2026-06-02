@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "/student-cases";
     return;
   }
+  
 
   // ===== 🔗 עדכון טאבים =====
   document.getElementById("detailsTab").href = `/student-details?id=${studentId}`;
