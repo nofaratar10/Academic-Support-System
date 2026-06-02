@@ -665,7 +665,7 @@ def summarize_text():
         return jsonify({"error": "Failed to generate summary", "details": str(e)}), 500
 
 
-# ─── Summarize Audio API ─────────────────
+# ─── Summarize Audio API ──────────────────────────────────
 
 @app.route("/summarize-audio", methods=["POST"])
 def summarize_audio():
