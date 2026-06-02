@@ -64,7 +64,10 @@
       </header>
 
       <section class="student-bar" aria-label="פרטי סטודנט">
-        <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
+          <span class="status-pill" id="statusPill"></span>
+        </div>
         <button
           class="back"
           type="button"
@@ -142,10 +145,12 @@
                 </div>
 
                 <div class="field">
-                  <label>סטטוס סטודנט</label>
-                  <div>
-                    <span class="status-pill status-open" id="statusPill">פתוח</span>
-                  </div>
+                  <label for="statusSelect">סטטוס ליווי</label>
+                  <select id="statusSelect" name="statusSelect">
+                    <option value="Open">פתוח</option>
+                    <option value="Pending">מושהה</option>
+                    <option value="Closed">סגור</option>
+                  </select>
                 </div>
               </div>
             </div>

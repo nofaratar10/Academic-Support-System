@@ -63,18 +63,20 @@
       </header>
 
       <main class="content">
-        <form id="newCaseForm" class="new-case-card">
+        <form id="newCaseForm" class="new-case-card" novalidate>
           <h3>פרטי סטודנט</h3>
 
           <div class="new-case-grid">
             <div class="field">
-              <label for="first_name">שם פרטי</label>
+              <label for="first_name">שם פרטי <span style="color:#e03131;">*</span></label>
               <input id="first_name" required />
+              <span class="field-error" id="firstNameError"></span>
             </div>
 
             <div class="field">
-              <label for="last_name">שם משפחה</label>
+              <label for="last_name">שם משפחה <span style="color:#e03131;">*</span></label>
               <input id="last_name" required />
+              <span class="field-error" id="lastNameError"></span>
             </div>
 
             <div class="field">
@@ -84,12 +86,22 @@
 
             <div class="field">
               <label for="email">אימייל</label>
-              <input id="email" />
+              <input id="email" type="email" dir="ltr" placeholder="example@mail.com" />
             </div>
 
             <div class="field">
               <label for="phone">טלפון</label>
-              <input id="phone" />
+              <input id="phone" placeholder="0501234567" dir="ltr" />
+              <span class="field-error" id="phoneError"></span>
+            </div>
+
+            <div class="field">
+              <label for="status">סטטוס ליווי</label>
+              <select id="status">
+                <option value="Open">פתוח</option>
+                <option value="Pending">מושהה</option>
+                <option value="Closed">סגור</option>
+              </select>
             </div>
           </div>
 

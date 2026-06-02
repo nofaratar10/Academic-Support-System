@@ -17,10 +17,6 @@ function getStatusClass(status) {
   return "status-pill status-pending";
 }
 
-function getDirectionLabel(direction) {
-  return direction === "incoming" ? "נכנסת ↓" : "יוצאת ↑";
-}
-
 function renderTickets(tickets) {
   tableBody.innerHTML = "";
 
@@ -40,8 +36,19 @@ function renderTickets(tickets) {
       <td>${senderDisplay}</td>
       <td>${ticket.subject}</td>
       <td><span class="${getStatusClass(ticket.status)}">${ticket.status}</span></td>
-      <td>
+      <td style="display:flex;gap:6px;align-items:center;">
         <a href="/view-ticket?id=${ticket.ticket_id}" class="primary-btn">פתיחה</a>
+        <button class="delete-icon-btn delete-btn" data-id="${ticket.ticket_id}" title="מחיקת פנייה">
+          <span class="trash-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+            </svg>
+          </span>
+        </button>
       </td>
     `;
     tableBody.appendChild(row);
@@ -77,6 +84,26 @@ async function loadTickets() {
     tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">שגיאה בטעינת הפניות</td></tr>`;
   }
 }
+
+async function deleteTicket(ticketId) {
+  if (!confirm("האם למחוק את הפנייה?")) return;
+  try {
+    const res = await fetch(`/api/tickets/${ticketId}`, { method: "DELETE" });
+    if (!res.ok) throw new Error();
+    allTickets = allTickets.filter(t => t.ticket_id !== parseInt(ticketId));
+    applyFilters();
+  } catch (err) {
+    console.error(err);
+    alert("שגיאה במחיקת הפנייה");
+  }
+}
+
+// Event delegation for delete buttons
+tableBody.addEventListener("click", (e) => {
+  const btn = e.target.closest(".delete-btn");
+  if (!btn) return;
+  deleteTicket(btn.dataset.id);
+});
 
 // כפתורי כיוון
 directionBtns.forEach(btn => {

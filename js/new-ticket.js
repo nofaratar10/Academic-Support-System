@@ -1,59 +1,137 @@
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
 
-  // טעינת רשימת סטודנטים מה-DB
-  const recipientSelect = document.getElementById('recipient');
-  try {
-    const res = await fetch('/students');
-    const students = await res.json();
-    students.forEach(s => {
-      const option = document.createElement('option');
-      option.value = s.student_id;
-      option.textContent = `${s.first_name} ${s.last_name} (סטודנט)`;
-      option.dataset.name = `${s.first_name} ${s.last_name}`;
-      recipientSelect.appendChild(option);
+  // ─── Toolbar B / I / U ─────────────────────────────────────
+  document.querySelectorAll('.editor-toolbar button[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const textarea = document.getElementById('ticketContent');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selected = textarea.value.substring(start, end);
+
+      let before, after;
+      const action = btn.dataset.action;
+      if (action === 'bold')      { before = '**';   after = '**';   }
+      else if (action === 'italic')    { before = '_';    after = '_';    }
+      else if (action === 'underline') { before = '<u>';  after = '</u>'; }
+
+      const newText =
+        textarea.value.substring(0, start) +
+        before + selected + after +
+        textarea.value.substring(end);
+
+      textarea.value = newText;
+      textarea.selectionStart = start + before.length;
+      textarea.selectionEnd   = end   + before.length;
+      textarea.focus();
     });
-  } catch (err) {
-    console.error('שגיאה בטעינת סטודנטים:', err);
+  });
+
+  // ─── Validation helpers ────────────────────────────────────
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   }
 
-  // שליחת פנייה
+  function showError(fieldId, errorId, message) {
+    const field = document.getElementById(fieldId);
+    const err   = document.getElementById(errorId);
+    if (message) {
+      field.classList.add('input-invalid');
+      err.textContent = message;
+    } else {
+      field.classList.remove('input-invalid');
+      err.textContent = '';
+    }
+  }
+
+  function validateForm() {
+    const studentName  = document.getElementById('studentName').value.trim();
+    const studentEmail = document.getElementById('studentEmail').value.trim();
+    const subject      = document.getElementById('subject').value.trim();
+    const content      = document.getElementById('ticketContent').value.trim();
+
+    let valid = true;
+
+    if (!studentName) {
+      showError('studentName', 'studentNameError', 'שם סטודנט הוא שדה חובה');
+      valid = false;
+    } else {
+      showError('studentName', 'studentNameError', '');
+    }
+
+    if (!studentEmail) {
+      showError('studentEmail', 'studentEmailError', 'מייל הוא שדה חובה');
+      valid = false;
+    } else if (!isValidEmail(studentEmail)) {
+      showError('studentEmail', 'studentEmailError', 'כתובת מייל אינה תקינה');
+      valid = false;
+    } else {
+      showError('studentEmail', 'studentEmailError', '');
+    }
+
+    if (!subject) {
+      showError('subject', 'subjectError', 'נושא הוא שדה חובה');
+      valid = false;
+    } else {
+      showError('subject', 'subjectError', '');
+    }
+
+    if (!content) {
+      showError('ticketContent', 'contentError', 'תוכן הפנייה הוא שדה חובה');
+      valid = false;
+    } else {
+      showError('ticketContent', 'contentError', '');
+    }
+
+    return valid;
+  }
+
+  // ─── Form submit ───────────────────────────────────────────
   const ticketForm = document.getElementById('newTicketForm');
-  if (ticketForm) {
-    ticketForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  if (!ticketForm) return;
 
-      const selectedOption = recipientSelect.options[recipientSelect.selectedIndex];
-      const studentId = parseInt(recipientSelect.value) || null;
-      const recipientName = selectedOption?.dataset?.name || selectedOption?.textContent || recipientSelect.value;
+  ticketForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      const formData = {
-        student_id: studentId,
-        sender_name: "פולינה (רכזת)",
-        recipient: recipientName,
-        cc: document.getElementById('cc').value,
-        subject: document.getElementById('subject').value,
-        content: document.getElementById('ticketContent').value,
-        direction: "outgoing",
-        status: "נשלח"
-      };
+    if (!validateForm()) return;
 
-      try {
-        const response = await fetch('/api/tickets', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        });
+    const studentName  = document.getElementById('studentName').value.trim();
+    const studentEmail = document.getElementById('studentEmail').value.trim();
+    const subject      = document.getElementById('subject').value.trim();
+    const content      = document.getElementById('ticketContent').value.trim();
+    const cc           = document.getElementById('cc').value;
 
-        if (response.ok) {
-          const ticket = await response.json();
-          window.location.href = `/view-ticket?id=${ticket.ticket_id}`;
-        } else {
-          throw new Error('שגיאה בשליחת הפנייה');
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert('חלה שגיאה בחיבור לשרת');
+    const formData = {
+      sender_name: "פולינה (רכזת)",
+      recipient: studentName,
+      cc: cc || null,
+      subject,
+      content,
+      direction: "outgoing",
+      status: "נשלח"
+    };
+
+    const submitBtn = ticketForm.querySelector('[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'שולח...';
+
+    try {
+      const response = await fetch('/api/tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const ticket = await response.json();
+        window.location.href = `/view-ticket?id=${ticket.ticket_id}`;
+      } else {
+        throw new Error('שגיאה בשליחת הפנייה');
       }
-    });
-  }
+    } catch (error) {
+      console.error("Error:", error);
+      alert('חלה שגיאה בחיבור לשרת');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'שליחת פנייה';
+    }
+  });
 });

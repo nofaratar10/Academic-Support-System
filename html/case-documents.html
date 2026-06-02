@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>מסמכי התאמות - מערכת ליווי</title>
-  <link rel="stylesheet" href="/CSS/site.css"/>
-  <link rel="stylesheet" href="/CSS/case-documents.css"/>
-  <link rel="stylesheet" href="/CSS/Chatbot.css"/>
+  <link rel="stylesheet" href="/CSS/site.css" />
+  <link rel="stylesheet" href="/CSS/case-documents.css" />
+  <link rel="stylesheet" href="/CSS/Chatbot.css" />
 </head>
 <body class="page">
 
@@ -42,7 +42,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <a href="#" class="settings-link" title="לא מיושם בסדנה">הגדרות</a>
+        <a href="#" class="settings-link">הגדרות</a>
       </div>
     </aside>
 
@@ -52,10 +52,11 @@
         <div class="topbar-right">
           <h1 class="page-title">תיק ליווי</h1>
         </div>
-
         <div class="topbar-center">
+          <div class="search-box">
+            <input type="text" placeholder="חיפוש סטודנט / פנייה..." />
+          </div>
         </div>
-
         <div class="topbar-left">
           <button class="icon-btn" type="button">🔔</button>
           <div class="user-name">פולינה (רכזת)</div>
@@ -109,10 +110,7 @@
                 <option>אבחון דידקטי</option>
                 <option>טופס התאמות</option>
               </select>
-
-              <input type="file" id="filePicker" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
-             
-              <button class="primary-btn" type="button" id="addDocumentBtn">העלאת מסמך</button>
+              <button class="primary-btn" type="button" id="addDocumentBtn">העלאת מסמך +</button>
             </div>
           </div>
         </section>

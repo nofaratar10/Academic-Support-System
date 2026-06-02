@@ -5,40 +5,67 @@ const studentHeader = document.getElementById("studentHeader");
 const planTableBody = document.getElementById("planTableBody");
 const toast = document.getElementById("toast");
 
-const detailsTab = document.getElementById("detailsTab");
+const detailsTab   = document.getElementById("detailsTab");
 const documentsTab = document.getElementById("documentsTab");
-const planTab = document.getElementById("planTab");
-const summaryTab = document.getElementById("summaryTab");
+const planTab      = document.getElementById("planTab");
+const summaryTab   = document.getElementById("summaryTab");
 
-const addTaskBtn = document.getElementById("addTaskBtn");
-const taskModal = document.getElementById("taskModal");
-const cancelTaskBtn = document.getElementById("cancelTaskBtn");
-const saveTaskBtn = document.getElementById("saveTaskBtn");
-
-const taskNameInput = document.getElementById("taskName");
+const addTaskBtn         = document.getElementById("addTaskBtn");
+const taskModal          = document.getElementById("taskModal");
+const cancelTaskBtn      = document.getElementById("cancelTaskBtn");
+const saveTaskBtn        = document.getElementById("saveTaskBtn");
+const taskNameInput      = document.getElementById("taskName");
 const taskDescriptionInput = document.getElementById("taskDescription");
-const taskDueDateInput = document.getElementById("taskDueDate");
-const taskStatusInput = document.getElementById("taskStatus");
+const taskDueDateInput   = document.getElementById("taskDueDate");
+const taskStatusInput    = document.getElementById("taskStatus");
 
+// ─── Status helpers ──────────────────────────────────────────
+function getHebrewStatus(status) {
+  if (!status) return "פתוח";
+  const s = status.toLowerCase();
+  if (s.includes("open"))    return "פתוח";
+  if (s.includes("closed"))  return "סגור";
+  if (s.includes("pending")) return "מושהה";
+  return status;
+}
+
+function getStudentStatusClass(status) {
+  const s = (status || "").toLowerCase();
+  if (s.includes("open")   || s.includes("פתוח"))  return "status-pill status-open";
+  if (s.includes("closed") || s.includes("סגור"))  return "status-pill status-closed";
+  return "status-pill status-pending";
+}
+
+function updateStatusBadge(status) {
+  const pill = document.getElementById("statusPill");
+  if (!pill) return;
+  pill.textContent = getHebrewStatus(status);
+  pill.className   = getStudentStatusClass(status);
+}
+
+// CSS class for task status (separate from student status)
+function getTaskStatusClass(status) {
+  if (status === "הושלם")   return "status-pill status-closed";
+  if (status === "בביצוע")  return "status-pill status-progress";
+  return "status-pill status-open";
+}
+
+// ─── Toast ───────────────────────────────────────────────────
 function showToast(message) {
   toast.textContent = message;
   toast.classList.add("visible");
   setTimeout(() => toast.classList.remove("visible"), 2200);
 }
 
+// ─── Tabs ────────────────────────────────────────────────────
 function setTabs(id) {
-  detailsTab.href = `/student-details?id=${id}`;
+  detailsTab.href   = `/student-details?id=${id}`;
   documentsTab.href = `/case-documents?id=${id}`;
-  planTab.href = `/case-plan?id=${id}`;
-  summaryTab.href = `/student-summary?id=${id}`;
+  planTab.href      = `/case-plan?id=${id}`;
+  summaryTab.href   = `/student-summary?id=${id}`;
 }
 
-function getStatusClass(status) {
-  if (status === "הושלם") return "status-pill status-closed";
-  if (status === "בביצוע") return "status-pill status-progress";
-  return "status-pill status-open";
-}
-
+// ─── Load student ─────────────────────────────────────────────
 async function loadStudent() {
   if (!studentId) {
     studentHeader.textContent = "לא נבחר סטודנט";
@@ -49,19 +76,21 @@ async function loadStudent() {
     if (!res.ok) throw new Error();
     const student = await res.json();
     const fullName = `${student.first_name || ""} ${student.last_name || ""}`.trim();
+
     studentHeader.textContent = `${fullName} | ${student.student_id}`;
+    updateStatusBadge(student.support_status || "Open");
     setTabs(student.student_id);
   } catch {
     studentHeader.textContent = "שגיאה בטעינת הנתונים";
   }
 }
 
+// ─── Tasks ────────────────────────────────────────────────────
 async function loadTasks() {
   try {
     const res = await fetch(`/students/${studentId}/tasks`);
     if (!res.ok) throw new Error();
-    const tasks = await res.json();
-    renderTasks(tasks);
+    renderTasks(await res.json());
   } catch {
     planTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">שגיאה בטעינת המשימות</td></tr>`;
   }
@@ -79,7 +108,7 @@ function renderTasks(tasks) {
       <td>${item.task || ""}</td>
       <td>${item.description || ""}</td>
       <td>${item.dueDate || ""}</td>
-      <td><span class="${getStatusClass(item.status)}">${item.status || "פתוח"}</span></td>
+      <td><span class="${getTaskStatusClass(item.status)}">${item.status || "פתוח"}</span></td>
       <td>
         <button class="btn" type="button" onclick="deleteTask(${item.task_id})">מחיקה</button>
       </td>
@@ -88,7 +117,7 @@ function renderTasks(tasks) {
   });
 }
 
-window.deleteTask = async function(taskId) {
+window.deleteTask = async function (taskId) {
   if (!confirm("למחוק את המשימה?")) return;
   try {
     const res = await fetch(`/tasks/${taskId}`, { method: "DELETE" });
@@ -101,27 +130,22 @@ window.deleteTask = async function(taskId) {
 };
 
 addTaskBtn.addEventListener("click", () => {
-  taskNameInput.value = "";
+  taskNameInput.value        = "";
   taskDescriptionInput.value = "";
-  taskDueDateInput.value = "";
-  taskStatusInput.value = "פתוח";
+  taskDueDateInput.value     = "";
+  taskStatusInput.value      = "פתוח";
   taskModal.classList.add("visible");
 });
 
-cancelTaskBtn.addEventListener("click", () => {
-  taskModal.classList.remove("visible");
-});
+cancelTaskBtn.addEventListener("click", () => taskModal.classList.remove("visible"));
 
 saveTaskBtn.addEventListener("click", async () => {
-  const task = taskNameInput.value.trim();
+  const task        = taskNameInput.value.trim();
   const description = taskDescriptionInput.value.trim();
-  const dueDate = taskDueDateInput.value;
-  const status = taskStatusInput.value;
+  const dueDate     = taskDueDateInput.value;
+  const status      = taskStatusInput.value;
 
-  if (!task) {
-    alert("יש למלא שם משימה");
-    return;
-  }
+  if (!task) { alert("יש למלא שם משימה"); return; }
 
   try {
     const res = await fetch(`/students/${studentId}/tasks`, {

@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/CSS/site.css" />
     <link rel="stylesheet" href="/CSS/new-ticket.css" />
     <link rel="stylesheet" href="/CSS/Chatbot.css" />
-
 </head>
 
 <body class="page">
@@ -66,17 +65,27 @@
                         <h2>פנייה חדשה</h2>
                     </div>
 
-                    <form id="newTicketForm">
+                    <form id="newTicketForm" novalidate>
+
+                        <!-- שם ואימייל סטודנט -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="recipient">נמען</label>
-                                <select id="recipient" name="recipient" required>
-                                    <option value="">בחירת נמען (סטודנט, מרצה..)</option>
-                                    <option value="student_1">יוסי כהן (סטודנט)</option>
-                                    <option value="lecturer_1">ד"ר לוי (מרצה)</option>
-                                </select>
+                                <label for="studentName">שם סטודנט <span style="color:#e03131;">*</span></label>
+                                <input type="text" id="studentName" name="studentName"
+                                    placeholder="הקלד שם מלא" />
+                                <span class="field-error" id="studentNameError"></span>
                             </div>
 
+                            <div class="form-group">
+                                <label for="studentEmail">מייל סטודנט <span style="color:#e03131;">*</span></label>
+                                <input type="email" id="studentEmail" name="studentEmail"
+                                    placeholder="example@mail.com" dir="ltr" />
+                                <span class="field-error" id="studentEmailError"></span>
+                            </div>
+                        </div>
+
+                        <!-- נמען והעתק -->
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="cc">העתק</label>
                                 <select id="cc" name="cc">
@@ -86,28 +95,32 @@
                             </div>
                         </div>
 
+                        <!-- נושא -->
                         <div class="form-group">
-                            <label for="subject">נושא</label>
-                            <input type="text" id="subject" name="subject" placeholder="בחירת נושא" required />
+                            <label for="subject">נושא <span style="color:#e03131;">*</span></label>
+                            <input type="text" id="subject" name="subject" placeholder="נושא הפנייה" />
+                            <span class="field-error" id="subjectError"></span>
                         </div>
 
+                        <!-- תוכן הפנייה עם סרגל עריכה -->
                         <div class="form-group">
-                            <label>תוכן הפנייה</label>
+                            <label>תוכן הפנייה <span style="color:#e03131;">*</span></label>
                             <div class="editor-container">
                                 <div class="editor-toolbar">
                                     <button type="button" title="צירוף קובץ">📎</button>
-                                    <button type="button" style="font-weight: bold;">B</button>
-                                    <button type="button" style="font-style: italic;">I</button>
-                                    <button type="button" style="text-decoration: underline;">U</button>
+                                    <button type="button" data-action="bold" style="font-weight:bold;" title="מודגש (Bold)">B</button>
+                                    <button type="button" data-action="italic" style="font-style:italic;" title="נטוי (Italic)">I</button>
+                                    <button type="button" data-action="underline" style="text-decoration:underline;" title="קו תחתון (Underline)">U</button>
                                     <button type="button">≡</button>
                                 </div>
-                                <textarea id="ticketContent" name="content" placeholder="הקלד כאן את תוכן הפנייה..."
-                                    required></textarea>
+                                <textarea id="ticketContent" name="content"
+                                    placeholder="הקלד כאן את תוכן הפנייה..."></textarea>
                             </div>
+                            <span class="field-error" id="contentError"></span>
                         </div>
 
                         <div class="form-footer">
-                            <button type="submit" class="primary-btn submit-btn">שליחת פניה</button>
+                            <button type="submit" class="primary-btn submit-btn">שליחת פנייה</button>
                         </div>
                     </form>
                 </div>
