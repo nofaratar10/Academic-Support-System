@@ -64,6 +64,7 @@
 .input-type-selector {
   display: flex;
   gap: 10px;
+  margin-top: 20px;
   margin-bottom: 20px;
   padding: 0 12px;
 }
@@ -133,5 +134,168 @@
 
   .summary-result {
     gap: 14px;
+  }
+}
+
+/* ===== כפתור משני ===== */
+.btn-secondary {
+  background: #fff;
+  border: 1px solid #0056b3;
+  color: #0056b3;
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background: #e8f0fe;
+}
+
+/* ===== קטע סיכומים קודמים ===== */
+.prev-summaries-section {
+  margin-top: 24px;
+}
+
+.prev-summaries-header {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 0;
+  padding: 16px 20px 12px;
+}
+
+.prev-summaries-list {
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.no-summaries-msg {
+  color: #888;
+  font-size: 0.95em;
+  text-align: center;
+  padding: 16px 0;
+}
+
+/* ===== אקורדיון סיכומים ===== */
+.acc-item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.acc-item:last-child {
+  border-bottom: none;
+}
+
+.acc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 4px;
+  cursor: pointer;
+  user-select: none;
+  gap: 12px;
+}
+
+.acc-header:hover {
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.acc-header-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.acc-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.acc-arrow {
+  font-size: 0.75em;
+  color: #999;
+  transition: transform 0.15s;
+}
+
+.acc-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: #aaa;
+  line-height: 1;
+}
+
+.acc-delete-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.acc-body {
+  padding: 4px 4px 16px;
+}
+
+/* ===== תגיות מקור ===== */
+.card-date {
+  font-size: 0.88em;
+  color: #555;
+}
+
+.source-badge {
+  font-size: 0.78em;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.badge-text  { background: #e0f2fe; color: #0369a1; }
+.badge-audio { background: #ede9fe; color: #6d28d9; }
+.badge-video { background: #fef3c7; color: #b45309; }
+
+/* ===== תוכן מורחב ===== */
+.card-section {
+  margin-bottom: 12px;
+}
+
+.card-section:last-child {
+  margin-bottom: 0;
+}
+
+.card-section h5 {
+  font-size: 0.88em;
+  color: #374151;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.card-section p,
+.card-section ul {
+  margin: 0;
+  font-size: 0.9em;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.card-section ul {
+  padding-right: 18px;
+}
+
+.card-section li {
+  margin-bottom: 3px;
+}
+
+.empty-section {
+  color: #aaa;
+  font-style: italic;
+  font-size: 0.88em;
+}
+
+@media (max-width: 600px) {
+  .prev-summaries-list {
+    padding: 8px 12px;
   }
 }

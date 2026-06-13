@@ -64,6 +64,7 @@
   padding: 16px 20px;
 }
 .status-pill.status-urgent  { background: #fff5f5; color: #fa5252; }
+.status-pill.urgency-normal { background: #f1f3f5; color: #868e96; }
 .status-pill.status-open    { background: #e6fcf5; color: #0ca678; }
 .status-pill.status-pending { background: #fff9db; color: #f08c00; }
 .status-pill.status-progress { background: #e7f5ff; color: #228be6; }

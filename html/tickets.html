@@ -64,23 +64,9 @@
       <main class="content">
         <section class="filters-card">
           <div class="filters-row">
-            <div class="filter-group">
-              <label>שנה סטודנטיאלית:</label>
-              <input type="text" value='תשפ"ו (2025–2026)' />
-            </div>
-            <div class="filter-group">
-              <label>שנה:</label>
-              <input type="text" placeholder="שנה א" />
-            </div>
-            <div class="filter-group">
-              <label>סמסטר:</label>
-              <input type="text" placeholder="סמסטר א" />
-            </div>
-          </div>
-          <div class="filters-row second-row">
             <div class="filter-group wide">
               <label>סינון:</label>
-              <input type="text" id="filterInput" placeholder="שם/מס' סטודנט/סטטוס" />
+              <input type="text" id="filterInput" placeholder="שם / נושא / סטטוס" />
             </div>
           </div>
         </section>
@@ -99,9 +85,9 @@
             <thead>
               <tr>
                 <th>מס'</th>
-                <th>שולח</th>
+                <th>יוצר הפנייה</th>
                 <th>נושא</th>
-                <th>סטטוס</th>
+                <th>סטטוס טיפול</th>
                 <th>פעולה</th>
               </tr>
             </thead>
@@ -109,7 +95,7 @@
           </table>
 
           <div class="table-footer">
-            <button class="secondary-link">«</button>
+            <div id="pagination" class="pagination"></div>
             <button class="primary-btn big-btn" onclick="location.href='/new-ticket'">פנייה חדשה +</button>
           </div>
         </section>
@@ -118,8 +104,8 @@
   </div>
 
   <script src="/js/ticket.js"></script>
+  <script src="/js/auth.js"></script>
   <script src="/js/chatbot-widget.js"></script>
-  <script src="/js/search.js"></script>
 
 </body>
 </html>

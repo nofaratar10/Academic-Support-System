@@ -108,19 +108,34 @@ form.addEventListener("submit", async (event) => {
   if (!studentId) return;
 
   const selectedStatus = document.getElementById("statusSelect")?.value || "Open";
+  const selectedYear = document.getElementById("year")?.value || "";
+  const selectedSemester = document.getElementById("semester")?.value || "";
+  const selectedEmail = document.getElementById("email")?.value || "";
+  const selectedPhone = document.getElementById("phone")?.value || "";
   const submitBtn = form.querySelector('[type="submit"]');
   submitBtn.disabled = true;
 
   try {
-    const res = await fetch(`/students/${studentId}/status`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: selectedStatus })
-    });
+    const [resFields, resStatus] = await Promise.all([
+      fetch(`/students/${studentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          academic_year: selectedYear,
+          semester: selectedSemester,
+          email: selectedEmail,
+          phone: selectedPhone
+        })
+      }),
+      fetch(`/students/${studentId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: selectedStatus })
+      })
+    ]);
 
-    if (!res.ok) throw new Error("שגיאה בשמירה");
+    if (!resFields.ok || !resStatus.ok) throw new Error("שגיאה בשמירה");
 
-    // Update badge to reflect the new status
     updateStatusBadge(selectedStatus);
 
     toast.textContent = "הפרטים נשמרו";
@@ -129,7 +144,7 @@ form.addEventListener("submit", async (event) => {
 
   } catch (err) {
     console.error(err);
-    alert("שגיאה בשמירת הסטטוס");
+    alert("שגיאה בשמירת הפרטים");
   } finally {
     submitBtn.disabled = false;
   }

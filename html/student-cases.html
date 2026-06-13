@@ -75,12 +75,12 @@
 
             <div class="filter-group">
               <label>שנה:</label>
-              <input type="text" placeholder="שנה א" />
+              <input type="text" id="filterYear" placeholder="שנה א" />
             </div>
 
             <div class="filter-group">
               <label>סמסטר:</label>
-              <input type="text" placeholder="סמסטר א" />
+              <input type="text" id="filterSemester" placeholder="סמסטר א" />
             </div>
           </div>
 
@@ -99,7 +99,8 @@
                 <th>מס' סטודנט</th>
                 <th>שם</th>
                 <th>סטטוס ליווי</th>
-                <th>סטטוס משימות</th>
+                <th>שנה</th>
+                <th>סמסטר</th>
                 <th>פעולה</th>
               </tr>
             </thead>
@@ -107,8 +108,8 @@
           </table>
 
           <div class="table-footer">
-            <button class="secondary-link">«</button>
-            <a href="/new-case" class="primary-btn big-btn"> פתיחת תיק חדש</a>
+            <div id="pagination" class="pagination"></div>
+            <a href="/new-case" class="primary-btn big-btn">פתיחת תיק חדש</a>
           </div>
         </section>
       </main>
@@ -117,7 +118,7 @@
   </div>
 
   <script src="/js/chatbot-widget.js"></script>
+  <script src="/js/auth.js"></script>
   <script src="/js/student-cases.js"></script>
-  <script src="/js/search.js"> </script>
 </body>
 </html>

@@ -1,9 +1,9 @@
 const params = new URLSearchParams(window.location.search);
 const studentId = params.get("id");
 
-const studentHeader    = document.getElementById("studentHeader");
+const studentHeader      = document.getElementById("studentHeader");
 const documentsTableBody = document.getElementById("documentsTableBody");
-const toast            = document.getElementById("toast");
+const toast              = document.getElementById("toast");
 
 const detailsTab   = document.getElementById("detailsTab");
 const documentsTab = document.getElementById("documentsTab");
@@ -11,7 +11,7 @@ const planTab      = document.getElementById("planTab");
 const summaryTab   = document.getElementById("summaryTab");
 
 const docNameInput   = document.getElementById("docName");
-const docTypeSelect  = document.getElementById("docType");
+const docFileInput   = document.getElementById("docFile");
 const addDocumentBtn = document.getElementById("addDocumentBtn");
 
 // ─── Status helpers ──────────────────────────────────────────
@@ -53,58 +53,98 @@ function setTabs(id) {
   summaryTab.href   = `/student-summary?id=${id}`;
 }
 
-// ─── Documents (localStorage) ────────────────────────────────
-function getStorageKey()     { return `student_documents_${studentId}`; }
-function getDocuments()      { const r = localStorage.getItem(getStorageKey()); return r ? JSON.parse(r) : []; }
-function saveDocuments(docs) { localStorage.setItem(getStorageKey(), JSON.stringify(docs)); }
-
-function renderDocuments() {
-  const documents = getDocuments();
+// ─── Render documents ─────────────────────────────────────────
+function renderDocuments(documents) {
   documentsTableBody.innerHTML = "";
 
   if (!documents.length) {
-    documentsTableBody.innerHTML = `<tr><td colspan="5" class="empty-row" style="text-align:center;padding:20px;color:#888;">אין מסמכים עדיין</td></tr>`;
+    documentsTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:#888;">אין מסמכים עדיין</td></tr>`;
     return;
   }
 
-  documents.forEach((doc, index) => {
+  documents.forEach(doc => {
+    const fileUrl = doc.filename ? `/uploads/${doc.filename}` : "";
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${doc.name}</td>
-      <td>${doc.type}</td>
-      <td>${doc.uploadDate}</td>
-      <td><span class="status-pill status-open">${doc.status}</span></td>
-      <td>
-        <button class="btn" type="button" onclick="deleteDocument(${index})">מחיקה</button>
+      <td>${doc.filename || "—"}</td>
+      <td>${doc.upload_date || ""}</td>
+      <td style="display:flex;gap:6px;align-items:center;justify-content:center;">
+        ${fileUrl
+          ? `<a href="${fileUrl}" target="_blank" class="primary-btn">פתיחה</a>`
+          : `<button class="primary-btn" type="button" disabled>פתיחה</button>`}
+        <button class="delete-icon-btn delete-doc-btn" type="button" data-id="${doc.id}" title="מחיקת מסמך">
+          <span class="trash-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+              <path d="M10 11v6"></path>
+              <path d="M14 11v6"></path>
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+            </svg>
+          </span>
+        </button>
       </td>
     `;
     documentsTableBody.appendChild(row);
   });
 }
 
-window.deleteDocument = function (index) {
+// ─── Load documents from API ──────────────────────────────────
+async function loadDocuments() {
+  if (!studentId) return;
+  try {
+    const res = await fetch(`/students/${studentId}/documents`);
+    if (!res.ok) throw new Error();
+    const docs = await res.json();
+    renderDocuments(docs);
+  } catch {
+    documentsTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#c00;">שגיאה בטעינת המסמכים</td></tr>`;
+  }
+}
+
+// ─── Delete document ─────────────────────────────────────────
+documentsTableBody.addEventListener("click", async e => {
+  const btn = e.target.closest(".delete-doc-btn");
+  if (!btn) return;
   if (!confirm("האם למחוק מסמך זה?")) return;
-  const documents = getDocuments();
-  documents.splice(index, 1);
-  saveDocuments(documents);
-  renderDocuments();
-  showToast("המסמך נמחק");
-};
 
-function addDocument() {
+  const docId = btn.dataset.id;
+  try {
+    const res = await fetch(`/documents/${docId}`, { method: "DELETE" });
+    if (!res.ok) throw new Error();
+    showToast("המסמך נמחק");
+    loadDocuments();
+  } catch {
+    showToast("שגיאה במחיקת המסמך");
+  }
+});
+
+// ─── Upload document ──────────────────────────────────────────
+async function addDocument() {
   const name = docNameInput.value.trim();
-  const type = docTypeSelect.value;
+  const file = docFileInput.files[0];
 
-  if (!name || !type) { showToast("יש למלא שם מסמך וסוג התאמה"); return; }
+  if (!name)  { showToast("יש למלא שם מסמך");  return; }
+  if (!file)  { showToast("יש לבחור קובץ");     return; }
 
-  const documents = getDocuments();
-  documents.push({ name, type, uploadDate: new Date().toLocaleDateString("he-IL"), status: "הועלה" });
-  saveDocuments(documents);
-  renderDocuments();
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("file", file);
 
-  docNameInput.value  = "";
-  docTypeSelect.value = "";
-  showToast("המסמך נוסף");
+  try {
+    const res = await fetch(`/students/${studentId}/documents`, {
+      method: "POST",
+      body: formData
+    });
+    if (!res.ok) throw new Error();
+    docNameInput.value = "";
+    docFileInput.value = "";
+    showToast("המסמך הועלה בהצלחה");
+    loadDocuments();
+  } catch {
+    showToast("שגיאה בהעלאת המסמך");
+  }
 }
 
 // ─── Load student ─────────────────────────────────────────────
@@ -130,4 +170,4 @@ async function loadStudent() {
 addDocumentBtn.addEventListener("click", addDocument);
 
 loadStudent();
-renderDocuments();
+loadDocuments();

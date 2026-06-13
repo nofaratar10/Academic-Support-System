@@ -83,6 +83,67 @@
     font-size: 0.8rem; 
 }
 
+.ticket-meta-card {
+    padding: 18px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ticket-meta-row {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: #374151;
+}
+
+.ticket-original-content {
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.6;
+}
+
+.ticket-original-content p {
+    margin-top: 6px;
+    white-space: pre-wrap;
+}
+
+.reply-card {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.reply-card h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #374151;
+}
+
+.reply-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.close-ticket-btn {
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+.close-ticket-btn:hover:not(:disabled) {
+    background: #fff0f0;
+    border-color: #dc2626;
+}
+
+.close-ticket-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .back-btn {
     background: none;
     border: none;

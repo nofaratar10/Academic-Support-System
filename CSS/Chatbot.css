@@ -200,6 +200,41 @@
     color: #ff3b30; /* הופך לאדום עדין כשעומדים עליו */
 }
 
+/* כפתורי בחירת פעולה */
+.chatbot-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    width: 100%;
+    align-self: stretch;
+}
+
+.chatbot-action-btn {
+    background: #fff;
+    border: 1px solid #74c0fc;
+    border-radius: 8px;
+    color: #1c7ed6;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    text-align: right;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.chatbot-action-btn:hover {
+    background: #e7f5ff;
+    border-color: #339af0;
+}
+
+/* input נעול לפני בחירת פעולה */
+.chat-input-area input:disabled,
+.chat-input-area button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 @media (max-width: 480px) {
     .chatbot-bubble {
         bottom: 16px;

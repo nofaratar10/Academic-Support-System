@@ -4,8 +4,10 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from pathlib import Path
 from datetime import date, datetime, timedelta
+from werkzeug.utils import secure_filename
 import requests
 import os
+import uuid
 import google.generativeai as genai
 
 # ─── App & Config ────────────────────────────────────────────────────────────
@@ -40,6 +42,7 @@ class Student(db.Model):
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
     academic_year = db.Column(db.String(20), nullable=True)
+    semester = db.Column(db.String(20), nullable=True)
     email = db.Column(db.String(100), nullable=True, unique=True)
     phone = db.Column(db.String(20), nullable=True)
 
@@ -64,7 +67,7 @@ class Student(db.Model):
             "support_status": latest_support_file.status if latest_support_file else "Open",
             "task_status": "הושלם",
             "track": "מערכות מידע",
-            "semester": "סמסטר א"
+            "semester": self.semester or ""
         }
 
 
@@ -77,6 +80,8 @@ class SupportFile(db.Model):
     status = db.Column(db.String(50), nullable=False, default="Open")
     urgency_level = db.Column(db.String(50), nullable=True)
     summary = db.Column(db.Text, nullable=True)
+    source_type = db.Column(db.String(20), nullable=True)
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.now)
 
     def to_dict(self):
         return {
@@ -86,6 +91,8 @@ class SupportFile(db.Model):
             "status": self.status,
             "urgency_level": self.urgency_level,
             "summary": self.summary,
+            "source_type": self.source_type,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
         }
 
 
@@ -170,10 +177,11 @@ class Document(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey("students.student_id"), nullable=False)
-    name = db.Column(db.String(150), nullable=False)        
-    filename = db.Column(db.String(250), nullable=False)    
-    doc_type = db.Column(db.String(100), nullable=False)    
-    upload_date = db.Column(db.String(50), nullable=False)  
+    name = db.Column(db.String(150), nullable=False)
+    filename = db.Column(db.String(250), nullable=False)
+    file_path = db.Column(db.String(500), nullable=True)
+    doc_type = db.Column(db.String(100), nullable=True, default="")
+    upload_date = db.Column(db.String(50), nullable=False)
     status = db.Column(db.String(50), nullable=False, default="הועלה")
 
     def to_dict(self):
@@ -182,7 +190,7 @@ class Document(db.Model):
             "student_id": self.student_id,
             "name": self.name,
             "filename": self.filename,
-            "doc_type": self.doc_type,
+            "file_path": self.file_path or "",
             "upload_date": self.upload_date,
             "status": self.status,
             "url": f"/uploads/{self.filename}"
@@ -218,7 +226,11 @@ def _parse_due_date(value):
 
 @app.route("/")
 def home():
-    return send_from_directory(os.path.join(BASE_DIR, "html"), "student-cases.html")
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "login.html")
+
+@app.route("/login")
+def login_page():
+    return send_from_directory(os.path.join(BASE_DIR, "html"), "login.html")
 
 @app.route("/student-cases")
 def student_cases():
@@ -277,7 +289,7 @@ def reports():
 def css_files(filename):
     return send_from_directory(os.path.join(BASE_DIR, "CSS"), filename)
 
-@app.route('/JS/<path:filename>')
+@app.route('/js/<path:filename>')
 def js_files(filename):
     return send_from_directory(os.path.join(BASE_DIR, "js"), filename)
 
@@ -298,6 +310,25 @@ def get_students():
 def get_student(student_id):
     student = Student.query.get_or_404(student_id)
     return jsonify(student.to_dict())
+
+@app.route("/students/<int:student_id>", methods=["PATCH"])
+def update_student(student_id):
+    student = Student.query.get_or_404(student_id)
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No JSON body provided"}), 400
+
+    if "academic_year" in data:
+        student.academic_year = data["academic_year"]
+    if "semester" in data:
+        student.semester = data["semester"]
+    if "email" in data:
+        student.email = data["email"]
+    if "phone" in data:
+        student.phone = data["phone"]
+
+    db.session.commit()
+    return jsonify(student.to_dict()), 200
 
 @app.route("/students/<int:student_id>/status", methods=["PATCH"])
 def update_student_status(student_id):
@@ -346,6 +377,7 @@ def create_student():
         first_name=data["first_name"],
         last_name=data["last_name"],
         academic_year=data.get("academic_year"),
+        semester=data.get("semester"),
         email=data.get("email"),
         phone=data.get("phone"),
     )
@@ -398,6 +430,71 @@ def delete_task(task_id):
     return jsonify({"message": "deleted"}), 200
 
 
+@app.route("/tasks/<int:task_id>", methods=["PUT"])
+def update_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    data = request.get_json(silent=True) or {}
+    new_status = data.get("status", "").strip()
+    if new_status not in {"פתוח", "בביצוע", "הושלם"}:
+        return jsonify({"error": "סטטוס לא חוקי"}), 400
+    task.status = new_status
+    db.session.commit()
+    return jsonify(task.to_dict()), 200
+
+
+# ─── Documents API ────────────────────────────────────────────
+
+@app.route("/uploads/<path:filename>")
+def serve_upload(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
+@app.route("/students/<int:student_id>/documents", methods=["GET"])
+def get_documents(student_id):
+    Student.query.get_or_404(student_id)
+    docs = Document.query.filter_by(student_id=student_id).order_by(Document.id.desc()).all()
+    return jsonify([d.to_dict() for d in docs])
+
+@app.route("/students/<int:student_id>/documents", methods=["POST"])
+def upload_document(student_id):
+    Student.query.get_or_404(student_id)
+    name = request.form.get("name", "").strip()
+    if not name:
+        return jsonify({"error": "שם מסמך הוא שדה חובה"}), 400
+    if "file" not in request.files or request.files["file"].filename == "":
+        return jsonify({"error": "לא נבחר קובץ"}), 400
+
+    file = request.files["file"]
+    safe_name = secure_filename(file.filename)
+    unique_filename = f"{student_id}_{uuid.uuid4().hex[:8]}_{safe_name}"
+    full_path = os.path.join(app.config["UPLOAD_FOLDER"], unique_filename)
+    file.save(full_path)
+
+    doc = Document(
+        student_id=student_id,
+        name=name,
+        filename=unique_filename,
+        file_path=full_path,
+        doc_type="",
+        upload_date=date.today().strftime("%d/%m/%Y"),
+        status="הועלה"
+    )
+    db.session.add(doc)
+    db.session.commit()
+    return jsonify(doc.to_dict()), 201
+
+@app.route("/documents/<int:document_id>", methods=["DELETE"])
+def delete_document(document_id):
+    doc = Document.query.get_or_404(document_id)
+    try:
+        if doc.file_path and os.path.exists(doc.file_path):
+            os.remove(doc.file_path)
+    except Exception:
+        pass
+    db.session.delete(doc)
+    db.session.commit()
+    return jsonify({"message": "נמחק"}), 200
+
+
 # ─── Progress API ────────────────────────────────────────────
 
 @app.route("/api/progress", methods=["GET"])
@@ -413,9 +510,9 @@ def get_progress():
         in_progress = sum(1 for t in tasks if t.status == "בביצוע")
         progress = round(completed / total * 100) if total > 0 else 0
         points = completed * 10
-        has_overdue = any(
-            t.due_date and t.due_date < today and t.status != "הושלם"
-            for t in tasks
+        overdue_count = sum(
+            1 for t in tasks
+            if t.due_date and t.due_date < today and t.status != "הושלם"
         )
         result.append({
             "student_id": student.student_id,
@@ -425,7 +522,8 @@ def get_progress():
             "in_progress_tasks": in_progress,
             "progress": progress,
             "points": points,
-            "status": "איחור" if has_overdue else "תקין"
+            "overdue_tasks": overdue_count,
+            "status": "איחור" if overdue_count > 0 else "תקין"
         })
 
     return jsonify(result)
@@ -552,86 +650,102 @@ def chatbot_message():
         return jsonify({"status": "chatbot route is working"})
 
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "no data"}), 400
 
-    if not data or not data.get("message"):
+    user_message   = (data.get("message") or "").strip()
+    action         = data.get("action", "free")
+    ticket_ctx     = data.get("ticket_context")  # dict or None
+
+    # Must have at least some content
+    if not user_message and not ticket_ctx:
         return jsonify({"error": "message is required"}), 400
 
-    user_message = data["message"]
+    SYSTEM = (
+        "אתה עוזר AI פנימי במערכת ליווי סטודנטים עבור רכזת מילואים. "
+        "המשתמשת היא הרכזת — כל תשובה מופנית אליה בלבד. "
+        "ענה רק בהקשר של ליווי סטודנטים, פניות, התאמות, תגבור, סיכומי שיחה ומשימות. "
+        "אל תאשר זכויות, התאמות או מועדים באופן סופי. "
+        "אל תאבחן מצב רפואי או נפשי. "
+        "ענה בעברית, בטון מקצועי וברור."
+    )
 
-    prompt = f"""
-אתה עוזר AI פנימי במערכת ליווי סטודנטים עבור רכזת מילואים.
+    def ticket_block(ctx):
+        if not ctx:
+            return ""
+        lines = [
+            "\n--- פרטי הפנייה ---",
+            f"נושא: {ctx.get('subject','')}",
+            f"שולח: {ctx.get('sender','')}",
+            f"סטטוס: {ctx.get('status','')}",
+            f"תוכן: {ctx.get('content','')}",
+            "-------------------",
+        ]
+        return "\n".join(lines)
 
-המשתמשת במערכת היא רכזת מילואים, ולכן כל תשובה צריכה להיות מופנית אליה בלבד.
-אין לפנות ישירות לסטודנט, אלא אם אתה מציע לרכזת נוסח אפשרי לשליחה אליו.
+    def notes_block(msg):
+        return f"\nהערות הרכזת: {msg}" if msg else ""
 
-מטרתך היא לסייע לרכזת:
-- להבין את מצב הפנייה.
-- לסווג את סוג הבעיה.
-- לזהות רמת דחיפות.
-- להבין איזה מידע חסר.
-- להחליט מה הצעד הבא בטיפול.
-- להמליץ על גורם מתאים להמשך טיפול.
-- להכין נוסח אפשרי לתגובה לסטודנט.
+    if action == "reply":
+        prompt = (
+            f"{SYSTEM}\n\n"
+            "ניסחי תגובה מקצועית ואמפתית לסטודנט, מנקודת מבטה של הרכזת.\n"
+            "התגובה תהיה: 3-5 משפטים, לא מתחייבת לגבי אישורים, תשקף שהפנייה התקבלה.\n"
+            "החזר רק את נוסח התגובה, ללא כותרות נוספות.\n"
+            f"{ticket_block(ticket_ctx)}{notes_block(user_message)}"
+        )
 
-סוגי פניות אפשריים:
-- היעדרות עקב מילואים
-- דחיית הגשה
-- בקשה למועד מיוחד
-- השלמת חומר לימודי
-- קושי מול מרצה
-- עומס לימודי לאחר חזרה ממילואים
-- בקשה להתאמות
-- צורך בליווי אישי
-- מצוקה חריגה או צורך בהפניה לגורם נוסף
+    elif action == "steps":
+        prompt = (
+            f"{SYSTEM}\n\n"
+            "הצגי רשימת צעדי טיפול ממוספרים לפנייה הבאה, מסודרים לפי עדיפות.\n"
+            "לכל צעד: מה לעשות, מי אחראי, ומה ציר הזמן המומלץ.\n"
+            f"{ticket_block(ticket_ctx)}{notes_block(user_message)}"
+        )
 
-כללים חשובים:
-- אל תקבל החלטות סופיות במקום הרכזת.
-- אל תאשר זכויות, התאמות, מועדים או חריגים באופן סופי.
-- אל תמציא נהלים שאינם מופיעים במידע הקיים.
-- אל תאבחן מצב רפואי או נפשי.
-- אם חסר מידע, ציין במפורש מה צריך לברר.
-- אם יש חשש למצוקה חריפה, המלץ לרכזת להפנות לגורם מקצועי מתאים.
-- ענה בעברית, בטון מקצועי, ברור ותכליתי.
+    elif action == "summary":
+        prompt = (
+            f"{SYSTEM}\n\n"
+            "סכמי את הפנייה הבאה בצורה תמציתית.\n"
+            "כלול: נושא, מה הסטודנט מבקש, רמת דחיפות (נמוכה/בינונית/גבוהה), ומה צריך לברר.\n"
+            f"{ticket_block(ticket_ctx)}{notes_block(user_message)}"
+        )
 
-החזר תשובה במבנה הבא:
+    elif action == "tasks":
+        prompt = (
+            f"{SYSTEM}\n\n"
+            "בני רשימת משימות ממוספרת להמשך הטיפול בפנייה.\n"
+            "לכל משימה: תיאור קצר, גורם אחראי (רכזת/מרצה/מינהל/סטודנט), ועדיפות.\n"
+            f"{ticket_block(ticket_ctx)}{notes_block(user_message)}"
+        )
 
-סיכום הפנייה:
-...
-
-סיווג הפנייה:
-...
-
-רמת דחיפות:
-נמוכה / בינונית / גבוהה
-
-מידע חסר:
-...
-
-המלצה לרכזת:
-...
-
-גורם מומלץ להמשך טיפול:
-...
-
-נוסח אפשרי לשליחה לסטודנט:
-...
-
-המידע שהוזן על ידי הרכזת:
-{user_message}
-"""
+    else:  # free
+        prompt = (
+            f"{SYSTEM}\n\n"
+            "ענה בצורה מקצועית ותכליתית לשאלה או הבקשה הבאה:\n"
+            f"{user_message}"
+        )
 
     try:
         api_key = os.getenv("GEMINI_API_KEY")
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
-        res = requests.post(url, json=payload)
+        res = requests.post(url, json=payload, timeout=30)
+
+        if res.status_code == 503:
+            return jsonify({"error": "service_unavailable"}), 503
+
         res.raise_for_status()
         reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
-
         return jsonify({"reply": reply})
 
-    except Exception as e:
-        return jsonify({"error": "Chatbot failed", "details": str(e)}), 500
+    except requests.HTTPError as e:
+        code = e.response.status_code if e.response is not None else 500
+        if code == 503:
+            return jsonify({"error": "service_unavailable"}), 503
+        return jsonify({"error": "ai_error"}), 500
+    except Exception:
+        return jsonify({"error": "server_error"}), 500
 
 # ─── Summarize & Audio Transcription API  ─────────────────
 
@@ -658,69 +772,157 @@ def summarize_text():
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
         res = requests.post(url, json=payload)
+
+        if res.status_code == 503:
+            return jsonify({"error": "השירות לא זמין כרגע, נסי שוב בעוד רגע."}), 503
         res.raise_for_status()
         reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
-        
         return jsonify({"summary_result": reply})
-    except Exception as e:
-        return jsonify({"error": "Failed to generate summary", "details": str(e)}), 500
+    except requests.HTTPError:
+        return jsonify({"error": "שגיאה בשירות ה-AI. נסי שוב."}), 500
+    except Exception:
+        return jsonify({"error": "שגיאה בשרת. נסי שוב."}), 500
 
 
-# ─── Summarize Audio API ─────────────────────────
+# ─── Transcribe Audio API ─────────────────────────
 
-@app.route("/summarize-audio", methods=["POST"])
-def summarize_audio():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
+@app.route("/transcribe-audio", methods=["POST"])
+def transcribe_audio():
+    if "file" not in request.files:
+        return jsonify({"error": "לא נבחר קובץ"}), 400
+
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"error": "לא נבחר קובץ"}), 400
+
+    file_data = file.read()
+    MAX_BYTES = 15 * 1024 * 1024  # 15 MB — inline data limit
+    if len(file_data) > MAX_BYTES:
+        return jsonify({"error": "הקובץ גדול מדי (מקסימום 15MB). נסי לחלק את ההקלטה לחלקים קצרים יותר."}), 400
 
     try:
-        file_data = file.read()
         import base64
-        encoded_file = base64.b64encode(file_data).decode('utf-8')
-        mime_type = file.content_type
+        encoded = base64.b64encode(file_data).decode("utf-8")
+        mime_type = file.content_type or "audio/mpeg"
 
-        prompt = """הקשב להקלטת השיחה הבאה (זו יכולה להיות הקלטת זום או שיחה קולית).
-תמלל את השיחה בלבך, ולאחר מכן סכם אותה בפורמט הבא בדיוק:
-סיכום: [כתוב כאן סיכום קצר ותמציתי של מה שנאמר בהקלטה]
-נקודות:
-* [נקודה מרכזית 1]
-* [נקודה מרכזית 2]
-משימות:
-* [משימה להמשך 1]
-* [משימה להמשך 2]"""
+        prompt = (
+            "תמלל את ההקלטה הבאה בעברית. "
+            "החזר רק את התמלול עצמו ללא כותרות, ללא הסברים נוספים. "
+            "אם יש כמה דוברים, ציין לפני כל משפט מי מדבר (לדוגמה: 'דובר 1:', 'דובר 2:')."
+        )
 
         api_key = os.getenv("GEMINI_API_KEY")
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
-        
+        if not api_key:
+            return jsonify({"error": "מפתח GEMINI_API_KEY לא מוגדר בשרת"}), 500
+
+        url = (
+            "https://generativelanguage.googleapis.com/v1beta/"
+            f"models/gemini-2.5-flash:generateContent?key={api_key}"
+        )
         payload = {
             "contents": [{
                 "parts": [
-                    {
-                        "inlineData": {
-                            "mimeType": mime_type,
-                            "data": encoded_file
-                        }
-                    },
+                    {"inlineData": {"mimeType": mime_type, "data": encoded}},
                     {"text": prompt}
                 ]
             }]
         }
-        
-        res = requests.post(url, json=payload)
-        res.raise_for_status()
-        reply = res.json()["candidates"][0]["content"]["parts"][0]["text"]
 
-        return jsonify({"summary_result": reply})
+        res = requests.post(url, json=payload, timeout=120)
 
-    except Exception as e:
-        return jsonify({"error": "Failed to process audio file", "details": str(e)}), 500
+        if res.status_code == 503:
+            return jsonify({"error": "השירות לא זמין כרגע, נסי שוב בעוד רגע."}), 503
+        if not res.ok:
+            return jsonify({"error": "שגיאה בשירות התמלול. נסי שוב."}), 500
+
+        transcription = res.json()["candidates"][0]["content"]["parts"][0]["text"]
+        return jsonify({"transcription": transcription})
+
+    except requests.HTTPError:
+        return jsonify({"error": "שגיאה בשירות התמלול. נסי שוב."}), 500
+    except Exception:
+        return jsonify({"error": "שגיאה בשרת בעת התמלול. נסי שוב."}), 500
+
+
+# ─── Support Files (conversation summaries) ───────────────────────────────────
+
+@app.route("/support-files", methods=["GET"])
+def get_support_files():
+    student_id = request.args.get("student_id")
+    if not student_id:
+        return jsonify({"error": "student_id is required"}), 400
+
+    records = (
+        SupportFile.query
+        .filter_by(student_id=student_id)
+        .filter(SupportFile.summary.isnot(None))
+        .order_by(SupportFile.created_at.desc(), SupportFile.case_id.desc())
+        .all()
+    )
+    return jsonify([r.to_dict() for r in records])
+
+
+@app.route("/support-files", methods=["POST"])
+def create_support_file():
+    data = request.get_json()
+    if not data or not data.get("student_id") or not data.get("summary"):
+        return jsonify({"error": "student_id and summary are required"}), 400
+
+    record = SupportFile(
+        student_id=data["student_id"],
+        summary=data["summary"],
+        source_type=data.get("source_type", "text"),
+        status="Open",
+        created_at=datetime.now(),
+        open_date=date.today(),
+    )
+    db.session.add(record)
+    db.session.commit()
+    return jsonify(record.to_dict()), 201
+
+
+@app.route("/support-files/<int:case_id>", methods=["DELETE"])
+def delete_support_file(case_id):
+    record = SupportFile.query.get_or_404(case_id)
+    db.session.delete(record)
+    db.session.commit()
+    return jsonify({"message": "נמחק"}), 200
 
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
+        # Add columns introduced after initial schema creation
+        with db.engine.connect() as conn:
+            for col, definition in [
+                ("source_type", "VARCHAR(20)"),
+                ("created_at", "DATETIME"),
+            ]:
+                try:
+                    conn.execute(db.text(
+                        f"ALTER TABLE support_files ADD COLUMN {col} {definition}"
+                    ))
+                    conn.commit()
+                except Exception:
+                    pass  # column already exists
+
+            # documents table migrations
+            for col, definition in [
+                ("file_path", "VARCHAR(500)"),
+                ("semester", "VARCHAR(20)"),
+            ]:
+                try:
+                    conn.execute(db.text(
+                        f"ALTER TABLE documents ADD COLUMN {col} {definition}"
+                    ))
+                    conn.commit()
+                except Exception:
+                    pass  # column already exists
+            try:
+                conn.execute(db.text(
+                    "ALTER TABLE documents MODIFY COLUMN doc_type VARCHAR(100) NULL DEFAULT ''"
+                ))
+                conn.commit()
+            except Exception:
+                pass
     app.run(host="0.0.0.0", port=5000, debug=True)

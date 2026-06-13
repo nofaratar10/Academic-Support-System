@@ -43,11 +43,13 @@ function updateStatusBadge(status) {
   pill.className   = getStudentStatusClass(status);
 }
 
-// CSS class for task status (separate from student status)
-function getTaskStatusClass(status) {
-  if (status === "הושלם")   return "status-pill status-closed";
-  if (status === "בביצוע")  return "status-pill status-progress";
-  return "status-pill status-open";
+// CSS class for task status — includes overdue detection based on due date
+function getTaskStatusClass(status, dueDate) {
+  if (status === "הושלם") return "task-status-completed";
+  const today = new Date().toISOString().split("T")[0];
+  if (dueDate && dueDate < today) return "task-status-overdue";
+  if (status === "בביצוע") return "task-status-in-progress";
+  return "task-status-open";
 }
 
 // ─── Toast ───────────────────────────────────────────────────
@@ -102,19 +104,54 @@ function renderTasks(tasks) {
     planTableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">אין משימות עדיין</td></tr>`;
     return;
   }
+
   tasks.forEach((item) => {
+    const statusClass = getTaskStatusClass(item.status, item.dueDate);
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${item.task || ""}</td>
       <td>${item.description || ""}</td>
       <td>${item.dueDate || ""}</td>
-      <td><span class="${getTaskStatusClass(item.status)}">${item.status || "פתוח"}</span></td>
+      <td>
+        <select class="task-status-select ${statusClass}"
+                data-task-id="${item.task_id}"
+                data-due-date="${item.dueDate || ""}">
+          <option value="פתוח"   ${item.status === "פתוח"   ? "selected" : ""}>פתוח</option>
+          <option value="בביצוע" ${item.status === "בביצוע" ? "selected" : ""}>בביצוע</option>
+          <option value="הושלם"  ${item.status === "הושלם"  ? "selected" : ""}>הושלם</option>
+        </select>
+      </td>
       <td>
         <button class="btn" type="button" onclick="deleteTask(${item.task_id})">מחיקה</button>
       </td>
     `;
     planTableBody.appendChild(row);
   });
+
+  planTableBody.querySelectorAll(".task-status-select").forEach(sel => {
+    sel.addEventListener("change", handleStatusChange);
+  });
+}
+
+async function handleStatusChange(e) {
+  const sel = e.target;
+  const taskId = sel.dataset.taskId;
+  const newStatus = sel.value;
+  const dueDate = sel.dataset.dueDate;
+
+  try {
+    const res = await fetch(`/tasks/${taskId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (!res.ok) throw new Error();
+    sel.className = `task-status-select ${getTaskStatusClass(newStatus, dueDate)}`;
+    showToast("הסטטוס עודכן");
+  } catch {
+    alert("שגיאה בעדכון הסטטוס");
+    await loadTasks();
+  }
 }
 
 window.deleteTask = async function (taskId) {

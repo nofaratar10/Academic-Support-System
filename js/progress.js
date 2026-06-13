@@ -13,18 +13,6 @@ function getBarColor(pct) {
   return "#e5e7eb";
 }
 
-function getAlertClass(alert) {
-  if (alert === "לא התחיל") return "alert-row alert-danger";
-  if (alert === "משימה באיחור" || alert === "ירידה בקצב") return "alert-row alert-warning";
-  return "";
-}
-
-function getAlertIcon(alert) {
-  if (alert === "לא התחיל") return "⚠️";
-  if (alert === "משימה באיחור") return "⏰";
-  return "📉";
-}
-
 function getBadge(rank, data) {
   if (data.pct === 100) return `<span class="badge badge-gold">⭐ מצטיין</span>`;
   if (rank === 1 && data.points > 0) return `<span class="badge badge-gold">🏆 מוביל</span>`;
@@ -36,7 +24,7 @@ function renderSummary(data) {
   const totalDone = data.reduce((s, d) => s + d.done, 0);
   const totalInProgress = data.reduce((s, d) => s + d.in_progress, 0);
   const totalPoints = data.reduce((s, d) => s + d.points, 0);
-  const totalAlerts = data.filter(d => d.alert).length;
+  const totalAlerts = data.filter(d => d.overdue_tasks >= 2).length;
 
   document.getElementById("totalDone").textContent = totalDone;
   document.getElementById("totalInProgress").textContent = totalInProgress;
@@ -51,14 +39,21 @@ function renderSummary(data) {
 
 function renderLeaderboard(data) {
   const list = document.getElementById("leaderboardList");
-  const top = data.filter(d => d.points > 0).slice(0, 5);
+  const sorted = [...data]
+    .filter(d => d.points > 0)
+    .sort((a, b) => {
+      if (b.points !== a.points) return b.points - a.points;
+      if (b.done !== a.done) return b.done - a.done;
+      return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`, "he");
+    })
+    .slice(0, 5);
 
-  if (!top.length) {
+  if (!sorted.length) {
     list.innerHTML = `<div class="empty-row">אין נתונים עדיין</div>`;
     return;
   }
 
-  list.innerHTML = top.map((d, i) => `
+  list.innerHTML = sorted.map((d, i) => `
     <div class="student-row">
       <span class="rank-num">${i + 1}</span>
       <div class="avatar av-${(i % 4) + 1}">${getInitials(d.first_name, d.last_name)}</div>
@@ -73,23 +68,28 @@ function renderLeaderboard(data) {
 
 function renderAlerts(data) {
   const list = document.getElementById("alertsList");
-  const alerts = data.filter(d => d.alert);
+  const alerts = data.filter(d => d.overdue_tasks >= 2);
 
   if (!alerts.length) {
     list.innerHTML = `<div class="empty-row" style="color:#0ca678;">✅ אין התראות</div>`;
     return;
   }
 
-  list.innerHTML = alerts.map(d => `
-    <div class="${getAlertClass(d.alert)}">
-      <span style="font-size:16px;">${getAlertIcon(d.alert)}</span>
-      <div style="flex:1;">
-        <div style="font-size:13px; font-weight:500; color:var(--color-text-primary, #111);">${d.first_name} ${d.last_name}</div>
-        <div style="font-size:12px; color:#64748b;">${d.alert}</div>
+  list.innerHTML = alerts.map(d => {
+    const msg = d.overdue_tasks >= 3
+      ? `${d.overdue_tasks} משימות באיחור - נדרש מעקב`
+      : `${d.overdue_tasks} משימות באיחור`;
+    return `
+      <div class="alert-row alert-danger">
+        <span style="font-size:16px;">⏰</span>
+        <div style="flex:1;">
+          <div style="font-size:13px; font-weight:500; color:var(--color-text-primary, #111);">${d.first_name} ${d.last_name}</div>
+          <div style="font-size:12px; color:#64748b;">${msg}</div>
+        </div>
+        <a href="/case-plan?id=${d.student_id}" class="btn-small">תיק ליווי</a>
       </div>
-      <a href="/case-plan?id=${d.student_id}" class="btn-small">תיק ליווי</a>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function renderAllStudents(data) {
@@ -142,24 +142,19 @@ async function loadProgress() {
 
     allData = serverData.map(student => {
       const nameParts = student.name ? student.name.split(" ") : ["", ""];
-      
       const total = student.total_tasks || 0;
       const completed = student.completed_tasks || 0;
-      
-      let computedAlert = "";
-      if (student.progress < 40) computedAlert = "לא התחיל";
-      if (student.status === "איחור") computedAlert = "משימה באיחור";
 
       return {
         student_id: student.student_id,
         first_name: nameParts[0] || "סטודנט",
         last_name: nameParts.slice(1).join(" ") || "",
-        pct: student.progress || 0, 
+        pct: student.progress || 0,
         done: completed,
-        in_progress: student.in_progress_tasks || 0, 
+        in_progress: student.in_progress_tasks || 0,
         total_tasks: total,
         points: student.points || 0,
-        alert: computedAlert
+        overdue_tasks: student.overdue_tasks || 0
       };
     });
 

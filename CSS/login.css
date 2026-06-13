@@ -1,0 +1,321 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #eef1f7;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  direction: rtl;
+}
+
+/* ─── מרכז הדף ─── */
+.login-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+/* ─── כרטיס ─── */
+.login-card {
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(47, 109, 246, 0.10), 0 2px 8px rgba(0,0,0,0.06);
+  padding: 40px 36px 32px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─── לוגו ─── */
+.login-brand {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.login-logo {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.login-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  letter-spacing: 0.3px;
+}
+
+.login-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ─── ברוך הבא ─── */
+.login-welcome {
+  text-align: center;
+}
+
+.login-welcome h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.login-welcome p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* ─── טאבים ─── */
+.login-tabs {
+  display: flex;
+  background: #f4f5f7;
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.login-tab {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+}
+
+.login-tab.active {
+  background: #ffffff;
+  color: #2f6df6;
+  font-weight: 700;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.10);
+}
+
+.login-tab:hover:not(.active) {
+  background: #e8ecf5;
+  color: #374151;
+}
+
+/* ─── טופס ─── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #d9dde4;
+  border-radius: 12px;
+  background: #fafafa;
+  font-size: 14px;
+  color: #1f2937;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: #2f6df6;
+  box-shadow: 0 0 0 3px rgba(47, 109, 246, 0.12);
+  background: #fff;
+}
+
+.form-group input::placeholder {
+  color: #b0b7c3;
+}
+
+/* ─── שדה סיסמה עם כפתור ─── */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-left: 42px;
+}
+
+.toggle-password {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  color: #9ca3af;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password:hover {
+  color: #6b7280;
+}
+
+/* ─── שכחת סיסמה ─── */
+.login-meta {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: -4px;
+}
+
+.forgot-link {
+  font-size: 13px;
+  color: #2f6df6;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+/* ─── שגיאה ─── */
+.login-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.login-error.hidden {
+  display: none;
+}
+
+/* ─── כפתור כניסה ─── */
+.btn-login {
+  width: 100%;
+  padding: 13px;
+  background: #2f6df6;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.1s;
+  margin-top: 2px;
+}
+
+.btn-login:hover {
+  background: #255ae0;
+}
+
+.btn-login:active {
+  transform: scale(0.98);
+}
+
+.btn-login:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ─── מפריד ─── */
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #9ca3af;
+  font-size: 13px;
+  margin: 0 -4px;
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+/* ─── כפתור SSO ─── */
+.btn-sso {
+  width: 100%;
+  padding: 12px;
+  background: #fff;
+  color: #374151;
+  border: 1.5px solid #d9dde4;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.btn-sso:hover {
+  background: #f4f5f7;
+  border-color: #b0b7c3;
+}
+
+.sso-icon {
+  font-size: 17px;
+}
+
+/* ─── הערה תחתונה ─── */
+.login-notice {
+  text-align: center;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: -4px;
+  line-height: 1.5;
+}
+
+/* ─── רספונסיבי ─── */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 28px 20px 24px;
+    border-radius: 18px;
+    gap: 16px;
+  }
+
+  .login-logo {
+    font-size: 34px;
+  }
+
+  .login-title {
+    font-size: 18px;
+  }
+
+  .login-welcome h2 {
+    font-size: 19px;
+  }
+}

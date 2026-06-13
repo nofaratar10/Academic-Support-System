@@ -68,7 +68,16 @@
             </div>
           </div>
 
-          <!-- שרשור הודעות -->
+          <!-- פרטי הפנייה -->
+          <div class="table-card ticket-meta-card">
+            <div class="ticket-meta-row">
+              <span><strong>מ:</strong> <span id="ticketFrom"></span></span>
+              <span><strong>אל:</strong> <span id="ticketTo"></span></span>
+              <span><strong>תאריך:</strong> <span id="ticketDate"></span></span>
+            </div>
+          </div>
+
+          <!-- שרשור תגובות -->
           <div id="ticketMessagesContainer"></div>
 
           <!-- שדה תגובה -->
@@ -76,6 +85,7 @@
             <h4>תגובה</h4>
             <textarea id="replyContent" placeholder="כתבי תגובה..."></textarea>
             <div class="reply-footer">
+              <button class="btn close-ticket-btn" id="closeTicketBtn">סגור פנייה</button>
               <button class="send-reply-btn" id="sendReplyBtn">שליחה</button>
             </div>
           </div>
@@ -86,6 +96,7 @@
   </div>
 
   <script src="/js/view-ticket.js"></script>
+  <script src="/js/auth.js"></script>
   <script src="/js/chatbot-widget.js"></script>
 </body>
 </html>

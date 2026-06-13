@@ -64,7 +64,10 @@
       </header>
 
       <section class="student-bar" aria-label="פרטי סטודנט">
-        <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <h2 class="student-name" id="studentHeader">טוען פרטי סטודנט...</h2>
+          <span class="status-pill" id="statusPill"></span>
+        </div>
         <button
           class="back"
           type="button"
@@ -90,10 +93,9 @@
           <table class="documents-table">
             <thead>
               <tr>
-                <th>קובץ</th>
-                <th>סוג התאמה</th>
+                <th>שם מסמך</th>
+                <th>שם קובץ</th>
                 <th>תאריך העלאה</th>
-                <th>סטטוס</th>
                 <th>פעולה</th>
               </tr>
             </thead>
@@ -103,14 +105,8 @@
           <div class="table-footer documents-footer">
             <div class="documents-form">
               <input type="text" id="docName" placeholder="שם מסמך" />
-              <select id="docType">
-                <option value="">בחרי סוג התאמה</option>
-                <option>אישור רפואי</option>
-                <option>אישור מילואים</option>
-                <option>אבחון דידקטי</option>
-                <option>טופס התאמות</option>
-              </select>
-              <button class="primary-btn" type="button" id="addDocumentBtn">העלאת מסמך +</button>
+              <input type="file" id="docFile" />
+              <button class="primary-btn" type="button" id="addDocumentBtn">העלאת מסמך </button>
             </div>
           </div>
         </section>
@@ -122,6 +118,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite">המסמך נוסף</div>
 
   <script src="/js/case-documents.js"></script>
+  <script src="/js/auth.js"></script>
   <script src="/js/chatbot-widget.js"></script>
 </body>
 </html>

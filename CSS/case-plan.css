@@ -53,6 +53,38 @@
   font-weight: 700;
 }
 
+/* ─── Task status classes (plan screen only) ─── */
+.task-status-select {
+  border: none;
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  outline: none;
+}
+
+.task-status-open {
+  background: #e7f5ff;
+  color: #1971c2;
+}
+
+.task-status-in-progress {
+  background: #fff9db;
+  color: #854f0b;
+}
+
+.task-status-completed {
+  background: #e6fcf5;
+  color: #0ca678;
+}
+
+.task-status-overdue {
+  background: #fff5f5;
+  color: #c92a2a;
+}
+
 .plan-footer {
   justify-content: center;
 }

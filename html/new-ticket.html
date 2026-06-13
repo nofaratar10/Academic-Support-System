@@ -67,20 +67,52 @@
 
                     <form id="newTicketForm" novalidate>
 
-                        <!-- שם ואימייל סטודנט -->
-                        <div class="form-row">
+                        <!-- סוג פנייה: סטודנט יחיד / תפוצה -->
+                        <div class="form-group">
+                            <label>סוג פנייה <span style="color:#e03131;">*</span></label>
+                            <div class="mode-toggle" style="display:flex; gap:24px; align-items:center; flex-wrap:wrap;">
+                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                                    <input type="radio" name="ticketMode" value="single" checked
+                                        style="width:16px; height:16px; margin:0; flex:none;" />
+                                    פנייה לסטודנט יחיד
+                                </label>
+                                <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+                                    <input type="radio" name="ticketMode" value="broadcast"
+                                        style="width:16px; height:16px; margin:0; flex:none;" />
+                                    מייל תפוצה לכל הסטודנטים
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- שם ואימייל סטודנט (פנייה לסטודנט יחיד) -->
+                        <div class="form-row" id="singleStudentFields">
                             <div class="form-group">
                                 <label for="studentName">שם סטודנט <span style="color:#e03131;">*</span></label>
                                 <input type="text" id="studentName" name="studentName"
-                                    placeholder="הקלד שם מלא" />
+                                    list="studentNameList" autocomplete="off"
+                                    placeholder="הקלד/י שם סטודנט" />
+                                <datalist id="studentNameList"></datalist>
                                 <span class="field-error" id="studentNameError"></span>
                             </div>
 
                             <div class="form-group">
                                 <label for="studentEmail">מייל סטודנט <span style="color:#e03131;">*</span></label>
                                 <input type="email" id="studentEmail" name="studentEmail"
-                                    placeholder="example@mail.com" dir="ltr" />
+                                    list="studentEmailList" autocomplete="off"
+                                    placeholder="הקלד/י מייל סטודנט" dir="ltr" />
+                                <datalist id="studentEmailList"></datalist>
                                 <span class="field-error" id="studentEmailError"></span>
+                            </div>
+                        </div>
+
+                        <!-- מידע על נמעני התפוצה (מייל תפוצה) -->
+                        <div class="form-group" id="broadcastInfo" style="display:none;">
+                            <div class="broadcast-banner"
+                                style="background:#e7f5ff; border:1px solid #a5d8ff; border-radius:8px; padding:12px 14px; color:#1864ab;">
+                                ההודעה תישלח לכל הסטודנטים שיש להם תיק ליווי במערכת.
+                                <div style="margin-top:6px;">
+                                    מספר נמענים: <strong id="recipientCount">0</strong>
+                                </div>
                             </div>
                         </div>
 
@@ -88,10 +120,12 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="cc">העתק</label>
-                                <select id="cc" name="cc">
-                                    <option value=""></option>
-                                    <option value="admin">רכזת לימודים</option>
-                                </select>
+                                <div class="cc-autocomplete">
+                                    <input type="text" id="cc" name="cc" dir="ltr" autocomplete="off"
+                                        placeholder="כתובות מייל נוספות, מופרדות בפסיקים" />
+                                    <div id="ccSuggestions" class="cc-suggestions"></div>
+                                </div>
+                                <span class="field-error" id="ccError"></span>
                             </div>
                         </div>
 
@@ -129,7 +163,8 @@
     </div>
 
     <script src="/js/new-ticket.js"></script>
-    <script src="/js/chatbot-widget.js"></script>
+    <script src="/js/auth.js"></script>
+  <script src="/js/chatbot-widget.js"></script>
 </body>
 
 </html>

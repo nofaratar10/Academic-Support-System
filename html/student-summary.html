@@ -77,10 +77,12 @@
       </div>
 
       <main class="content">
+
+        <!-- ══ יצירת סיכום חדש ══ -->
         <section class="table-card summary-shell">
 
           <div class="details-header">
-            <h3>יצירת סיכום שיחה בעזרת AI</h3>
+            <h3 id="createSummaryTitle">יצירת סיכום שיחה בעזרת AI</h3>
           </div>
 
           <div class="details-body">
@@ -104,10 +106,10 @@
             </div>
 
             <div class="actions">
-              <button class="primary-btn">✨ יצירת סיכום</button>
+              <button class="primary-btn" id="generateBtn">✨ יצירת סיכום</button>
             </div>
 
-            <div class="summary-result">
+            <div class="summary-result hidden" id="summaryResult">
               <div class="result-box">
                 <h4>סיכום כללי</h4>
                 <p id="summaryOutput"></p>
@@ -123,18 +125,31 @@
             </div>
 
             <div class="table-footer">
-              <button class="btn">שמירה</button>
+              <button class="btn" id="saveBtn">שמירה</button>
+              <button class="btn btn-secondary hidden" id="newSummaryBtn">+ יצירת סיכום נוסף</button>
             </div>
 
           </div>
 
         </section>
+
+        <!-- ══ סיכומי שיחה קודמים ══ -->
+        <section class="table-card prev-summaries-section" id="prevSummariesSection">
+          <div class="details-header prev-summaries-header">
+            <h3>סיכומי שיחה קודמים</h3>
+          </div>
+          <div id="prevSummariesList" class="prev-summaries-list">
+            <p class="no-summaries-msg" id="noSummariesMsg">אין עדיין סיכומים שמורים עבור סטודנט זה.</p>
+          </div>
+        </section>
+
       </main>
 
     </div>
   </div>
 
   <script src="/js/student-summary.js"></script>
+  <script src="/js/auth.js"></script>
   <script src="/js/chatbot-widget.js"></script>
 </body>
 

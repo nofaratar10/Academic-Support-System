@@ -1,6 +1,31 @@
 (function () {
+    const ACTIONS = [
+        { id: 'reply',   label: 'ניסוח תגובה לסטודנט',  hint: 'הדביקי את תוכן הפנייה או תארי את המצב:' },
+        { id: 'steps',   label: 'המלצה לצעדי טיפול',     hint: 'הדביקי את תוכן הפנייה או תארי את המצב:' },
+        { id: 'summary', label: 'סיכום פנייה',            hint: 'הדביקי את תוכן הפנייה לסיכום:' },
+        { id: 'tasks',   label: 'בניית משימות להמשך',    hint: 'הדביקי את תוכן הפנייה או תארי את המצב:' },
+        { id: 'free',    label: 'הודעה חופשית',           hint: 'כתבי את שאלתך:' },
+    ];
+
+    function getTicketContext() {
+        if (!window.location.pathname.includes('view-ticket')) return null;
+        const id = parseInt(new URLSearchParams(window.location.search).get('id'));
+        if (!id) return null;
+        try {
+            const tickets = JSON.parse(localStorage.getItem('tickets_data') || '[]');
+            const t = tickets.find(t => t.ticket_id === id);
+            if (!t) return null;
+            return {
+                ticket_id: t.ticket_id,
+                subject:   t.subject  || '',
+                sender:    t.direction === 'incoming' ? (t.sender_name || t.recipient) : 'פולינה (רכזת)',
+                content:   t.content  || '',
+                status:    t.status   || '',
+            };
+        } catch { return null; }
+    }
+
     function initChatbot() {
-        // Inject bubble if not already in the page
         if (!document.getElementById('globalChatbot')) {
             const bubble = document.createElement('div');
             bubble.className = 'chatbot-bubble';
@@ -10,7 +35,6 @@
             document.body.appendChild(bubble);
         }
 
-        // Inject chat popup if not already in the page
         if (!document.querySelector('.chatbot-container')) {
             const container = document.createElement('div');
             container.className = 'chatbot-container';
@@ -20,78 +44,180 @@
                     <h3>⚙️ עוזר AI - ליווי מילואים</h3>
                     <button type="button" class="close-chat-btn" id="closeChat">&times;</button>
                 </div>
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message bot-message">שלום פולינה, במה אוכל לסייע לך היום?</div>
-                </div>
+                <div class="chat-messages" id="chatMessages"></div>
                 <form class="chat-input-area" id="chatForm">
-                    <input type="text" id="userMessage" placeholder="הקלידי שאלה או פרטי פנייה..." autocomplete="off" />
-                    <button type="submit">שלח</button>
+                    <input type="text" id="userMessage" placeholder="בחרי פעולה למעלה..." autocomplete="off" disabled />
+                    <button type="submit" disabled>שלח</button>
                 </form>
             `;
             document.body.appendChild(container);
         }
 
-        const bubble = document.getElementById('globalChatbot');
+        const bubble        = document.getElementById('globalChatbot');
         const chatContainer = document.querySelector('.chatbot-container');
-        const chatForm = document.getElementById('chatForm');
-        const userMessageInput = document.getElementById('userMessage');
-        const chatMessages = document.getElementById('chatMessages');
-        const closeChatBtn = document.getElementById('closeChat');
+        const chatForm      = document.getElementById('chatForm');
+        const input         = document.getElementById('userMessage');
+        const chatMessages  = document.getElementById('chatMessages');
+        const closeBtn      = document.getElementById('closeChat');
+        const submitBtn     = chatForm.querySelector('button[type="submit"]');
 
-        const API_BASE_URL = 'http://vmedu473.mtacloud.co.il:5000';
+        const API_BASE_URL = window.location.origin;
 
-        bubble.addEventListener('click', () => {
-            const isHidden = chatContainer.style.display === 'none' || chatContainer.style.display === '';
-            chatContainer.style.display = isHidden ? 'flex' : 'none';
-        });
+        let selectedAction  = null;
+        let ticketContext   = null;
+        let initialized     = false;
 
-        closeChatBtn.addEventListener('click', () => {
-            chatContainer.style.display = 'none';
-        });
+        // ─── helpers ──────────────────────────────────────────
+        function addMessage(text, cls) {
+            const div = document.createElement('div');
+            div.className = `message ${cls}`;
+            div.innerText = text;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return div;
+        }
 
-        chatForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const userMessage = userMessageInput.value.trim();
-            if (!userMessage) return;
+        function enableInput(placeholder) {
+            input.disabled   = false;
+            submitBtn.disabled = false;
+            input.placeholder = placeholder;
+            input.focus();
+        }
 
-            addMessage(userMessage, 'user-message');
-            userMessageInput.value = '';
+        function disableInput() {
+            input.disabled    = true;
+            submitBtn.disabled = true;
+            input.value       = '';
+            input.placeholder = 'בחרי פעולה למעלה...';
+        }
 
-            const loadingDiv = addMessage('המערכת מנתחת את הנתונים ומכינה המלצות...', 'bot-message loading');
+        // ─── action buttons ───────────────────────────────────
+        function showActionButtons() {
+            const wrap = document.createElement('div');
+            wrap.className = 'chatbot-actions';
+            wrap.id = 'chatbotActions';
+            ACTIONS.forEach(action => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'chatbot-action-btn';
+                btn.textContent = action.label;
+                btn.addEventListener('click', () => onActionSelected(action));
+                wrap.appendChild(btn);
+            });
+            chatMessages.appendChild(wrap);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeActionButtons() {
+            const el = document.getElementById('chatbotActions');
+            if (el) el.remove();
+        }
+
+        // ─── send to AI ───────────────────────────────────────
+        async function sendToAI(userMessage, retryCount = 0) {
+            disableInput();
+            const loadingDiv = addMessage(
+                retryCount > 0 ? 'מנסה שוב...' : 'המערכת מנתחת ומכינה תשובה...',
+                'bot-message loading'
+            );
 
             try {
-                const response = await fetch(`${API_BASE_URL}/chatbot/message`, {
+                const res = await fetch(`${API_BASE_URL}/chatbot/message`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: userMessage })
+                    body: JSON.stringify({
+                        message:        userMessage,
+                        action:         selectedAction,
+                        ticket_context: ticketContext
+                    })
                 });
 
                 loadingDiv.remove();
-                const data = await response.json();
 
-                if (!response.ok) {
-                    addMessage(data.details || data.error || `שגיאת שרת. סטטוס: ${response.status}`, 'bot-message');
-                    return;
+                // retry once on 503
+                if (res.status === 503 && retryCount < 1) {
+                    const waitDiv = addMessage('השירות עמוס, מנסה שוב בעוד 3 שניות...', 'bot-message loading');
+                    await new Promise(r => setTimeout(r, 3000));
+                    waitDiv.remove();
+                    return sendToAI(userMessage, retryCount + 1);
                 }
 
-                if (data.reply) {
+                const data = await res.json();
+
+                if (!res.ok) {
+                    const msg = res.status === 503
+                        ? 'השירות לא זמין כרגע, נסי שוב בעוד רגע.'
+                        : 'שגיאה בשירות ה-AI, נסי שוב.';
+                    addMessage(msg, 'bot-message');
+                } else if (data.reply) {
                     addMessage(data.reply, 'bot-message');
                 }
-            } catch (error) {
-                if (loadingDiv) loadingDiv.remove();
-                console.error('שגיאה בשליחת הבקשה:', error);
-                addMessage('שגיאה בתקשורת: לא ניתן להתחבר לשרת הפייתון. ודאי שהוא רץ מול פורט 5000.', 'bot-message');
+            } catch {
+                if (loadingDiv.parentNode) loadingDiv.remove();
+                addMessage('שגיאה בתקשורת עם השרת. ודאי שהשרת פעיל.', 'bot-message');
+            }
+
+            enableInput('שאלה נוספת או הערה...');
+        }
+
+        // ─── select action ────────────────────────────────────
+        function onActionSelected(action) {
+            selectedAction = action.id;
+            removeActionButtons();
+            addMessage(`בחרת: ${action.label}`, 'user-message');
+
+            ticketContext = getTicketContext();
+
+            if (ticketContext && action.id !== 'free') {
+                // שלח מיד לגמיני עם תוכן הפנייה — ללא המתנה למשתמשת
+                sendToAI('');
+            } else {
+                addMessage(action.hint, 'bot-message');
+                enableInput(action.id === 'free' ? 'כתבי את שאלתך...' : 'הדביקי תוכן פנייה או תארי את המצב...');
+            }
+        }
+
+        // ─── reset ────────────────────────────────────────────
+        function resetChat() {
+            chatMessages.innerHTML = '';
+            selectedAction  = null;
+            ticketContext   = null;
+            disableInput();
+            addMessage('שלום פולינה, במה אוכל לסייע לך היום?', 'bot-message');
+            showActionButtons();
+        }
+
+        // ─── open / close ─────────────────────────────────────
+        bubble.addEventListener('click', () => {
+            const hidden = chatContainer.style.display === 'none' || chatContainer.style.display === '';
+            chatContainer.style.display = hidden ? 'flex' : 'none';
+            if (hidden && !initialized) {
+                initialized = true;
+                resetChat();
             }
         });
 
-        function addMessage(text, className) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${className}`;
-            messageDiv.innerText = text;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            return messageDiv;
-        }
+        closeBtn.addEventListener('click', () => {
+            chatContainer.style.display = 'none';
+        });
+
+        // ─── submit ───────────────────────────────────────────
+        chatForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const userMessage = input.value.trim();
+
+            if (!selectedAction) return;
+
+            const hasTicket = ticketContext && selectedAction !== 'free';
+            if (!userMessage && !hasTicket) {
+                addMessage('יש להזין תוכן לפני השליחה.', 'bot-message');
+                return;
+            }
+
+            addMessage(userMessage, 'user-message');
+            input.value = '';
+            await sendToAI(userMessage);
+        });
     }
 
     if (document.readyState === 'loading') {

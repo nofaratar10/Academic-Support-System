@@ -1,14 +1,10 @@
 .env
 python/.env
 __pycache__/
-*.pycpython/.env
-python/venv/
 python/__pycache__/
 *.pyc
+*.db
+python/venv/
 python/app.log
 python/chatbot.log
-=======
-*.pyc
-*.db
 instance/
-

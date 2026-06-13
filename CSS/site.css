@@ -130,6 +130,25 @@ textarea {
   color: #4b5563;
 }
 
+.logout-btn {
+  background: transparent;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.logout-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
 .content {
   padding: 22px;
 }
