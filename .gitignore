@@ -8,3 +8,7 @@ python/venv/
 python/app.log
 python/chatbot.log
 instance/
+
+# Runtime user uploads — keep the folder, ignore its contents
+uploads/*
+!uploads/.gitkeep

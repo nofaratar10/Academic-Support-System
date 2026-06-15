@@ -5,20 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginBtn      = document.getElementById("loginBtn");
   const loginError    = document.getElementById("loginError");
   const togglePwd     = document.getElementById("togglePassword");
-  const tabs          = document.querySelectorAll(".login-tab");
   const ssoBtn        = document.getElementById("ssoBtn");
 
   // ─── demo credentials ─────────────────────────────────
   const DEMO_EMAIL    = "polina@example.com";
   const DEMO_PASSWORD = "1234";
-
-  // ─── tabs ─────────────────────────────────────────────
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-    });
-  });
 
   // ─── show/hide password ───────────────────────────────
   togglePwd.addEventListener("click", () => {

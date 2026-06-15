@@ -4,10 +4,11 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from pathlib import Path
 from datetime import date, datetime, timedelta
-from werkzeug.utils import secure_filename
 import requests
 import os
+import re
 import uuid
+import unicodedata
 import google.generativeai as genai
 
 # ─── App & Config ────────────────────────────────────────────────────────────
@@ -23,11 +24,13 @@ CORS(app)
 # Folder to save files
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+# NOTE: intentionally no MAX_CONTENT_LENGTH — on the dev server an exceeded limit resets
+# the connection mid-upload, which the browser sees as a generic network/fetch failure.
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://livu_user:12345678@localhost/livu_db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://livu_user:12345678@localhost/livu_db?charset=utf8mb4"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -198,6 +201,23 @@ class Document(db.Model):
 
 
 # ─── Helper Functions ─────────────────────────────────────────────────────────
+
+def make_storage_filename(student_id, original_filename):
+    """Build a unique, filesystem-safe upload name that PRESERVES Unicode characters
+    (e.g. Hebrew). werkzeug's secure_filename() strips every non-ASCII character, which
+    turned Hebrew filenames into an empty string and broke the upload; here we only drop
+    path-dangerous characters and keep the original (Hebrew/English) name readable."""
+    raw = os.path.basename(original_filename or "")
+    raw = unicodedata.normalize("NFC", raw)
+    base, ext = os.path.splitext(raw)
+    # keep Unicode letters/digits, dot, dash, parentheses; replace everything else
+    base = re.sub(r"[^\w.\-()]", "_", base, flags=re.UNICODE).strip("._ ")
+    ext = re.sub(r"[^\w.]", "", ext, flags=re.UNICODE)
+    if not base:
+        base = "file"
+    base = base[:120]  # keep well within the filename column limit, also for multibyte chars
+    return f"{student_id}_{uuid.uuid4().hex[:8]}_{base}{ext}"
+
 
 def _parse_due_date(value):
     if value is None or value == "":
@@ -446,7 +466,12 @@ def update_task(task_id):
 
 @app.route("/uploads/<path:filename>")
 def serve_upload(filename):
-    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+    # Guard against path traversal and report missing files clearly instead of a raw 404 page
+    safe = os.path.basename(filename)
+    if not safe or not os.path.exists(os.path.join(app.config["UPLOAD_FOLDER"], safe)):
+        return jsonify({"error": "הקובץ לא נמצא בשרת"}), 404
+    as_attachment = request.args.get("download") == "1"
+    return send_from_directory(app.config["UPLOAD_FOLDER"], safe, as_attachment=as_attachment)
 
 @app.route("/students/<int:student_id>/documents", methods=["GET"])
 def get_documents(student_id):
@@ -464,22 +489,33 @@ def upload_document(student_id):
         return jsonify({"error": "לא נבחר קובץ"}), 400
 
     file = request.files["file"]
-    safe_name = secure_filename(file.filename)
-    unique_filename = f"{student_id}_{uuid.uuid4().hex[:8]}_{safe_name}"
-    full_path = os.path.join(app.config["UPLOAD_FOLDER"], unique_filename)
-    file.save(full_path)
+    full_path = None
+    try:
+        # Preserve Hebrew/Unicode filenames (see make_storage_filename) instead of letting
+        # secure_filename() strip them, which is what previously broke Hebrew uploads.
+        unique_filename = make_storage_filename(student_id, file.filename)
+        full_path = os.path.join(app.config["UPLOAD_FOLDER"], unique_filename)
+        file.save(full_path)
+        doc = Document(
+            student_id=student_id,
+            name=name,
+            filename=unique_filename,
+            file_path=full_path,
+            doc_type="",
+            upload_date=date.today().strftime("%d/%m/%Y"),
+            status="הועלה"
+        )
+        db.session.add(doc)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        if full_path and os.path.exists(full_path):
+            try:
+                os.remove(full_path)
+            except OSError:
+                pass
+        return jsonify({"error": "שגיאה בשמירת המסמך בשרת"}), 500
 
-    doc = Document(
-        student_id=student_id,
-        name=name,
-        filename=unique_filename,
-        file_path=full_path,
-        doc_type="",
-        upload_date=date.today().strftime("%d/%m/%Y"),
-        status="הועלה"
-    )
-    db.session.add(doc)
-    db.session.commit()
     return jsonify(doc.to_dict()), 201
 
 @app.route("/documents/<int:document_id>", methods=["DELETE"])

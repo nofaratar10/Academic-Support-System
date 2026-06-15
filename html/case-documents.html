@@ -104,9 +104,15 @@
 
           <div class="table-footer documents-footer">
             <div class="documents-form">
-              <input type="text" id="docName" placeholder="שם מסמך" />
-              <input type="file" id="docFile" />
-              <button class="primary-btn" type="button" id="addDocumentBtn">העלאת מסמך </button>
+              <div class="doc-field">
+                <label for="docName" class="doc-field-label">שם מסמך <span style="color:#e03131;">*</span></label>
+                <input type="text" id="docName" maxlength="150" placeholder="לדוגמה: אישור מילואים" />
+              </div>
+              <div class="doc-field">
+                <label for="docFile" class="doc-field-label">קובץ <span style="color:#e03131;">*</span></label>
+                <input type="file" id="docFile" />
+              </div>
+              <button class="primary-btn" type="button" id="addDocumentBtn">העלאת מסמך</button>
             </div>
           </div>
         </section>

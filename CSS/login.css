@@ -114,6 +114,19 @@ body {
   color: #374151;
 }
 
+/* ─── הודעת יישום ─── */
+.login-implementation-note {
+  background: #eef4ff;
+  border: 1px solid #c7d9fb;
+  border-right: 4px solid #2f6df6;
+  color: #2c4a8a;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: right;
+}
+
 /* ─── טופס ─── */
 .login-form {
   display: flex;

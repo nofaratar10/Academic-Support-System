@@ -68,6 +68,13 @@ textarea {
   border-right: 4px solid #2563eb;
 }
 
+/* עמודים שאינם מיושמים בסדנה - עמעום חזותי */
+.main-nav a[href="/dashboard"],
+.main-nav a[href="/adjustments"],
+.main-nav a[href="/reports"] {
+  opacity: 0.45;
+}
+
 .sidebar-footer {
   margin-top: auto;
   padding-top: 18px;

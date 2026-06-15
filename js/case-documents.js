@@ -132,18 +132,29 @@ async function addDocument() {
   formData.append("name", name);
   formData.append("file", file);
 
+  addDocumentBtn.disabled = true;
   try {
     const res = await fetch(`/students/${studentId}/documents`, {
       method: "POST",
       body: formData
     });
-    if (!res.ok) throw new Error();
+    if (!res.ok) {
+      let msg = "שגיאה בהעלאת המסמך";
+      try {
+        const err = await res.json();
+        if (err && err.error) msg = err.error;
+      } catch { /* non-JSON error response */ }
+      showToast(msg);
+      return;
+    }
     docNameInput.value = "";
     docFileInput.value = "";
     showToast("המסמך הועלה בהצלחה");
     loadDocuments();
   } catch {
     showToast("שגיאה בהעלאת המסמך");
+  } finally {
+    addDocumentBtn.disabled = false;
   }
 }
 
