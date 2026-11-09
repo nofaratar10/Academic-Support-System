@@ -1,4 +1,4 @@
-# LIVU — Academic Student Support System
+#  Academic Student Support System
 
 **A web-based student support and case-management platform built as a B.Sc. Information Systems capstone project.**
 
@@ -29,7 +29,6 @@ Academic support processes can involve multiple stakeholders, scattered communic
 - Create tasks linked to individual students.
 - Update task statuses: **Open**, **In Progress**, or **Completed**.
 - Calculate progress percentages from completed tasks.
-- Award **10 points per completed task** and display progress indicators.
 - Highlight overdue work and display a student leaderboard.
 
 ### AI-powered assistance
@@ -47,12 +46,14 @@ The repository also includes interface mockups for a general dashboard, academic
 
 ## My contribution
 
-As part of the three-person development team, I worked on the **task-management and progress-tracking functionality**, including:
+As part of a three-person development team, I contributed to the system's technical architecture, development, and deployment.
+My key contributions included:
 
-- Designing the `tasks` data model and its relationship to student records.
-- Implementing and integrating task-related backend logic and API endpoints.
-- Calculating student progress and completion metrics returned as JSON.
-- Connecting the Flask API responses to JavaScript-based frontend views.
+-System Architecture & Technology Selection: Planned the application's technical architecture and selected the technology stack, including Flask, Python, JavaScript, and  MySQL.
+-AI Chatbot Development: Developed and integrated an AI-powered chatbot using the Google Gemini API.
+-API Integration: Configured the Gemini API integration and managed the API key using environment variables (.env).
+-Linux Server Deployment: Connected to a remote Linux server and uploaded the application files as part of the deployment process.
+-Full-Stack Development: Contributed to frontend and backend implementation across the system's workflows, collaborating with other team members.
 
 The project also involved end-to-end information-systems work, from understanding the support process and designing workflows to implementing and integrating system components.
 
@@ -67,19 +68,24 @@ The project also involved end-to-end information-systems work, from understandin
 | Integration | HTTP requests, JSON, Fetch API |
 | Development & hosting | Git, GitHub, Linux/Ubuntu |
 
-## Architecture
+## Deployment
 
-```mermaid
-flowchart TD
-    U[Support coordinator] --> UI[HTML / CSS / JavaScript interface]
-    UI -->|HTTP / JSON| API[Flask backend]
-    API --> ORM[SQLAlchemy]
-    ORM --> DB[(MySQL database)]
-    API -->|AI requests| AI[Google Gemini API]
-    API --> FILES[Uploaded documents]
-```
+The application was previously hosted on a remote Linux server for academic demonstration purposes. The hosted version is no longer available, but the source code remains accessible in this repository.
 
-The frontend communicates with Flask endpoints. The backend handles application logic, reads and writes student-related data through SQLAlchemy, stores uploaded documents, and calls Gemini for supported AI features.
+## System Architecture
+
+The system follows a client-server architecture and was deployed on a Linux-based hosting environment.
+
+![System Architecture](docs/architecture.png)
+
+-Frontend: HTML, CSS, and JavaScript provide the user interface.
+-Backend: Python and Flask handle application logic, API requests, and communication with the database.
+-Database: MySQL stores student records, support cases, tasks, tickets, messages, and document-related data.
+-AI Integration: Google Gemini API enables AI-powered chatbot assistance and text summarization.
+-Hosting: The application was deployed on a Linux server during the academic project. The hosted version is no longer available.
+
+The architecture separates the presentation layer, application logic, and data storage, while integrating external AI services through API calls.
+
 
 ### Main data entities
 
