@@ -10,7 +10,7 @@ LIVU helps academic support staff manage student cases, coordinate follow-up act
 
 Academic support processes can involve multiple stakeholders, scattered communications, separate documents, and manual follow-ups. Without a centralized view, it is difficult to understand a student's case history, identify pending tasks, and keep track of progress.
 
-**LIVU brings these activities into a single workflow**, giving support coordinators a clearer view of student needs, open requests, case documentation, and action items.
+**The system brings these activities into a single workflow**, giving support coordinators a clearer view of student needs, open requests, case documentation, and action items.
 
 ## Implemented features
 
@@ -76,7 +76,7 @@ The application was previously hosted on a remote Linux server for academic demo
 
 The system follows a client-server architecture and was deployed on a Linux-based hosting environment.
 
-![System Architecture](docs/architecture.png)
+<img src="./docs/architecture.png" alt="System Architecture" width="900">
 
 -Frontend: HTML, CSS, and JavaScript provide the user interface.
 -Backend: Python and Flask handle application logic, API requests, and communication with the database.
